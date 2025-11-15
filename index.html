@@ -51,11 +51,25 @@
 
         /* Animação de fade-in para telas */
         .screen {
-            display: none;
+            display: none; /* Oculto por padrão */
         }
+        
+        /* Correção para centralizar Login */
+        #login-screen.screen {
+            display: none; /* JS vai trocar para 'flex' */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+        }
+        #login-screen.screen.active {
+            display: flex; /* Garante a centralização */
+        }
+        
         .screen.active {
-            display: block;
+            display: block; /* Telas normais */
         }
+        
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -115,7 +129,7 @@
 <body class="bg-cinza-fundo text-azul-escuro overflow-x-hidden">
 
     <!-- Topo Fixo -->
-    <header id="main-header" class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
+    <header id="main-header" class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-md z-50 transition-all duration-300 hidden">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <!-- Logo e Nome (Editável) -->
             <div class="flex items-center space-x-3">
@@ -146,11 +160,11 @@
     </header>
 
     <!-- Conteúdo Principal -->
-    <main id="main-content" class="pt-24 container mx-auto px-6 py-8 transition-all duration-300">
+    <main id="main-content" class="container mx-auto px-6 py-8 transition-all duration-300">
 
         <!-- TELA 0: LOGIN -->
-        <section id="login-screen" class="screen fade-in">
-            <div class="max-w-md mx-auto mt-12">
+        <section id="login-screen" class="screen fade-in active">
+            <div class="max-w-md w-full mt-12">
                 <form id="login-form" class="auth-card p-8 rounded-xl shadow-lg">
                     <div class="text-center mb-6">
                         <div class="w-16 h-16 bg-azul-principal/20 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -176,7 +190,6 @@
                         </button>
                     </div>
                     
-                    <!-- Link de cadastro removido -->
                 </form>
             </div>
         </section>
@@ -205,11 +218,7 @@
                         <div>
                             <label for="register-role" class="block text-sm font-medium mb-1">Cargo</label>
                             <select id="register-role" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
-                                <option value="Atendente N1">Atendente Nível 1</option>
-                                <option value="Atendente N2">Atendente Nível 2</option>
-                                <option value="Atendente N3">Atendente Nível 3</option>
-                                <option value="Supervisor">Supervisor</option>
-                                <option value="Admin">Admin</option>
+                                <!-- Opções de cargo populadas por JS -->
                             </select>
                         </div>
                         <button type="submit" class="w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg">
@@ -229,7 +238,7 @@
         <section id="home-screen" class="screen fade-in">
             <h1 id="home-welcome-title" class="text-3xl font-bold mb-8 text-center"></h1>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 
                 <!-- Bloco Setor: Suporte Técnico -->
                 <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
@@ -247,9 +256,17 @@
                     <p class="text-cinza-texto">Instalação, manutenção de campo, equipamentos e agendamentos.</p>
                 </div>
                 
+                <!-- Bloco: Contatos de Emergência -->
+                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                     onclick="app.loadContacts()">
+                    <i class="ph-bold ph-phone-call text-7xl text-azul-principal mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2">Contatos de Emergência</h2>
+                    <p class="text-cinza-texto">Técnicos de plantão, supervisores e telefones de campo.</p>
+                </div>
+                
                 <!-- Bloco Admin: Gerenciar Conteúdo (CRUD de Artigos) -->
-                <div id="admin-articles-card" class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.promptAdminPassword('admin')"> <!-- Modificado -->
+                <div id="admin-articles-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                     onclick="app.promptAdminPassword('admin')">
                     <i class="ph-bold ph-pencil-simple-line text-7xl text-azul-principal mb-4"></i>
                     <h2 class="text-2xl font-bold mb-2">Gerenciar Conteúdo</h2>
                     <p class="text-cinza-texto">Adicionar, editar ou remover artigos da base de conhecimento.</p>
@@ -257,7 +274,7 @@
                 
                 <!-- Bloco Admin: Gerenciar Usuários (Somente Admin) -->
                 <div id="admin-users-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.promptAdminPassword('users-admin')"> <!-- Modificado -->
+                     onclick="app.promptAdminPassword('users-admin')">
                     <i class="ph-bold ph-users-three text-7xl text-azul-principal mb-4"></i>
                     <h2 class="text-2xl font-bold mb-2">Gerenciar Usuários</h2>
                     <p class="text-cinza-texto">Editar cargos, senhas e excluir usuários do sistema.</p>
@@ -454,6 +471,30 @@
             </form>
         </section>
 
+        <!-- TELA 6: CONTATOS DE EMERGÊNCIA (Com CRUD) -->
+        <section id="contacts-screen" class="screen fade-in max-w-4xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold">Contatos de Emergência</h1>
+                <button id="add-contact-btn" onclick="app.promptEditContact(null)" class="hidden bg-azul-principal text-white px-5 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center space-x-2">
+                    <i class="ph-bold ph-plus"></i>
+                    <span>Adicionar Contato</span>
+                </button>
+            </div>
+            
+            <!-- Barra de Busca de Contatos -->
+            <form class="relative mb-8">
+                <i class="ph-bold ph-magnifying-glass text-cinza-texto text-2xl absolute left-6 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="contacts-search-input" placeholder="Buscar por nome, cargo ou equipe..." class="huge-search-bar w-full text-lg pl-16 pr-6 py-5 rounded-xl border-2 border-transparent focus:border-azul-principal focus:ring-2 focus:ring-azul-principal/50 outline-none">
+            </form>
+
+            <div id="contacts-list" class="space-y-8">
+                <!-- Grupos de contatos serão populados pelo JS -->
+            </div>
+        </section>
         
         <!-- Alerta de "Copiado!" -->
         <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
@@ -468,7 +509,7 @@
     <!-- MODAIS (Fora do <main> para garantir o z-index) -->
 
     <!-- MODAL: Verificação de Senha Admin -->
-    <div id="admin-password-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+    <div id="admin-password-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <form id="admin-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
             <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Acesso Restrito</h2>
             <p class="text-cinza-texto text-center mb-6">Por favor, insira a senha mestra de administrador para continuar.</p>
@@ -483,7 +524,7 @@
             </div>
             
             <div class="flex items-center justify-end space-x-4 mt-6">
-                <button type="button" id="admin-pass-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                <button type="button" id="admin-pass-cancel" onclick="app.toggleAdminPasswordModal(false)" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
                     Cancelar
                 </button>
                 <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
@@ -494,7 +535,7 @@
     </div>
 
     <!-- MODAL: Alteração de Senha Pessoal -->
-    <div id="change-password-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+    <div id="change-password-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <form id="change-my-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
             <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Alterar Minha Senha</h2>
             
@@ -528,7 +569,7 @@
     </div>
 
     <!-- MODAL: Editar Usuário (Admin) -->
-    <div id="edit-user-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+    <div id="edit-user-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <form id="edit-user-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
             <h2 class="text-2xl font-bold text-azul-escuro mb-6">Editar Usuário</h2>
             <input type="hidden" id="edit-user-id">
@@ -569,12 +610,49 @@
         </form>
     </div>
 
+    <!-- NOVO MODAL: Adicionar/Editar Contato (Admin) -->
+    <div id="edit-contact-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+        <form id="edit-contact-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
+            <h2 id="edit-contact-title" class="text-2xl font-bold text-azul-escuro mb-6">Adicionar Contato</h2>
+            <input type="hidden" id="edit-contact-id">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="edit-contact-name" class="block text-sm font-medium mb-1">Nome Completo</label>
+                    <input type="text" id="edit-contact-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+                <div>
+                    <label for="edit-contact-phone" class="block text-sm font-medium mb-1">Telefone</label>
+                    <input type="text" id="edit-contact-phone" placeholder="(00) 90000-0000" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+                <div>
+                    <label for="edit-contact-team" class="block text-sm font-medium mb-1">Equipe</label>
+                    <input type="text" id="edit-contact-team" placeholder="Ex: Operacional" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+                 <div>
+                    <label for="edit-contact-role" class="block text-sm font-medium mb-1">Cargo / Função</label>
+                    <input type="text" id="edit-contact-role" placeholder="Ex: Técnico de Plantão" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-4 mt-6">
+                <button type="button" id="edit-contact-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+                    Salvar Contato
+                </button>
+            </div>
+        </form>
+    </div>
+
 
     <script>
         // Simulação de um banco de dados
         const mockDB = {
             masterPassword: "admin123", // Senha mestra
             nextUserId: 4,
+            nextContactId: 5,
             users: [
                 { id: 1, name: "Ana Sousa", username: "ana", password: "123", role: "Atendente N1", avatar: "https://placehold.co/100x100/4FA3FF/FFFFFF?text=A&font=inter" },
                 { id: 2, name: "Bruno Costa", username: "bruno", password: "123", role: "Supervisor", avatar: "https://placehold.co/100x100/1F2F4B/FFFFFF?text=B&font=inter" },
@@ -650,6 +728,12 @@
                     tags: ["onu", "olt", "provisionar", "ativacao", "novo cliente"],
                     updated_at: "09/11/2025"
                 }
+            ],
+            contacts: [
+                { id: 1, name: "Marcos Oliveira", role: "Técnico de Campo (Plantão)", team: "Operacional", phone: "(00) 98888-1234" },
+                { id: 2, name: "Carla Mendes", role: "Supervisora (Plantão NOC)", team: "Suporte Avançado", phone: "(00) 99999-4321" },
+                { id: 3, name: "Equipe NOC N2", role: "Fila de Atendimento", team: "Suporte Avançado", phone: "0800-000-002" },
+                { id: 4, name: "Ricardo Almeida", role: "Técnico de Fibra (Plantão)", team: "Operacional", phone: "(00) 97777-5555" }
             ]
         };
 
@@ -662,6 +746,7 @@
             editingArticleId: null, // Para saber se estamos editando ou criando
             adminTargetScreen: null, // Para onde ir após senha mestra
             roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], // Cargos Padrão
+            editingContactId: null, // Para CRUD de contatos
 
             init() {
                 // Formulários de Autenticação
@@ -671,7 +756,8 @@
                 // Navegação e Busca
                 document.getElementById('search-input').addEventListener('input', (e) => this.search(e.target.value));
                 document.getElementById('search-form').addEventListener('submit', (e) => e.preventDefault());
-
+                document.getElementById('contacts-search-input').addEventListener('input', (e) => app.loadContacts(e.target.value));
+                
                 // Admin CRUD Artigos
                 document.getElementById('admin-form').addEventListener('submit', (e) => this.handleFormSubmit(e));
                 document.getElementById('admin-form-cancel').addEventListener('click', () => this.resetForm());
@@ -688,6 +774,12 @@
                 
                 document.getElementById('change-master-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleChangeMasterPassword(); });
 
+                // NOVO: CRUD de Contatos
+                document.getElementById('edit-contact-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleEditContact(); });
+                document.getElementById('edit-contact-cancel').addEventListener('click', () => this.toggleEditContactModal(false));
+
+                // Popula selects de cargo
+                this.populateRoleSelects();
 
                 // Mostra a tela inicial (login)
                 this.showScreen('login');
@@ -697,32 +789,38 @@
             
             showScreen(screenId) {
                 // Lógica de proteção de rotas
-                const authScreens = ['login', 'register'];
+                const authScreens = ['login']; 
                 const isAuthScreen = authScreens.includes(screenId);
-                const adminScreens = ['admin', 'users-admin'];
-                const isProtectedScreen = adminScreens.includes(screenId);
-
-                // Oculta header em telas de auth
-                document.getElementById('main-header').classList.toggle('hidden', isAuthScreen);
-                document.getElementById('main-content').classList.toggle('pt-24', !isAuthScreen); // Ajusta padding
+                const adminScreens = ['admin', 'users-admin', 'register']; 
+                
+                // Oculta/Mostra header
+                const header = document.getElementById('main-header');
+                const main = document.getElementById('main-content');
+                if (isAuthScreen) {
+                    header.classList.add('hidden');
+                    main.classList.remove('pt-24');
+                } else {
+                    header.classList.remove('hidden');
+                    main.classList.add('pt-24');
+                }
 
                 if (!this.currentUser && !isAuthScreen) {
-                    // Se não está logado e tenta acessar tela protegida, vai para login
                     screenId = 'login';
                 } else if (this.currentUser && isAuthScreen) {
-                    // Se está logado e tenta acessar login/registro (exceto se for admin indo para registro)
-                    if (screenId !== 'register' || this.currentUser.role !== 'Admin') {
-                         screenId = 'home';
-                    }
+                    screenId = 'home';
                 }
                 
                 // Proteção extra para admin
-                if (isProtectedScreen && (!this.currentUser || (this.currentUser.role !== 'Admin' && this.currentUser.role !== 'Supervisor'))) {
-                    if (screenId === 'users-admin' && this.currentUser.role !== 'Admin') {
-                        this.showAlert('Acesso negado. Apenas Admins.', true);
+                if (this.currentUser) {
+                    const isSupervisorOrAdmin = ['Supervisor', 'Admin'].includes(this.currentUser.role);
+                    const isAdmin = this.currentUser.role === 'Admin';
+
+                    if (screenId === 'admin' && !isSupervisorOrAdmin) {
+                        this.showAlert('Acesso negado. Apenas Supervisor ou Admin.', true);
                         screenId = 'home';
-                    } else if (screenId === 'admin') {
-                         this.showAlert('Acesso negado. Apenas Supervisor ou Admin.', true);
+                    }
+                    if ((screenId === 'users-admin' || screenId === 'register') && !isAdmin) {
+                         this.showAlert('Acesso negado. Apenas Admins.', true);
                          screenId = 'home';
                     }
                 }
@@ -730,34 +828,42 @@
 
                 document.querySelectorAll('.screen').forEach(screen => {
                     screen.classList.remove('active', 'fade-in');
+                    screen.style.display = 'none'; // Correção do Bug
                 });
                 
                 const activeScreen = document.getElementById(`${screenId}-screen`);
                 
                 if (activeScreen) {
+                    // Correção de display para login
+                    if (screenId === 'login') {
+                        activeScreen.style.display = 'flex';
+                    } else {
+                         activeScreen.style.display = 'block';
+                    }
+
                     activeScreen.classList.add('active');
-                    // Força re-flow para a animação
                     void activeScreen.offsetWidth; 
                     activeScreen.classList.add('fade-in');
                     
-                    window.scrollTo(0, 0); // Rola para o topo
-                    this.currentScreen = screenId;
+                    window.scrollTo(0, 0); 
+                    this.currentScreen = screenId; // CORREÇÃO: Armazena o ID base
 
                     // Ações específicas ao entrar na tela
                     if(screenId === 'admin') {
-                        this.loadAdminList(); // Recarrega a lista ao entrar
+                        this.loadAdminList(); 
                         this.resetForm();
                     }
-                    if(screenId === 'users-admin' && this.currentUser && this.currentUser.role === 'Admin') {
+                    if(screenId === 'users-admin' && this.currentUser?.role === 'Admin') {
                         this.loadUsersAdminList();
                     }
+                    if (screenId === 'contacts') {
+                        this.loadContacts(); // Carrega contatos e decide se mostra botões admin
+                    }
                     
-                    // Atualiza a UI se o usuário estiver logado
                     if (this.currentUser) {
                         this.updateUI();
                     }
                     
-                    // Mostra ou oculta o menu do usuário
                     document.getElementById('user-profile-menu').classList.toggle('hidden', !this.currentUser);
                     document.getElementById('user-profile-menu').classList.toggle('flex', !!this.currentUser);
 
@@ -769,7 +875,6 @@
 
             goBackToSector() {
                 this.showScreen('sector');
-                // Limpa a busca ao voltar
                 document.getElementById('search-input').value = '';
                 this.toggleSearchResults(false);
             },
@@ -780,10 +885,9 @@
                 if (!sector) return;
 
                 document.getElementById('sector-title').innerText = sector.name;
-                document.getElementById('search-input').value = ''; // Limpa busca
+                document.getElementById('search-input').value = ''; 
                 this.toggleSearchResults(false);
                 
-                // Popula categorias dinamicamente
                 this.loadCategories(sectorId);
                 
                 this.showScreen('sector');
@@ -793,10 +897,8 @@
                 const listEl = document.getElementById('categories-list');
                 const articlesInSector = this.db.articles.filter(a => a.sector_id === sectorId);
                 
-                // Mapeia categorias únicas
                 const categories = [...new Set(articlesInSector.map(a => a.category))];
                 
-                // Ícones padrão para categorias
                 const icons = {
                     "Problemas Comuns": "ph-warning-circle",
                     "Procedimentos": "ph-list-checks",
@@ -805,7 +907,7 @@
                     "default": "ph-book-open"
                 };
                 
-                listEl.innerHTML = ''; // Limpa
+                listEl.innerHTML = ''; 
                 categories.forEach(category => {
                     const icon = icons[category] || icons['default'];
                     listEl.innerHTML += `
@@ -815,6 +917,76 @@
                         </div>
                     `;
                 });
+            },
+
+            // LÓGICA DE CONTATOS (Com CRUD)
+            loadContacts(searchQuery = '') {
+                // CORREÇÃO: Verifica se a tela atual é 'contacts', não 'contacts-screen'
+                if (this.currentScreen !== 'contacts') { 
+                    this.showScreen('contacts'); // CORREÇÃO: Chama o ID base
+                    return; 
+                }
+                
+                const listEl = document.getElementById('contacts-list');
+                const lowerQuery = searchQuery.toLowerCase().trim();
+                const isAdmin = this.currentUser && this.currentUser.role === 'Admin';
+
+                // Mostra/oculta botão de Adicionar
+                document.getElementById('add-contact-btn').classList.toggle('hidden', !isAdmin);
+
+                let filteredContacts = this.db.contacts;
+
+                if (lowerQuery.length > 0) {
+                    filteredContacts = this.db.contacts.filter(c => 
+                        c.name.toLowerCase().includes(lowerQuery) ||
+                        c.role.toLowerCase().includes(lowerQuery) ||
+                        c.team.toLowerCase().includes(lowerQuery)
+                    );
+                }
+
+                const groups = filteredContacts.reduce((acc, contact) => {
+                    (acc[contact.team] = acc[contact.team] || []).push(contact);
+                    return acc;
+                }, {});
+
+                listEl.innerHTML = ''; 
+
+                if (filteredContacts.length === 0) {
+                    listEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhum contato encontrado.</p>';
+                    return;
+                }
+
+                for (const team in groups) {
+                    const contactsHTML = groups[team].map(contact => `
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-4">
+                            <div>
+                                <h4 class="font-semibold">${contact.name}</h4>
+                                <p class="text-sm text-cinza-texto">${contact.role}</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-shrink-0">
+                                <a href="tel:${contact.phone}" class="bg-azul-principal text-white px-4 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all text-sm flex items-center justify-center space-x-2 w-full">
+                                    <i class="ph-bold ph-phone"></i>
+                                    <span>${contact.phone}</span>
+                                </a>
+                                ${isAdmin ? `
+                                <div class="flex gap-2 w-full">
+                                    <button onclick="app.promptEditContact(${contact.id})" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 text-sm flex-1 justify-center">Editar</button>
+                                    <button onclick="app.deleteContact(${contact.id})" class="bg-vermelho-erro/20 text-vermelho-erro px-4 py-2 rounded-lg font-medium hover:bg-vermelho-erro/30 text-sm flex-1 justify-center">Excluir</button>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+
+                    listEl.innerHTML += `
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold mb-4">${team}</h2>
+                            <div class="space-y-4">
+                                ${contactsHTML}
+                            </div>
+                        </div>
+                    `;
+                }
             },
 
             // --- LÓGICA DE ARTIGOS E BUSCA ---
@@ -841,11 +1013,10 @@
                 this.showScreen('article');
             },
 
-            // Simulação de "Fuzzy Search"
             search(query) {
                 const lowerQuery = query.toLowerCase().trim();
                 if (lowerQuery.length < 2) {
-                    this.toggleSearchResults(false); // Esconde resultados se busca for curta
+                    this.toggleSearchResults(false); 
                     return;
                 }
 
@@ -863,7 +1034,7 @@
 
             renderSearchResults(results) {
                 const resultsEl = document.getElementById('search-results');
-                resultsEl.innerHTML = ''; // Limpa resultados anteriores
+                resultsEl.innerHTML = ''; 
 
                 if (results.length === 0) {
                     resultsEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhum resultado encontrado.</p>';
@@ -965,7 +1136,6 @@
                 const role = document.getElementById('register-role').value;
                 const errorEl = document.getElementById('register-error');
                 
-                // Verifica se usuário já existe
                 const existingUser = this.db.users.find(u => u.username === username);
                 if (existingUser) {
                     errorEl.innerText = 'Este nome de usuário já está em uso.';
@@ -973,8 +1143,7 @@
                     return;
                 }
                 
-                // Cria novo usuário
-                const newId = this.db.nextUserId++; // Usa o contador
+                const newId = this.db.nextUserId++; 
                 const newUser = {
                     id: newId,
                     name: name,
@@ -986,7 +1155,7 @@
                 
                 this.db.users.push(newUser);
                 this.showAlert(`Usuário ${name} cadastrado com sucesso!`);
-                this.showScreen('users-admin'); // Volta para a tela de admin
+                this.showScreen('users-admin'); 
                 errorEl.classList.add('hidden');
                 document.getElementById('register-form').reset();
             },
@@ -999,25 +1168,19 @@
             updateUI() {
                 if (!this.currentUser) return;
                 
-                // Atualiza Header
                 document.getElementById('user-profile-name').innerText = this.currentUser.name;
                 document.getElementById('user-profile-role').innerText = this.currentUser.role;
                 document.getElementById('user-profile-avatar').src = this.currentUser.avatar;
                 document.getElementById('user-profile-avatar').alt = `Avatar de ${this.currentUser.name}`;
                 
-                // Atualiza Título da Home
                 const firstName = this.currentUser.name.split(' ')[0];
                 document.getElementById('home-welcome-title').innerText = `Bem-vindo(a), ${firstName}. O que você precisa?`;
 
-                // Controla visibilidade dos cards de Admin na Home
                 const adminRoles = ['Supervisor', 'Admin'];
                 const articleAdminCard = document.getElementById('admin-articles-card');
                 const userAdminCard = document.getElementById('admin-users-card');
 
-                // Gerenciar Conteúdo (Artigos) - Supervisor ou Admin
                 articleAdminCard.classList.toggle('hidden', !adminRoles.includes(this.currentUser.role));
-
-                // Gerenciar Usuários - Apenas Admin
                 userAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
             },
 
@@ -1033,7 +1196,7 @@
 
                 articlesToManage.forEach(article => {
                     listEl.innerHTML += `
-                        <div class="flex justify-between items-center bg-cinza-fundo p-4 rounded-lg">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-2">
                             <div>
                                 <h4 class="font-semibold">${article.title}</h4>
                                 <span class="text-sm text-cinza-texto">${this.db.sectors.find(s => s.id === article.sector_id).name}</span>
@@ -1070,14 +1233,12 @@
                 };
 
                 if (this.editingArticleId) {
-                    // Atualiza Artigo
                     const index = this.db.articles.findIndex(a => a.id === this.editingArticleId);
                     if (index !== -1) {
                         this.db.articles[index] = { ...this.db.articles[index], ...newArticleData };
                         this.showAlert('Artigo atualizado com sucesso!');
                     }
                 } else {
-                    // Cria Novo Artigo
                     const newId = this.db.articles.length > 0 ? Math.max(...this.db.articles.map(a => a.id)) + 1 : 1;
                     this.db.articles.push({ id: newId, ...newArticleData });
                     this.showAlert('Artigo criado com sucesso!');
@@ -1108,11 +1269,13 @@
             },
 
             deleteArticle(articleId) {
-                const index = this.db.articles.findIndex(a => a.id === articleId);
-                if (index !== -1) {
-                    this.db.articles.splice(index, 1);
-                    this.showAlert('Artigo excluído com sucesso.', true);
-                    this.loadAdminList();
+                if (confirm('Tem certeza que deseja excluir este artigo?')) {
+                    const index = this.db.articles.findIndex(a => a.id === articleId);
+                    if (index !== -1) {
+                        this.db.articles.splice(index, 1);
+                        this.showAlert('Artigo excluído com sucesso.', true);
+                        this.loadAdminList();
+                    }
                 }
             },
 
@@ -1124,6 +1287,15 @@
             },
 
             // --- LÓGICA DE ADMIN (Gerenciar Usuários) ---
+            
+            populateRoleSelects() {
+                const roles = this.roles;
+                const registerSelect = document.getElementById('register-role');
+                const editSelect = document.getElementById('edit-user-role');
+                
+                registerSelect.innerHTML = roles.map(role => `<option value="${role}">${role}</option>`).join('');
+                editSelect.innerHTML = roles.map(role => `<option value="${role}">${role}</option>`).join('');
+            },
 
             loadUsersAdminList() {
                 const listEl = document.getElementById('users-admin-list');
@@ -1135,7 +1307,6 @@
                 this.db.users.forEach(user => {
                     const isCurrentUser = user.id === this.currentUser.id;
 
-                    // Cria as opções do select
                     const options = roles.map(role => 
                         `<option value="${role}" ${user.role === role ? 'selected' : ''}>${role}</option>`
                     ).join('');
@@ -1169,19 +1340,18 @@
                 const userIndex = this.db.users.findIndex(u => u.id === userId);
                 if (userIndex === -1) return;
 
-                // Não permite rebaixar o último admin
                 if (this.db.users[userIndex].role === 'Admin' && newRole !== 'Admin') {
                     const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
                     if (adminCount <= 1) {
                         this.showAlert('Não é possível alterar o cargo do último Admin.', true);
-                        this.loadUsersAdminList(); // Recarrega para reverter a mudança visual
+                        this.loadUsersAdminList(); 
                         return;
                     }
                 }
 
                 this.db.users[userIndex].role = newRole;
                 this.showAlert(`Cargo de ${this.db.users[userIndex].name} atualizado para ${newRole}!`);
-                this.loadUsersAdminList(); // Recarrega a lista
+                this.loadUsersAdminList(); 
             },
 
             deleteUser(userId) {
@@ -1189,31 +1359,32 @@
                     this.showAlert('Você não pode excluir sua própria conta.', true);
                     return;
                 }
-                
+
                 const userIndex = this.db.users.findIndex(u => u.id === userId);
                 if (userIndex === -1) return;
 
                 const userName = this.db.users[userIndex].name;
-
-                // Não permite excluir o último admin
-                if (this.db.users[userIndex].role === 'Admin') {
-                    const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
-                    if (adminCount <= 1) {
-                        this.showAlert('Não é possível excluir o último Admin do sistema.', true);
-                        return;
-                    }
-                }
                 
-                this.db.users.splice(userIndex, 1);
-                this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
-                this.loadUsersAdminList(); // Recarrega a lista
+                if (confirm(`Tem certeza que deseja excluir o usuário ${userName}?`)) {
+                    if (this.db.users[userIndex].role === 'Admin') {
+                        const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+                        if (adminCount <= 1) {
+                            this.showAlert('Não é possível excluir o último Admin do sistema.', true);
+                            return;
+                        }
+                    }
+                    
+                    this.db.users.splice(userIndex, 1);
+                    this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
+                    this.loadUsersAdminList(); 
+                }
             },
 
             // --- LÓGICA DOS MODAIS (SENHAS, EDIÇÃO) ---
 
             // Senha Mestra
             promptAdminPassword(target) {
-                this.adminTargetScreen = target; // Salva aonde ir (ex: 'admin' ou 'users-admin')
+                this.adminTargetScreen = target; 
                 document.getElementById('admin-pass-form').reset();
                 document.getElementById('admin-pass-error').classList.add('hidden');
                 this.toggleAdminPasswordModal(true);
@@ -1231,7 +1402,7 @@
 
                 if (password === this.db.masterPassword) {
                     this.toggleAdminPasswordModal(false);
-                    this.showScreen(this.adminTargetScreen); // Vai para o destino salvo
+                    this.showScreen(this.adminTargetScreen); 
                 } else {
                     errorEl.classList.remove('hidden');
                     this.shakeElement('admin-pass-form');
@@ -1305,12 +1476,9 @@
                 document.getElementById('edit-user-id').value = user.id;
                 document.getElementById('edit-user-name').value = user.name;
                 document.getElementById('edit-user-username').value = user.username;
-                
-                // Popula o select de cargos
+
                 const roleSelect = document.getElementById('edit-user-role');
-                roleSelect.innerHTML = this.roles.map(role => 
-                    `<option value="${role}" ${user.role === role ? 'selected' : ''}>${role}</option>`
-                ).join('');
+                roleSelect.value = user.role;
                 
                 this.toggleEditUserModal(true);
             },
@@ -1337,7 +1505,6 @@
                     return;
                 }
                 
-                // Verifica se o novo username já existe (e não é do próprio usuário)
                 if (this.db.users.some(u => u.username === username && u.id !== userId)) {
                     errorEl.innerText = 'Este nome de usuário já está em uso.';
                     errorEl.classList.remove('hidden');
@@ -1348,9 +1515,11 @@
                 this.db.users[userIndex].name = name;
                 this.db.users[userIndex].username = username;
                 
-                // Lógica de segurança para cargo
-                this.updateUserRole(userId, role); // Usa a função que já tem a trava de segurança
-                this.db.users[userIndex].role = document.getElementById('edit-user-role').value; // Garante que o select foi lido
+                // Lógica de segurança para cargo (só atualiza se a função de updateRole permitir)
+                const currentRole = this.db.users[userIndex].role;
+                if (currentRole !== role) {
+                    this.updateUserRole(userId, role); // Usa a função que já tem a trava de segurança
+                }
                 
                 if (newPassword.trim().length > 0) {
                     if (newPassword.trim().length < 3) {
@@ -1363,7 +1532,7 @@
                 
                 this.showAlert(`Usuário ${name} atualizado com sucesso!`);
                 this.toggleEditUserModal(false);
-                this.loadUsersAdminList(); // Recarrega a lista
+                this.loadUsersAdminList(); 
             },
 
             // Senha Mestra
@@ -1401,6 +1570,75 @@
                 successEl.innerText = 'Senha mestra alterada com sucesso!';
                 successEl.classList.remove('hidden');
                 document.getElementById('change-master-pass-form').reset();
+            },
+
+            // NOVO: CRUD de Contatos
+            promptEditContact(contactId) {
+                document.getElementById('edit-contact-form').reset();
+                this.editingContactId = contactId;
+
+                if (contactId === null) {
+                    // Adicionando
+                    document.getElementById('edit-contact-title').innerText = 'Adicionar Novo Contato';
+                } else {
+                    // Editando
+                    document.getElementById('edit-contact-title').innerText = 'Editar Contato';
+                    const contact = this.db.contacts.find(c => c.id === contactId);
+                    if (contact) {
+                        document.getElementById('edit-contact-id').value = contact.id;
+                        document.getElementById('edit-contact-name').value = contact.name;
+                        document.getElementById('edit-contact-phone').value = contact.phone;
+                        document.getElementById('edit-contact-team').value = contact.team;
+                        document.getElementById('edit-contact-role').value = contact.role;
+                    }
+                }
+                this.toggleEditContactModal(true);
+            },
+
+            toggleEditContactModal(show) {
+                const modal = document.getElementById('edit-contact-modal');
+                modal.classList.toggle('hidden', !show);
+                modal.classList.toggle('flex', show);
+            },
+
+            handleEditContact() {
+                const name = document.getElementById('edit-contact-name').value;
+                const phone = document.getElementById('edit-contact-phone').value;
+                const team = document.getElementById('edit-contact-team').value;
+                const role = document.getElementById('edit-contact-role').value;
+
+                if (!name || !phone || !team || !role) {
+                    this.showAlert('Todos os campos são obrigatórios.', true);
+                    return;
+                }
+
+                if (this.editingContactId === null) {
+                    // Adicionar
+                    const newId = this.db.nextContactId++;
+                    this.db.contacts.push({ id: newId, name, phone, team, role });
+                    this.showAlert('Contato adicionado com sucesso!');
+                } else {
+                    // Editar
+                    const index = this.db.contacts.findIndex(c => c.id === this.editingContactId);
+                    if (index !== -1) {
+                        this.db.contacts[index] = { id: this.editingContactId, name, phone, team, role };
+                        this.showAlert('Contato atualizado com sucesso!');
+                    }
+                }
+
+                this.toggleEditContactModal(false);
+                this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
+            },
+
+            deleteContact(contactId) {
+                if (confirm('Tem certeza que deseja excluir este contato?')) {
+                    const index = this.db.contacts.findIndex(c => c.id === contactId);
+                    if (index !== -1) {
+                        this.db.contacts.splice(index, 1);
+                        this.showAlert('Contato excluído com sucesso.', true);
+                        this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
+                    }
+                }
             }
         };
 
