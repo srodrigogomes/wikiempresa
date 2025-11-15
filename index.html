@@ -30,6 +30,7 @@
             --cinza-texto: #9AA1AC;
             --verde-sucesso: #76D19B;
             --vermelho-erro: #E87A7A;
+            --amarelo-aviso: #facc15; /* Amarelo (para histórico) */
         }
 
         /* Aplicação das cores do Tailwind (para o config) */
@@ -38,12 +39,14 @@
         .bg-cinza-fundo { background-color: var(--cinza-fundo); }
         .bg-verde-sucesso { background-color: var(--verde-sucesso); }
         .bg-vermelho-erro { background-color: var(--vermelho-erro); }
+        .bg-amarelo-aviso { background-color: var(--amarelo-aviso); }
 
         .text-azul-principal { color: var(--azul-principal); }
         .text-azul-escuro { color: var(--azul-escuro); }
         .text-cinza-texto { color: var(--cinza-texto); }
         .text-verde-sucesso { color: var(--verde-sucesso); }
         .text-vermelho-erro { color: var(--vermelho-erro); }
+        .text-amarelo-aviso { color: var(--amarelo-aviso); }
         
         .hover\:bg-vermelho-erro\/20:hover { background-color: rgba(232, 122, 122, 0.2); }
         .hover\:bg-vermelho-erro\/30:hover { background-color: rgba(232, 122, 122, 0.3); }
@@ -293,6 +296,14 @@
                     <p class="text-cinza-texto">Editar cargos, senhas e excluir usuários do sistema.</p>
                 </div>
 
+                <!-- NOVO Bloco Admin: Histórico (Somente Admin) -->
+                <div id="admin-history-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                     onclick="app.accessAdminScreen('history')">
+                    <i class="ph-bold ph-clock-counter-clockwise text-7xl text-amarelo-aviso mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2">Histórico de Edições</h2>
+                    <p class="text-cinza-texto">Verificar e reverter alterações feitas no sistema.</p>
+                </div>
+
             </div>
         </section>
 
@@ -322,7 +333,7 @@
             <div id="categories-container">
                 <h2 class="text-2xl font-bold mb-6">Categorias Principais</h2>
                 <div id="categories-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <!-- Categorias populadas por JS -->
+                        <!-- Categorias populadas por JS -->
                 </div>
             </div>
         </section>
@@ -508,6 +519,25 @@
                 <!-- Grupos de contatos serão populados pelo JS -->
             </div>
         </section>
+
+        <!-- NOVA TELA 7: HISTÓRICO (Admin) -->
+        <section id="history-screen" class="screen fade-in max-w-4xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold">Histórico de Edições</h1>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                 <h2 class="text-2xl font-bold mb-6">Log de Alterações</h2>
+                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Exibindo as alterações mais recentes primeiro. A reversão de uma ação também gera um log.</p>
+                 <div class="space-y-4" id="history-log-list">
+                     <!-- Lista de logs será populada pelo JS -->
+                 </div>
+            </div>
+        </section>
         
         <!-- Alerta de "Copiado!" -->
         <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
@@ -688,6 +718,7 @@
             masterPassword: "admin123", // Senha mestra
             nextUserId: 4,
             nextContactId: 5,
+            nextLogId: 1, // NOVO
             users: [
                 { id: 1, name: "Ana Sousa", username: "ana", password: "123", role: "Atendente N1", avatar: "https://placehold.co/100x100/4FA3FF/FFFFFF?text=A&font=inter" },
                 { id: 2, name: "Bruno Costa", username: "bruno", password: "123", role: "Supervisor", avatar: "https://placehold.co/100x100/1F2F4B/FFFFFF?text=B&font=inter" },
@@ -769,6 +800,13 @@
                 { id: 2, name: "Carla Mendes", role: "Supervisora (Plantão NOC)", team: "Suporte Avançado", phone: "(00) 99999-4321" },
                 { id: 3, name: "Equipe NOC N2", role: "Fila de Atendimento", team: "Suporte Avançado", phone: "0800-000-002" },
                 { id: 4, name: "Ricardo Almeida", role: "Técnico de Fibra (Plantão)", team: "Operacional", phone: "(00) 97777-5555" }
+            ],
+            // NOVO: Log de Auditoria
+            auditLog: [
+                // Exemplo de entrada:
+                // { id: 1, timestamp: '15/11/2025 10:30:05', userId: 3, userName: 'Admin Mestre', 
+                //   action: 'update', entityType: 'article', entityId: 1, entityName: 'Cliente sem conexão...', 
+                //   previousState: { ...artigo_antigo }, newState: { ...artigo_novo }, reverted: false }
             ]
         };
 
@@ -831,7 +869,8 @@
                 // Lógica de proteção de rotas
                 const authScreens = ['login']; 
                 const isAuthScreen = authScreens.includes(screenId);
-                const adminScreens = ['admin', 'users-admin', 'register']; 
+                // adminScreens agora inclui 'history'
+                const adminScreens = ['admin', 'users-admin', 'register', 'history']; 
                 
                 // Oculta/Mostra header
                 const header = document.getElementById('main-header');
@@ -859,7 +898,7 @@
                         this.showAlert('Acesso negado. Apenas Nível 3 ou superior.', true); // <-- MODIFICADO
                         screenId = 'home';
                     }
-                    if ((screenId === 'users-admin' || screenId === 'register') && !isAdmin) {
+                    if ((screenId === 'users-admin' || screenId === 'register' || screenId === 'history') && !isAdmin) {
                          this.showAlert('Acesso negado. Apenas Admins.', true);
                          screenId = 'home';
                     }
@@ -898,6 +937,10 @@
                     }
                     if (screenId === 'contacts') {
                         this.loadContacts(); // Carrega contatos e decide se mostra botões admin
+                    }
+                    // NOVO: Carrega histórico ao entrar na tela
+                    if (screenId === 'history' && this.currentUser?.role === 'Admin') {
+                        this.loadHistory();
                     }
                     
                     if (this.currentUser) {
@@ -1108,6 +1151,43 @@
 
             // --- UTILITÁRIOS ---
 
+            // NOVO: Função para clonar objetos para o log (evita problemas de referência)
+            clone(obj) {
+                if (obj === null || typeof obj !== 'object') {
+                    return obj;
+                }
+                try {
+                    return JSON.parse(JSON.stringify(obj));
+                } catch (e) {
+                    console.error("Falha ao clonar objeto:", obj, e);
+                    return null;
+                }
+            },
+
+            // NOVO: Função central de log
+            logAction(action, entityType, entityId, entityName, previousState, newState) {
+                if (!this.currentUser) {
+                    console.warn("Tentativa de log sem usuário. Ação:", action, entityType);
+                    return;
+                }
+                
+                const logEntry = {
+                    id: this.db.nextLogId++,
+                    timestamp: new Date().toLocaleString('pt-BR'),
+                    userId: this.currentUser.id,
+                    userName: this.currentUser.name,
+                    action: action, // 'create', 'update', 'delete', 'revert'
+                    entityType: entityType, // 'article', 'user', 'contact', 'masterPassword', 'userPassword'
+                    entityId: entityId,
+                    entityName: entityName, // Título do artigo, nome do usuário, etc.
+                    previousState: this.clone(previousState), // Estado anterior
+                    newState: this.clone(newState), // Novo estado
+                    reverted: false // Se este log específico já foi revertido
+                };
+                
+                this.db.auditLog.push(logEntry);
+            },
+
             copyMessage(text) {
                 const textarea = document.getElementById('copy-textarea');
                 textarea.value = text;
@@ -1197,6 +1277,10 @@
                 };
                 
                 this.db.users.push(newUser);
+                
+                // LOG
+                this.logAction('create', 'user', newId, name, null, newUser);
+                
                 this.showAlert(`Usuário ${name} cadastrado com sucesso!`);
                 this.showScreen('users-admin'); 
                 errorEl.classList.add('hidden');
@@ -1222,9 +1306,11 @@
                 const contentAdminRoles = ['Atendente N3', 'Supervisor', 'Admin']; // <-- MODIFICADO
                 const articleAdminCard = document.getElementById('admin-articles-card');
                 const userAdminCard = document.getElementById('admin-users-card');
+                const historyAdminCard = document.getElementById('admin-history-card'); // NOVO
 
                 articleAdminCard.classList.toggle('hidden', !contentAdminRoles.includes(this.currentUser.role)); // <-- MODIFICADO
                 userAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
+                historyAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin'); // NOVO
             },
 
 
@@ -1278,12 +1364,22 @@
                 if (this.editingArticleId) {
                     const index = this.db.articles.findIndex(a => a.id === this.editingArticleId);
                     if (index !== -1) {
+                        const previousState = this.clone(this.db.articles[index]); // LOG: Captura estado anterior
+                        
                         this.db.articles[index] = { ...this.db.articles[index], ...newArticleData };
+                        
+                        const newState = this.clone(this.db.articles[index]); // LOG: Captura novo estado
+                        this.logAction('update', 'article', this.editingArticleId, title, previousState, newState); // LOG
+                        
                         this.showAlert('Artigo atualizado com sucesso!');
                     }
                 } else {
                     const newId = this.db.articles.length > 0 ? Math.max(...this.db.articles.map(a => a.id)) + 1 : 1;
-                    this.db.articles.push({ id: newId, ...newArticleData });
+                    const newArticle = { id: newId, ...newArticleData };
+                    this.db.articles.push(newArticle);
+                    
+                    this.logAction('create', 'article', newId, title, null, newArticle); // LOG
+                    
                     this.showAlert('Artigo criado com sucesso!');
                 }
 
@@ -1377,6 +1473,8 @@
                 const userIndex = this.db.users.findIndex(u => u.id === userId);
                 if (userIndex === -1) return;
 
+                const previousState = this.clone(this.db.users[userIndex]); // LOG
+
                 if (this.db.users[userIndex].role === 'Admin' && newRole !== 'Admin') {
                     const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
                     if (adminCount <= 1) {
@@ -1387,6 +1485,10 @@
                 }
 
                 this.db.users[userIndex].role = newRole;
+                
+                const newState = this.clone(this.db.users[userIndex]); // LOG
+                this.logAction('update', 'user', userId, newState.name, previousState, newState); // LOG
+                
                 this.showAlert(`Cargo de ${this.db.users[userIndex].name} atualizado para ${newRole}!`);
                 this.loadUsersAdminList(); 
             },
@@ -1399,9 +1501,8 @@
             // --- LÓGICA DOS MODAIS (SENHAS, EDIÇÃO) ---
 
             /**
-             * NOVO: Verifica as permissões antes de tentar acessar uma tela de admin.
-             * Para "Gerenciar Conteúdo", o N3+ entra direto.
-             * Para "Gerenciar Usuários", o Admin ainda precisa da senha mestra.
+             * MODIFICADO: Verifica permissões e/ou pede senha mestra.
+             * 'history' é um novo target.
              */
             accessAdminScreen(target) {
                 if (!this.currentUser) {
@@ -1414,15 +1515,15 @@
 
                 if (target === 'admin') {
                     if (canManageContent) {
-                        this.showScreen('admin'); // N3+ entra direto no Gerenciar Conteúdo
+                        this.showScreen('admin'); // N3+ entra direto
                     } else {
                         this.showAlert('Acesso negado.', true);
                         this.showScreen('home');
                     }
-                } else if (target === 'users-admin') {
+                } else if (target === 'users-admin' || target === 'history') { // NOVO: history aqui
                     if (isAdmin) {
                         // Apenas Admins podem *tentar* ver, e pedimos a senha mestra
-                        this.promptAdminPassword('users-admin');
+                        this.promptAdminPassword(target); // 'users-admin' ou 'history'
                     } else {
                         this.showAlert('Acesso negado.', true);
                         this.showScreen('home');
@@ -1500,11 +1601,16 @@
                     return;
                 }
 
+                const previousState = { password: this.currentUser.password }; // LOG
+                
                 this.currentUser.password = newPass;
                 const userIndex = this.db.users.findIndex(u => u.id === this.currentUser.id);
                 if (userIndex !== -1) {
                     this.db.users[userIndex].password = newPass;
                 }
+                
+                const newState = { password: newPass }; // LOG
+                this.logAction('update', 'userPassword', this.currentUser.id, this.currentUser.name, previousState, newState); // LOG
                 
                 successEl.innerText = 'Senha alterada com sucesso!';
                 successEl.classList.remove('hidden');
@@ -1553,6 +1659,8 @@
                     return;
                 }
                 
+                const previousState = this.clone(this.db.users[userIndex]); // LOG: Captura antes de qualquer mudança
+                
                 if (this.db.users.some(u => u.username === username && u.id !== userId)) {
                     errorEl.innerText = 'Este nome de usuário já está em uso.';
                     errorEl.classList.remove('hidden');
@@ -1566,7 +1674,16 @@
                 // Lógica de segurança para cargo (só atualiza se a função de updateRole permitir)
                 const currentRole = this.db.users[userIndex].role;
                 if (currentRole !== role) {
-                    this.updateUserRole(userId, role); // Usa a função que já tem a trava de segurança
+                    // Simula a verificação de segurança
+                    if (currentRole === 'Admin' && role !== 'Admin') {
+                        const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+                        if (adminCount <= 1) {
+                             this.showAlert('Não é possível alterar o cargo do último Admin.', true);
+                             this.loadUsersAdminList(); // Recarrega a lista para resetar o select
+                             return; // Não salva
+                        }
+                    }
+                    this.db.users[userIndex].role = role;
                 }
                 
                 if (newPassword.trim().length > 0) {
@@ -1577,6 +1694,9 @@
                     }
                     this.db.users[userIndex].password = newPassword.trim();
                 }
+                
+                const newState = this.clone(this.db.users[userIndex]); // LOG: Captura estado final
+                this.logAction('update', 'user', userId, name, previousState, newState); // LOG
                 
                 this.showAlert(`Usuário ${name} atualizado com sucesso!`);
                 this.toggleEditUserModal(false);
@@ -1614,6 +1734,9 @@
                 }
 
                 this.db.masterPassword = newPass;
+                
+                // LOG (sem salvar senhas)
+                this.logAction('update', 'masterPassword', 0, 'Senha Mestra', null, null);
                 
                 successEl.innerText = 'Senha mestra alterada com sucesso!';
                 successEl.classList.remove('hidden');
@@ -1663,13 +1786,23 @@
                 if (this.editingContactId === null) {
                     // Adicionar
                     const newId = this.db.nextContactId++;
-                    this.db.contacts.push({ id: newId, name, phone, team, role });
+                    const newContact = { id: newId, name, phone, team, role };
+                    this.db.contacts.push(newContact);
+                    
+                    this.logAction('create', 'contact', newId, name, null, newContact); // LOG
+                    
                     this.showAlert('Contato adicionado com sucesso!');
                 } else {
                     // Editar
                     const index = this.db.contacts.findIndex(c => c.id === this.editingContactId);
                     if (index !== -1) {
+                        const previousState = this.clone(this.db.contacts[index]); // LOG
+                        
                         this.db.contacts[index] = { id: this.editingContactId, name, phone, team, role };
+                        
+                        const newState = this.clone(this.db.contacts[index]); // LOG
+                        this.logAction('update', 'contact', this.editingContactId, name, previousState, newState); // LOG
+                        
                         this.showAlert('Contato atualizado com sucesso!');
                     }
                 }
@@ -1711,7 +1844,13 @@
                     case 'article':
                         const articleIndex = this.db.articles.findIndex(a => a.id === id);
                         if (articleIndex !== -1) {
+                            const previousState = this.clone(this.db.articles[articleIndex]); // LOG
+                            const articleName = previousState.title;
+                            
                             this.db.articles.splice(articleIndex, 1);
+                            
+                            this.logAction('delete', 'article', id, articleName, previousState, null); // LOG
+                            
                             this.showAlert('Artigo excluído com sucesso.', true);
                             this.loadAdminList();
                         }
@@ -1721,7 +1860,8 @@
                         const userIndex = this.db.users.findIndex(u => u.id === id);
                         if (userIndex === -1) return;
                         
-                        const userName = this.db.users[userIndex].name;
+                        const previousStateUser = this.clone(this.db.users[userIndex]); // LOG
+                        const userName = previousStateUser.name;
                         
                         if (this.db.users[userIndex].role === 'Admin') {
                             const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
@@ -1733,6 +1873,9 @@
                         }
                         
                         this.db.users.splice(userIndex, 1);
+                        
+                        this.logAction('delete', 'user', id, userName, previousStateUser, null); // LOG
+                        
                         this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
                         this.loadUsersAdminList(); 
                         break;
@@ -1740,7 +1883,13 @@
                     case 'contact':
                         const contactIndex = this.db.contacts.findIndex(c => c.id === id);
                         if (contactIndex !== -1) {
+                            const previousStateContact = this.clone(this.db.contacts[contactIndex]); // LOG
+                            const contactName = previousStateContact.name;
+                            
                             this.db.contacts.splice(contactIndex, 1);
+                            
+                            this.logAction('delete', 'contact', id, contactName, previousStateContact, null); // LOG
+                            
                             this.showAlert('Contato excluído com sucesso.', true);
                             this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
                         }
@@ -1749,6 +1898,178 @@
 
                 this.toggleConfirmModal(false);
                 this.deleteAction = { type: null, id: null }; // Limpa a ação
+            },
+
+            // --- NOVO: LÓGICA DE HISTÓRICO E REVERSÃO ---
+
+            loadHistory() {
+                const listEl = document.getElementById('history-log-list');
+                if (!listEl) return;
+                
+                listEl.innerHTML = '';
+                
+                // Exibe do mais novo para o mais antigo
+                const logs = [...this.db.auditLog].reverse(); 
+                
+                if (logs.length === 0) {
+                    listEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhuma alteração registrada ainda.</p>';
+                    return;
+                }
+
+                logs.forEach(log => {
+                    let description = '';
+                    let icon = '';
+                    let color = '';
+
+                    switch (log.action) {
+                        case 'create':
+                            description = `criou o ${log.entityType} "${log.entityName}"`;
+                            icon = 'ph-plus-circle';
+                            color = 'text-verde-sucesso';
+                            break;
+                        case 'update':
+                            description = `atualizou o ${log.entityType} "${log.entityName}"`;
+                            icon = 'ph-pencil-simple';
+                            color = 'text-amarelo-aviso';
+                            break;
+                        case 'delete':
+                            description = `excluiu o ${log.entityType} "${log.entityName}"`;
+                            icon = 'ph-trash';
+                            color = 'text-vermelho-erro';
+                            break;
+                        case 'revert':
+                            description = `REVERTEU a ação sobre "${log.entityName}"`;
+                            icon = 'ph-arrow-counter-clockwise';
+                            color = 'text-azul-principal';
+                            break;
+                        default:
+                            description = `realizou uma ação (${log.action}) em "${log.entityName}"`;
+                            icon = 'ph-question';
+                            color = 'text-cinza-texto';
+                    }
+
+                    // Botão de Reverter
+                    let revertButton = '';
+                    if (log.action !== 'revert' && !log.reverted) {
+                         // Só pode reverter se não for uma reversão e se já não foi revertido
+                        revertButton = `<button onclick="app.revertChange(${log.id})" class="text-azul-principal hover:underline text-sm font-medium">Reverter</button>`;
+                    } else if (log.reverted) {
+                        revertButton = `<span class="text-cinza-texto text-sm font-medium">Já Revertido</span>`;
+                    }
+
+                    listEl.innerHTML += `
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-2">
+                            <div class="flex items-center gap-3">
+                                <i class="ph-bold ${icon} ${color} text-2xl"></i>
+                                <div>
+                                    <h4 class="font-semibold">${log.userName} ${description}</h4>
+                                    <span class="text-sm text-cinza-texto">${log.timestamp} (Log ID: ${log.id})</span>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                ${revertButton}
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            revertChange(logId) {
+                const logEntry = this.db.auditLog.find(log => log.id === logId);
+                if (!logEntry || logEntry.reverted) {
+                    this.showAlert('Esta ação não pode ser revertida ou já foi revertida.', true);
+                    return;
+                }
+
+                try {
+                    let success = false;
+                    let logMessage = '';
+
+                    switch (logEntry.action) {
+                        // Reverter uma ATUALIZAÇÃO = Voltar ao estado anterior
+                        case 'update':
+                            if (logEntry.entityType === 'article') {
+                                const index = this.db.articles.findIndex(e => e.id === logEntry.entityId);
+                                if (index !== -1) {
+                                    this.db.articles[index] = this.clone(logEntry.previousState);
+                                    success = true;
+                                }
+                            } else if (logEntry.entityType === 'user' || logEntry.entityType === 'userPassword') {
+                                const index = this.db.users.findIndex(e => e.id === logEntry.entityId);
+                                if (index !== -1) {
+                                    this.db.users[index] = this.clone(logEntry.previousState);
+                                    success = true;
+                                }
+                            } else if (logEntry.entityType === 'contact') {
+                                const index = this.db.contacts.findIndex(e => e.id === logEntry.entityId);
+                                if (index !== -1) {
+                                    this.db.contacts[index] = this.clone(logEntry.previousState);
+                                    success = true;
+                                }
+                            }
+                            logMessage = `Reversão de 'update' para ${logEntry.entityType} ID ${logEntry.entityId}`;
+                            break;
+                        
+                        // Reverter uma EXCLUSÃO = Recriar o item
+                        case 'delete':
+                            if (logEntry.entityType === 'article') {
+                                this.db.articles.push(this.clone(logEntry.previousState));
+                                success = true;
+                            } else if (logEntry.entityType === 'user') {
+                                this.db.users.push(this.clone(logEntry.previousState));
+                                success = true;
+                            } else if (logEntry.entityType === 'contact') {
+                                this.db.contacts.push(this.clone(logEntry.previousState));
+                                success = true;
+                            }
+                            logMessage = `Reversão de 'delete' para ${logEntry.entityType} ID ${logEntry.entityId}`;
+                            break;
+
+                        // Reverter uma CRIAÇÃO = Excluir o item
+                        case 'create':
+                            if (logEntry.entityType === 'article') {
+                                const index = this.db.articles.findIndex(e => e.id === logEntry.entityId);
+                                if (index !== -1) {
+                                    this.db.articles.splice(index, 1);
+                                    success = true;
+                                }
+                            } else if (logEntry.entityType === 'user') {
+                                const index = this.db.users.findIndex(e => e.id === logEntry.entityId);
+                                if (index !== -1) {
+                                    this.db.users.splice(index, 1);
+                                    success = true;
+                                }
+                            } else if (logEntry.entityType === 'contact') {
+                                const index = this.db.contacts.findIndex(e => e.id === logEntry.entityId);
+                                if (index !== -1) {
+                                    this.db.contacts.splice(index, 1);
+                                    success = true;
+                                }
+                            }
+                            logMessage = `Reversão de 'create' para ${logEntry.entityType} ID ${logEntry.entityId}`;
+                            break;
+                        
+                        default:
+                            this.showAlert('Tipo de ação desconhecida, não pode ser revertida.', true);
+                            return;
+                    }
+
+                    if (success) {
+                        logEntry.reverted = true; // Marca o log original como revertido
+                        
+                        // Loga a própria reversão
+                        this.logAction('revert', logEntry.entityType, logEntry.entityId, logEntry.entityName, logEntry.newState, logEntry.previousState);
+                        
+                        this.showAlert(`Ação (Log ID: ${logId}) foi revertida com sucesso!`);
+                        this.loadHistory(); // Recarrega a tela de histórico
+                    } else {
+                        this.showAlert(`Falha ao reverter: O item (ID: ${logEntry.entityId}) não foi encontrado. Talvez já tenha sido excluído?`, true);
+                    }
+
+                } catch (e) {
+                    console.error("Erro ao reverter:", e);
+                    this.showAlert('Ocorreu um erro grave durante a reversão.', true);
+                }
             }
         };
 
