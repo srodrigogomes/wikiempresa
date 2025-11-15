@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Conhecimento</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+    
+    <style>
+        /* Tipografia Padrão */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Configuração das cores da identidade visual */
+        :root {
+            --azul-principal: #4FA3FF;
+            --azul-escuro: #1F2F4B;
+            --cinza-fundo: #F2F4F7;
+            --cinza-texto: #9AA1AC;
+            --verde-sucesso: #76D19B;
+            --vermelho-erro: #E87A7A;
+        }
+
+        /* Aplicação das cores do Tailwind (para o config) */
+        .bg-azul-principal { background-color: var(--azul-principal); }
+        .bg-azul-escuro { background-color: var(--azul-escuro); }
+        .bg-cinza-fundo { background-color: var(--cinza-fundo); }
+        .bg-verde-sucesso { background-color: var(--verde-sucesso); }
+        .bg-vermelho-erro { background-color: var(--vermelho-erro); }
+
+        .text-azul-principal { color: var(--azul-principal); }
+        .text-azul-escuro { color: var(--azul-escuro); }
+        .text-cinza-texto { color: var(--cinza-texto); }
+        .text-verde-sucesso { color: var(--verde-sucesso); }
+        .text-vermelho-erro { color: var(--vermelho-erro); }
+
+        .border-azul-principal { border-color: var(--azul-principal); }
+
+        .ring-azul-principal { --tw-ring-color: var(--azul-principal); }
+
+        /* Animação de fade-in para telas */
+        .screen {
+            display: none;
+        }
+        .screen.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        /* Imagem de Fundo Sutil */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1; /* Baixa intensidade */
+            filter: blur(8px); /* Blur */
+            z-index: -1;
+            transform: scale(1.1); /* Evita bordas borradas */
+        }
+
+        /* Estilo para login/cadastro/modais */
+        .auth-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Estilo para o campo de busca "enorme" */
+        .huge-search-bar {
+            box-shadow: 0 10px 30px -10px rgba(79, 163, 255, 0.3);
+        }
+
+        /* Estilo para os cards de setor */
+        .sector-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sector-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px -15px rgba(31, 47, 75, 0.2);
+        }
+
+        /* Animação de Shake para erros */
+        @keyframes shake {
+            '0%, 100%': { transform: 'translateX(0)' },
+            '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-10px)' },
+            '20%, 40%, 60%, 80%': { transform: 'translateX(10px)' },
+        }
+        .animate-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-cinza-fundo text-azul-escuro overflow-x-hidden">
+
+    <!-- Topo Fixo -->
+    <header id="main-header" class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-md z-50 transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo e Nome (Editável) -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-azul-principal/20 rounded-lg flex items-center justify-center">
+                    <i class="ph-bold ph-circles-four text-azul-principal text-2xl"></i>
+                </div>
+                <span class="text-xl font-bold text-azul-escuro hidden sm:block">Central de Conhecimento</span>
+            </div>
+
+            <!-- Perfil do Usuário (Agora dinâmico) -->
+            <div id="user-profile-menu" class="hidden items-center space-x-3">
+                <span class="hidden sm:inline text-right text-sm">
+                    <div id="user-profile-name" class="font-medium"></div>
+                    <div id="user-profile-role" class="text-cinza-texto"></div>
+                </span>
+                <img id="user-profile-avatar" alt="Avatar do Usuário" class="w-10 h-10 rounded-full border-2 border-azul-principal/50">
+                
+                <!-- Botão Alterar Senha Pessoal -->
+                <button onclick="app.promptChangeMyPassword()" class="ml-2 text-cinza-texto hover:text-azul-principal transition-all" title="Alterar minha senha">
+                    <i class="ph-bold ph-key text-2xl"></i>
+                </button>
+                
+                <button onclick="app.logout()" class="ml-2 text-cinza-texto hover:text-vermelho-erro transition-all" title="Sair">
+                    <i class="ph-bold ph-sign-out text-2xl"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main id="main-content" class="pt-24 container mx-auto px-6 py-8 transition-all duration-300">
+
+        <!-- TELA 0: LOGIN -->
+        <section id="login-screen" class="screen fade-in">
+            <div class="max-w-md mx-auto mt-12">
+                <form id="login-form" class="auth-card p-8 rounded-xl shadow-lg">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-azul-principal/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+                            <i class="ph-bold ph-circles-four text-azul-principal text-4xl"></i>
+                        </div>
+                        <h1 class="text-3xl font-bold text-azul-escuro">Acessar Central</h1>
+                        <p class="text-cinza-texto mt-1">Use suas credenciais para entrar.</p>
+                    </div>
+
+                    <div id="login-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="login-username" class="block text-sm font-medium mb-1">Usuário</label>
+                            <input type="text" id="login-username" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                        </div>
+                        <div>
+                            <label for="login-password" class="block text-sm font-medium mb-1">Senha</label>
+                            <input type="password" id="login-password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                        </div>
+                        <button type="submit" class="w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg">
+                            Entrar
+                        </button>
+                    </div>
+                    
+                    <!-- Link de cadastro removido -->
+                </form>
+            </div>
+        </section>
+        
+        <!-- TELA 0.1: CADASTRO (Agora acessada pelo Admin) -->
+        <section id="register-screen" class="screen fade-in">
+            <div class="max-w-md mx-auto mt-12">
+                <form id="register-form" class="auth-card p-8 rounded-xl shadow-lg">
+                    <h1 class="text-3xl font-bold text-azul-escuro text-center mb-6">Cadastrar Novo Usuário</h1>
+                    
+                    <div id="register-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label for="register-name" class="block text-sm font-medium mb-1">Nome Completo</label>
+                            <input type="text" id="register-name" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                        </div>
+                        <div>
+                            <label for="register-username" class="block text-sm font-medium mb-1">Nome de Usuário (login)</label>
+                            <input type="text" id="register-username" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                        </div>
+                        <div>
+                            <label for="register-password" class="block text-sm font-medium mb-1">Senha</label>
+                            <input type="password" id="register-password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                        </div>
+                        <div>
+                            <label for="register-role" class="block text-sm font-medium mb-1">Cargo</label>
+                            <select id="register-role" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
+                                <option value="Atendente N1">Atendente Nível 1</option>
+                                <option value="Atendente N2">Atendente Nível 2</option>
+                                <option value="Atendente N3">Atendente Nível 3</option>
+                                <option value="Supervisor">Supervisor</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg">
+                            Cadastrar
+                        </button>
+                    </div>
+                    
+                    <p class="text-center text-sm text-cinza-texto mt-6">
+                        <a href="#" onclick="app.showScreen('users-admin')" class="font-medium text-azul-principal hover:underline">Voltar ao Gerenciamento</a>
+                    </p>
+                </form>
+            </div>
+        </section>
+
+
+        <!-- TELA 1: HOME (Seleção de Setores) -->
+        <section id="home-screen" class="screen fade-in">
+            <h1 id="home-welcome-title" class="text-3xl font-bold mb-8 text-center"></h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                
+                <!-- Bloco Setor: Suporte Técnico -->
+                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                     onclick="app.loadSector(1)">
+                    <i class="ph-bold ph-broadcast text-7xl text-azul-principal mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2">Suporte Técnico</h2>
+                    <p class="text-cinza-texto">Diagnósticos, falhas de conexão, lentidão e procedimentos de rede.</p>
+                </div>
+
+                <!-- Bloco Setor: Operacional -->
+                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                     onclick="app.loadSector(2)">
+                    <i class="ph-bold ph-wrench text-7xl text-azul-principal mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2">Operacional</h2>
+                    <p class="text-cinza-texto">Instalação, manutenção de campo, equipamentos e agendamentos.</p>
+                </div>
+                
+                <!-- Bloco Admin: Gerenciar Conteúdo (CRUD de Artigos) -->
+                <div id="admin-articles-card" class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                     onclick="app.promptAdminPassword('admin')"> <!-- Modificado -->
+                    <i class="ph-bold ph-pencil-simple-line text-7xl text-azul-principal mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2">Gerenciar Conteúdo</h2>
+                    <p class="text-cinza-texto">Adicionar, editar ou remover artigos da base de conhecimento.</p>
+                </div>
+                
+                <!-- Bloco Admin: Gerenciar Usuários (Somente Admin) -->
+                <div id="admin-users-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                     onclick="app.promptAdminPassword('users-admin')"> <!-- Modificado -->
+                    <i class="ph-bold ph-users-three text-7xl text-azul-principal mb-4"></i>
+                    <h2 class="text-2xl font-bold mb-2">Gerenciar Usuários</h2>
+                    <p class="text-cinza-texto">Editar cargos, senhas e excluir usuários do sistema.</p>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- TELA 2: SETOR (Busca e Categorias) -->
+        <section id="sector-screen" class="screen fade-in max-w-4xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <h1 id="sector-title" class="text-3xl font-bold mb-8"></h1>
+            
+            <!-- Barra de Busca Enorme -->
+            <form id="search-form" class="relative mb-8">
+                <i class="ph-bold ph-magnifying-glass text-cinza-texto text-2xl absolute left-6 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="search-input" placeholder="Digite uma palavra-chave... (ex: poste caído, fibra rompida, lentidão)" class="huge-search-bar w-full text-lg pl-16 pr-6 py-5 rounded-xl border-2 border-transparent focus:border-azul-principal focus:ring-2 focus:ring-azul-principal/50 outline-none">
+            </form>
+
+            <!-- Container de Resultados da Busca -->
+            <div id="search-results-container" class="hidden">
+                <h2 id="search-results-title" class="text-2xl font-bold mb-6">Resultados da Busca</h2>
+                <div id="search-results" class="space-y-4">
+                    <!-- Resultados da busca aparecem aqui -->
+                </div>
+            </div>
+
+            <!-- Container de Categorias -->
+            <div id="categories-container">
+                <h2 class="text-2xl font-bold mb-6">Categorias Principais</h2>
+                <div id="categories-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <!-- Categorias populadas por JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TELA 3: ARTIGO (Informação Final) -->
+        <section id="article-screen" class="screen fade-in max-w-3xl mx-auto">
+            <button onclick="app.goBackToSector()" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Busca
+            </button>
+            
+            <article class="bg-white p-8 sm:p-10 rounded-xl shadow-lg">
+                <!-- Cabeçalho -->
+                <h1 id="article-title" class="text-3xl sm:text-4xl font-bold mb-4"></h1>
+                <div class="flex flex-wrap text-sm text-cinza-texto space-x-4 mb-6">
+                    <span>Setor: <strong id="article-sector" class="text-azul-escuro"></strong></span>
+                    <span>Última atualização: <strong id="article-updated" class="text-azul-escuro"></strong></span>
+                </div>
+
+                <!-- Conteúdo -->
+                <div class="prose max-w-none">
+                    <h2 class="text-xl font-semibold mb-2">O que é?</h2>
+                    <p id="article-content" class="mb-6"></p>
+
+                    <h2 class="text-xl font-semibold mb-2">Passo a Passo (O que fazer)</h2>
+                    <ol id="article-steps" class="list-none space-y-3 mb-6 p-0">
+                        <!-- Passos gerados por JS -->
+                    </ol>
+                    
+                    <h2 class="text-xl font-semibold mb-2">O que dizer ao cliente</h2>
+                    <div class="bg-cinza-fundo p-4 rounded-lg">
+                        <p id="article-message-to-client" class="text-azul-escuro"></p>
+                    </div>
+
+                    <button id="copy-button" class="mt-6 w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center justify-center space-x-2">
+                        <i class="ph-bold ph-copy"></i>
+                        <span>Copiar texto para envio</span>
+                    </button>
+                </div>
+            </article>
+        </section>
+
+        <!-- TELA 4: ADMIN (CRUD de Artigos) -->
+        <section id="admin-screen" class="screen fade-in max-w-4xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <h1 class="text-3xl font-bold mb-8">Gerenciar Conteúdo</h1>
+
+            <!-- Formulário de Adicionar/Editar Artigo -->
+            <form id="admin-form" class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                <h2 id="admin-form-title" class="text-2xl font-bold mb-6">Adicionar Novo Artigo</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Coluna 1 -->
+                    <div>
+                        <label for="admin-title" class="block text-sm font-medium mb-1">Título do Artigo</label>
+                        <input type="text" id="admin-title" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                    </div>
+                    <div>
+                        <label for="admin-sector" class="block text-sm font-medium mb-1">Setor</label>
+                        <select id="admin-sector" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
+                            <option value="1">Suporte Técnico</option>
+                            <option value="2">Operacional</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="admin-category" class="block text-sm font-medium mb-1">Categoria</label>
+                        <input type="text" id="admin-category" placeholder="Ex: Problemas Comuns" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                    </div>
+                    <div>
+                        <label for="admin-tags" class="block text-sm font-medium mb-1">Tags (separadas por vírgula)</label>
+                        <input type="text" id="admin-tags" placeholder="ex: lentidão, queda, fibra" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none">
+                    </div>
+                    <!-- Coluna 2 (Campos de Texto Grandes) -->
+                    <div class="md:col-span-2">
+                        <label for="admin-content" class="block text-sm font-medium mb-1">Descrição / O que é?</label>
+                        <textarea id="admin-content" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="admin-steps" class="block text-sm font-medium mb-1">Passo a Passo (um por linha)</label>
+                        <textarea id="admin-steps" rows="5" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="admin-message" class="block text-sm font-medium mb-1">O que dizer ao cliente (Script)</label>
+                        <textarea id="admin-message" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
+                    </div>
+                </div>
+                <!-- Botões do Formulário -->
+                <div class="flex items-center justify-end space-x-4 mt-6">
+                    <button type="button" id="admin-form-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="admin-form-submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+                        Salvar Artigo
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Lista de Artigos Existentes -->
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                 <h2 class="text-2xl font-bold mb-6">Artigos Existentes</h2>
+                 <div id="admin-articles-list" class="space-y-4">
+                     <!-- Artigos para gerenciar serão listados aqui -->
+                 </div>
+            </div>
+
+        </section>
+
+        <!-- TELA 5: ADMIN (Gerenciar Usuários) -->
+        <section id="users-admin-screen" class="screen fade-in max-w-4xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold">Gerenciar Usuários</h1>
+                <button onclick="app.showScreen('register')" class="bg-azul-principal text-white px-5 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center space-x-2">
+                    <i class="ph-bold ph-plus"></i>
+                    <span>Cadastrar Usuário</span>
+                </button>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                 <h2 class="text-2xl font-bold mb-6">Lista de Usuários</h2>
+                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Edite, altere o cargo ou exclua usuários. Você não pode excluir sua própria conta.</p>
+                 <div class="space-y-4" id="users-admin-list">
+                     <!-- Lista de usuários será populada pelo JS -->
+                 </div>
+            </div>
+
+            <!-- Card para Alterar Senha Mestra -->
+            <form id="change-master-pass-form" class="bg-white p-8 rounded-xl shadow-lg">
+                <h2 class="text-2xl font-bold mb-6">Alterar Senha Mestra</h2>
+                <p class="text-sm text-cinza-texto mb-6 -mt-4">Esta é a senha usada para acessar as telas de Gerenciamento.</p>
+                
+                <div id="change-master-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+                <div id="change-master-pass-success" class="hidden bg-verde-sucesso/10 text-verde-sucesso p-3 rounded-lg text-sm mb-4"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="master-pass-current" class="block text-sm font-medium mb-1">Senha Mestra Atual</label>
+                        <input type="password" id="master-pass-current" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                    </div>
+                    <div>
+                        <label for="master-pass-new" class="block text-sm font-medium mb-1">Nova Senha Mestra</label>
+                        <input type="password" id="master-pass-new" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                    </div>
+                    <div>
+                        <label for="master-pass-confirm" class="block text-sm font-medium mb-1">Confirmar Nova Senha</label>
+                        <input type="password" id="master-pass-confirm" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+                        Salvar Nova Senha Mestra
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        
+        <!-- Alerta de "Copiado!" -->
+        <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
+            <span id="alert-text"></span>
+        </div>
+        
+        <!-- Textarea oculto para cópia -->
+        <textarea id="copy-textarea" class="absolute -left-full"></textarea>
+
+    </main>
+
+    <!-- MODAIS (Fora do <main> para garantir o z-index) -->
+
+    <!-- MODAL: Verificação de Senha Admin -->
+    <div id="admin-password-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+        <form id="admin-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Acesso Restrito</h2>
+            <p class="text-cinza-texto text-center mb-6">Por favor, insira a senha mestra de administrador para continuar.</p>
+            
+            <div id="admin-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4">
+                Senha mestra incorreta.
+            </div>
+
+            <div>
+                <label for="admin-pass-input" class="block text-sm font-medium mb-1">Senha Mestra</label>
+                <input type="password" id="admin-pass-input" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+            </div>
+            
+            <div class="flex items-center justify-end space-x-4 mt-6">
+                <button type="button" id="admin-pass-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+                    Verificar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- MODAL: Alteração de Senha Pessoal -->
+    <div id="change-password-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+        <form id="change-my-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
+            <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Alterar Minha Senha</h2>
+            
+            <div id="change-my-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+            <div id="change-my-pass-success" class="hidden bg-verde-sucesso/10 text-verde-sucesso p-3 rounded-lg text-sm mb-4"></div>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="my-pass-current" class="block text-sm font-medium mb-1">Senha Atual</label>
+                    <input type="password" id="my-pass-current" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+                <div>
+                    <label for="my-pass-new" class="block text-sm font-medium mb-1">Nova Senha</label>
+                    <input type="password" id="my-pass-new" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+                <div>
+                    <label for="my-pass-confirm" class="block text-sm font-medium mb-1">Confirmar Nova Senha</label>
+                    <input type="password" id="my-pass-confirm" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end space-x-4 mt-6">
+                <button type="button" id="my-pass-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- MODAL: Editar Usuário (Admin) -->
+    <div id="edit-user-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+        <form id="edit-user-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
+            <h2 class="text-2xl font-bold text-azul-escuro mb-6">Editar Usuário</h2>
+            <input type="hidden" id="edit-user-id">
+
+            <div id="edit-user-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label for="edit-user-name" class="block text-sm font-medium mb-1">Nome Completo</label>
+                    <input type="text" id="edit-user-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+                <div>
+                    <label for="edit-user-username" class="block text-sm font-medium mb-1">Nome de Usuário (login)</label>
+                    <input type="text" id="edit-user-username" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                 <div>
+                    <label for="edit-user-role" class="block text-sm font-medium mb-1">Cargo</label>
+                    <select id="edit-user-role" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
+                         <!-- Opções de cargo populadas por JS -->
+                    </select>
+                </div>
+                <div>
+                    <label for="edit-user-password" class="block text-sm font-medium mb-1">Nova Senha (Opcional)</label>
+                    <input type="password" id="edit-user-password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" placeholder="Deixe em branco para manter">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end space-x-4 mt-6">
+                <button type="button" id="edit-user-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+                    Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+
+
+    <script>
+        // Simulação de um banco de dados
+        const mockDB = {
+            masterPassword: "admin123", // Senha mestra
+            nextUserId: 4,
+            users: [
+                { id: 1, name: "Ana Sousa", username: "ana", password: "123", role: "Atendente N1", avatar: "https://placehold.co/100x100/4FA3FF/FFFFFF?text=A&font=inter" },
+                { id: 2, name: "Bruno Costa", username: "bruno", password: "123", role: "Supervisor", avatar: "https://placehold.co/100x100/1F2F4B/FFFFFF?text=B&font=inter" },
+                { id: 3, name: "Admin Mestre", username: "admin", password: "admin", role: "Admin", avatar: "https://placehold.co/100x100/E87A7A/FFFFFF?text=AD&font=inter" }
+            ],
+            sectors: [
+                { id: 1, name: "Suporte Técnico" },
+                { id: 2, name: "Operacional" }
+            ],
+            articles: [
+                {
+                    id: 1,
+                    sector_id: 1,
+                    category: "Problemas Comuns",
+                    title: "Cliente sem conexão (Luz LOS piscando)",
+                    content: "Quando a luz 'LOS' do roteador está piscando em vermelho, indica um problema de sinal óptico, geralmente rompimento de fibra.",
+                    steps: [
+                        "Acalme o cliente e informe que a luz indica um problema físico na rede.",
+                        "Confirme o endereço completo.",
+                        "Verifique se há outros clientes na mesma região com o mesmo problema (pode ser falha massiva).",
+                        "Abra um chamado técnico de urgência para a equipe de campo."
+                    ],
+                    message_to_client: "Entendo, essa luz piscando indica que há um problema físico na fibra que chega até sua casa. Já estou registrando sua solicitação e enviando uma equipe técnica para verificar a rede na sua rua o mais rápido possível.",
+                    tags: ["los", "vermelha", "piscando", "sem sinal", "fibra", "rompimento"],
+                    updated_at: "14/11/2025"
+                },
+                {
+                    id: 2,
+                    sector_id: 1,
+                    category: "Problemas Comuns",
+                    title: "Poste caído ou fibra rompida na rua",
+                    content: "Cliente informa dano físico visível na infraestrutura da rua (poste caído, cabo partido, etc.) que causou a queda de sinal.",
+                    steps: [
+                        "Agradeça a informação (é valiosa).",
+                        "NÃO prometa prazo. Informe que é uma manutenção emergencial complexa.",
+                        "Confirme o endereço exato do dano.",
+                        "Abra um chamado de EMERGÊNCIA tipo 'Dano Físico' para o Operacional e informe o supervisor."
+                    ],
+                    message_to_client: "Muito obrigado por nos avisar sobre o poste! Sua informação é muito importante. Já estou abrindo um chamado de emergência para nossa equipe técnica verificar a situação no local. Como é um dano físico na rede, pode levar um tempo para normalizar, mas faremos o mais rápido possível.",
+                    tags: ["poste", "cabo", "rompido", "caiu", "acidente", "emergência", "fibra"],
+                    updated_at: "13/11/2025"
+                },
+                {
+                    id: 3,
+                    sector_id: 1,
+                    category: "Procedimentos",
+                    title: "Internet Lenta (Verificação Padrão)",
+                    content: "Cliente reclama de lentidão, mas tem conexão. Procedimento padrão de diagnóstico inicial antes de escalar.",
+                    steps: [
+                        "Peça ao cliente para reiniciar o roteador (tirar da tomada por 30s).",
+                        "Pergunte se a lentidão é no Wi-Fi ou no cabo.",
+                        "Solicite um teste de velocidade (usando nosso medidor oficial) no cabo, se possível.",
+                        "Se a velocidade no cabo estiver normal, o problema é o Wi-Fi (vá para 'Procedimento: Wi-Fi Lento').",
+                        "Se no cabo estiver lento, verifique o consumo de banda no sistema e agende visita técnica."
+                    ],
+                    message_to_client: "Certo, vamos verificar sua lentidão. Por favor, reinicie seu roteador tirando-o da tomada por 30 segundos. Enquanto ele reinicia, me diga: você nota essa lentidão em quais dispositivos? É mais no celular (Wi-Fi) ou em um computador no cabo?",
+                    tags: ["lentidão", "lenta", "velocidade", "teste", "wifi", "cabo"],
+                    updated_at: "10/11/2025"
+                },
+                 {
+                    id: 4,
+                    sector_id: 2,
+                    category: "Procedimentos",
+                    title: "Ativação de Novo Cliente (Provisionamento)",
+                    content: "Procedimento para provisionar uma nova ONU na OLT.",
+                    steps: [
+                        "Coletar S/N (Serial Number) da ONU com o técnico.",
+                        "Acessar a OLT referente à localidade.",
+                        "Provisionar na porta correta conforme projeto.",
+                        "Verificar se ONU autenticou (Sinal OK)."
+                    ],
+                    message_to_client: "(Uso interno do técnico. Não enviar ao cliente.)",
+                    tags: ["onu", "olt", "provisionar", "ativacao", "novo cliente"],
+                    updated_at: "09/11/2025"
+                }
+            ]
+        };
+
+        // Lógica da Aplicação
+        const app = {
+            currentScreen: 'login',
+            currentSectorId: null,
+            currentUser: null,
+            db: mockDB,
+            editingArticleId: null, // Para saber se estamos editando ou criando
+            adminTargetScreen: null, // Para onde ir após senha mestra
+            roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], // Cargos Padrão
+
+            init() {
+                // Formulários de Autenticação
+                document.getElementById('login-form').addEventListener('submit', (e) => this.login(e));
+                document.getElementById('register-form').addEventListener('submit', (e) => this.register(e));
+
+                // Navegação e Busca
+                document.getElementById('search-input').addEventListener('input', (e) => this.search(e.target.value));
+                document.getElementById('search-form').addEventListener('submit', (e) => e.preventDefault());
+
+                // Admin CRUD Artigos
+                document.getElementById('admin-form').addEventListener('submit', (e) => this.handleFormSubmit(e));
+                document.getElementById('admin-form-cancel').addEventListener('click', () => this.resetForm());
+
+                // Listeners dos Modais
+                document.getElementById('admin-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.checkAdminPassword(); });
+                document.getElementById('admin-pass-cancel').addEventListener('click', () => this.toggleAdminPasswordModal(false));
+
+                document.getElementById('change-my-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleChangeMyPassword(); });
+                document.getElementById('my-pass-cancel').addEventListener('click', () => this.toggleChangeMyPasswordModal(false));
+
+                document.getElementById('edit-user-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleEditUser(); });
+                document.getElementById('edit-user-cancel').addEventListener('click', () => this.toggleEditUserModal(false));
+                
+                document.getElementById('change-master-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleChangeMasterPassword(); });
+
+
+                // Mostra a tela inicial (login)
+                this.showScreen('login');
+            },
+
+            // --- NAVEGAÇÃO ---
+            
+            showScreen(screenId) {
+                // Lógica de proteção de rotas
+                const authScreens = ['login', 'register'];
+                const isAuthScreen = authScreens.includes(screenId);
+                const adminScreens = ['admin', 'users-admin'];
+                const isProtectedScreen = adminScreens.includes(screenId);
+
+                // Oculta header em telas de auth
+                document.getElementById('main-header').classList.toggle('hidden', isAuthScreen);
+                document.getElementById('main-content').classList.toggle('pt-24', !isAuthScreen); // Ajusta padding
+
+                if (!this.currentUser && !isAuthScreen) {
+                    // Se não está logado e tenta acessar tela protegida, vai para login
+                    screenId = 'login';
+                } else if (this.currentUser && isAuthScreen) {
+                    // Se está logado e tenta acessar login/registro (exceto se for admin indo para registro)
+                    if (screenId !== 'register' || this.currentUser.role !== 'Admin') {
+                         screenId = 'home';
+                    }
+                }
+                
+                // Proteção extra para admin
+                if (isProtectedScreen && (!this.currentUser || (this.currentUser.role !== 'Admin' && this.currentUser.role !== 'Supervisor'))) {
+                    if (screenId === 'users-admin' && this.currentUser.role !== 'Admin') {
+                        this.showAlert('Acesso negado. Apenas Admins.', true);
+                        screenId = 'home';
+                    } else if (screenId === 'admin') {
+                         this.showAlert('Acesso negado. Apenas Supervisor ou Admin.', true);
+                         screenId = 'home';
+                    }
+                }
+
+
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.classList.remove('active', 'fade-in');
+                });
+                
+                const activeScreen = document.getElementById(`${screenId}-screen`);
+                
+                if (activeScreen) {
+                    activeScreen.classList.add('active');
+                    // Força re-flow para a animação
+                    void activeScreen.offsetWidth; 
+                    activeScreen.classList.add('fade-in');
+                    
+                    window.scrollTo(0, 0); // Rola para o topo
+                    this.currentScreen = screenId;
+
+                    // Ações específicas ao entrar na tela
+                    if(screenId === 'admin') {
+                        this.loadAdminList(); // Recarrega a lista ao entrar
+                        this.resetForm();
+                    }
+                    if(screenId === 'users-admin' && this.currentUser && this.currentUser.role === 'Admin') {
+                        this.loadUsersAdminList();
+                    }
+                    
+                    // Atualiza a UI se o usuário estiver logado
+                    if (this.currentUser) {
+                        this.updateUI();
+                    }
+                    
+                    // Mostra ou oculta o menu do usuário
+                    document.getElementById('user-profile-menu').classList.toggle('hidden', !this.currentUser);
+                    document.getElementById('user-profile-menu').classList.toggle('flex', !!this.currentUser);
+
+                } else {
+                    console.error(`Tela com ID '${screenId}-screen' não encontrada.`);
+                    this.showScreen('login'); // Fallback
+                }
+            },
+
+            goBackToSector() {
+                this.showScreen('sector');
+                // Limpa a busca ao voltar
+                document.getElementById('search-input').value = '';
+                this.toggleSearchResults(false);
+            },
+
+            loadSector(sectorId) {
+                this.currentSectorId = sectorId;
+                const sector = this.db.sectors.find(s => s.id === sectorId);
+                if (!sector) return;
+
+                document.getElementById('sector-title').innerText = sector.name;
+                document.getElementById('search-input').value = ''; // Limpa busca
+                this.toggleSearchResults(false);
+                
+                // Popula categorias dinamicamente
+                this.loadCategories(sectorId);
+                
+                this.showScreen('sector');
+            },
+
+            loadCategories(sectorId) {
+                const listEl = document.getElementById('categories-list');
+                const articlesInSector = this.db.articles.filter(a => a.sector_id === sectorId);
+                
+                // Mapeia categorias únicas
+                const categories = [...new Set(articlesInSector.map(a => a.category))];
+                
+                // Ícones padrão para categorias
+                const icons = {
+                    "Problemas Comuns": "ph-warning-circle",
+                    "Procedimentos": "ph-list-checks",
+                    "Roteiros": "ph-microphone-stage",
+                    "Encaminhamentos": "ph-arrow-square-out",
+                    "default": "ph-book-open"
+                };
+                
+                listEl.innerHTML = ''; // Limpa
+                categories.forEach(category => {
+                    const icon = icons[category] || icons['default'];
+                    listEl.innerHTML += `
+                        <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('${category}')">
+                            <i class="ph-bold ${icon} text-4xl text-azul-principal mb-3"></i>
+                            <h3 class="text-lg font-semibold">${category}</h3>
+                        </div>
+                    `;
+                });
+            },
+
+            // --- LÓGICA DE ARTIGOS E BUSCA ---
+
+            loadArticle(articleId) {
+                const article = this.db.articles.find(a => a.id === articleId);
+                if (!article) return;
+
+                const sector = this.db.sectors.find(s => s.id === article.sector_id);
+                
+                document.getElementById('article-title').innerText = article.title;
+                document.getElementById('article-sector').innerText = sector.name;
+                document.getElementById('article-updated').innerText = article.updated_at;
+                document.getElementById('article-content').innerText = article.content;
+                document.getElementById('article-steps').innerHTML = article.steps.map((step, i) => 
+                    `<li class="flex items-start">
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-azul-principal text-white text-sm font-bold flex items-center justify-center mr-3">${i+1}</span>
+                        <span>${step}</span>
+                    </li>`
+                ).join('');
+                document.getElementById('article-message-to-client').innerText = article.message_to_client;
+                document.getElementById('copy-button').onclick = () => this.copyMessage(article.message_to_client);
+
+                this.showScreen('article');
+            },
+
+            // Simulação de "Fuzzy Search"
+            search(query) {
+                const lowerQuery = query.toLowerCase().trim();
+                if (lowerQuery.length < 2) {
+                    this.toggleSearchResults(false); // Esconde resultados se busca for curta
+                    return;
+                }
+
+                const articles = this.db.articles.filter(a => a.sector_id === this.currentSectorId);
+                const results = articles.filter(article => {
+                    const inTitle = article.title.toLowerCase().includes(lowerQuery);
+                    const inContent = article.content.toLowerCase().includes(lowerQuery);
+                    const inTags = article.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+                    return inTitle || inContent || inTags;
+                });
+
+                this.renderSearchResults(results);
+                this.toggleSearchResults(true);
+            },
+
+            renderSearchResults(results) {
+                const resultsEl = document.getElementById('search-results');
+                resultsEl.innerHTML = ''; // Limpa resultados anteriores
+
+                if (results.length === 0) {
+                    resultsEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhum resultado encontrado.</p>';
+                    return;
+                }
+
+                results.forEach(article => {
+                    resultsEl.innerHTML += `
+                        <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.loadArticle(${article.id})">
+                            <h4 class="font-bold text-azul-principal">${article.title}</h4>
+                            <p class="text-sm text-cinza-texto">${article.content.substring(0, 100)}...</p>
+                        </div>
+                    `;
+                });
+            },
+
+            toggleSearchResults(show) {
+                document.getElementById('search-results-container').classList.toggle('hidden', !show);
+                document.getElementById('categories-container').classList.toggle('hidden', show);
+            },
+
+            showArticlesByCategory(category) {
+                const articles = this.db.articles.filter(a => a.sector_id === this.currentSectorId && a.category === category);
+                this.renderSearchResults(articles);
+                this.toggleSearchResults(true);
+                document.getElementById('search-results-title').innerText = `Resultados para: ${category}`;
+            },
+
+            // --- UTILITÁRIOS ---
+
+            copyMessage(text) {
+                const textarea = document.getElementById('copy-textarea');
+                textarea.value = text;
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    this.showAlert('Texto copiado para a área de transferência!');
+                } catch (err) {
+                    console.error('Falha ao copiar:', err);
+                    this.showAlert('Falha ao copiar. Tente manualmente.', true);
+                }
+            },
+
+            showAlert(message, isError = false) {
+                const alertEl = document.getElementById('alert-toast');
+                const alertText = document.getElementById('alert-text');
+                
+                alertText.innerText = message;
+                alertEl.className = 'fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform'; // Reset
+                
+                if (isError) {
+                    alertEl.classList.add('bg-vermelho-erro');
+                } else {
+                    alertEl.classList.add('bg-verde-sucesso');
+                }
+                
+                alertEl.classList.remove('hidden', 'translate-y-10', 'opacity-0');
+                
+                setTimeout(() => {
+                    alertEl.classList.add('translate-y-10', 'opacity-0');
+                    setTimeout(() => alertEl.classList.add('hidden'), 300);
+                }, 3000);
+            },
+
+            shakeElement(elementId) {
+                const el = document.getElementById(elementId);
+                el.classList.add('animate-shake');
+                setTimeout(() => el.classList.remove('animate-shake'), 500);
+            },
+
+            // --- LÓGICA DE AUTENTICAÇÃO ---
+
+            login(e) {
+                e.preventDefault();
+                const username = document.getElementById('login-username').value.trim();
+                const password = document.getElementById('login-password').value;
+                const errorEl = document.getElementById('login-error');
+
+                const user = this.db.users.find(u => u.username === username && u.password === password);
+
+                if (user) {
+                    this.currentUser = user;
+                    this.showScreen('home');
+                    errorEl.classList.add('hidden');
+                    errorEl.innerText = '';
+                    document.getElementById('login-form').reset();
+                } else {
+                    errorEl.innerText = 'Usuário ou senha inválidos.';
+                    errorEl.classList.remove('hidden');
+                    this.shakeElement('login-form');
+                }
+            },
+
+            register(e) {
+                e.preventDefault();
+                const name = document.getElementById('register-name').value;
+                const username = document.getElementById('register-username').value;
+                const password = document.getElementById('register-password').value;
+                const role = document.getElementById('register-role').value;
+                const errorEl = document.getElementById('register-error');
+                
+                // Verifica se usuário já existe
+                const existingUser = this.db.users.find(u => u.username === username);
+                if (existingUser) {
+                    errorEl.innerText = 'Este nome de usuário já está em uso.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                
+                // Cria novo usuário
+                const newId = this.db.nextUserId++; // Usa o contador
+                const newUser = {
+                    id: newId,
+                    name: name,
+                    username: username,
+                    password: password,
+                    role: role, 
+                    avatar: `https://placehold.co/100x100/9AA1AC/FFFFFF?text=${name.charAt(0).toUpperCase()}&font=inter`
+                };
+                
+                this.db.users.push(newUser);
+                this.showAlert(`Usuário ${name} cadastrado com sucesso!`);
+                this.showScreen('users-admin'); // Volta para a tela de admin
+                errorEl.classList.add('hidden');
+                document.getElementById('register-form').reset();
+            },
+
+            logout() {
+                this.currentUser = null;
+                this.showScreen('login');
+            },
+
+            updateUI() {
+                if (!this.currentUser) return;
+                
+                // Atualiza Header
+                document.getElementById('user-profile-name').innerText = this.currentUser.name;
+                document.getElementById('user-profile-role').innerText = this.currentUser.role;
+                document.getElementById('user-profile-avatar').src = this.currentUser.avatar;
+                document.getElementById('user-profile-avatar').alt = `Avatar de ${this.currentUser.name}`;
+                
+                // Atualiza Título da Home
+                const firstName = this.currentUser.name.split(' ')[0];
+                document.getElementById('home-welcome-title').innerText = `Bem-vindo(a), ${firstName}. O que você precisa?`;
+
+                // Controla visibilidade dos cards de Admin na Home
+                const adminRoles = ['Supervisor', 'Admin'];
+                const articleAdminCard = document.getElementById('admin-articles-card');
+                const userAdminCard = document.getElementById('admin-users-card');
+
+                // Gerenciar Conteúdo (Artigos) - Supervisor ou Admin
+                articleAdminCard.classList.toggle('hidden', !adminRoles.includes(this.currentUser.role));
+
+                // Gerenciar Usuários - Apenas Admin
+                userAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
+            },
+
+
+            // --- LÓGICA DE ADMIN (CRUD de Artigos) ---
+
+            loadAdminList() {
+                const listEl = document.getElementById('admin-articles-list');
+                if (!listEl) return;
+                listEl.innerHTML = '';
+                
+                const articlesToManage = this.db.articles; 
+
+                articlesToManage.forEach(article => {
+                    listEl.innerHTML += `
+                        <div class="flex justify-between items-center bg-cinza-fundo p-4 rounded-lg">
+                            <div>
+                                <h4 class="font-semibold">${article.title}</h4>
+                                <span class="text-sm text-cinza-texto">${this.db.sectors.find(s => s.id === article.sector_id).name}</span>
+                            </div>
+                            <div class="space-x-2 flex-shrink-0">
+                                <button onclick="app.editArticle(${article.id})" class="text-azul-principal hover:underline text-sm font-medium">Editar</button>
+                                <button onclick="app.deleteArticle(${article.id})" class="text-vermelho-erro hover:underline text-sm font-medium">Excluir</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            handleFormSubmit(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('admin-title').value;
+                const sector_id = parseInt(document.getElementById('admin-sector').value);
+                const category = document.getElementById('admin-category').value;
+                const content = document.getElementById('admin-content').value;
+                const steps = document.getElementById('admin-steps').value.split('\n').filter(s => s.trim() !== '');
+                const message = document.getElementById('admin-message').value;
+                const tags = document.getElementById('admin-tags').value.split(',').map(t => t.trim()).filter(t => t !== '');
+                
+                const newArticleData = {
+                    sector_id,
+                    category,
+                    title,
+                    content,
+                    steps,
+                    message_to_client: message,
+                    tags,
+                    updated_at: new Date().toLocaleDateString('pt-BR')
+                };
+
+                if (this.editingArticleId) {
+                    // Atualiza Artigo
+                    const index = this.db.articles.findIndex(a => a.id === this.editingArticleId);
+                    if (index !== -1) {
+                        this.db.articles[index] = { ...this.db.articles[index], ...newArticleData };
+                        this.showAlert('Artigo atualizado com sucesso!');
+                    }
+                } else {
+                    // Cria Novo Artigo
+                    const newId = this.db.articles.length > 0 ? Math.max(...this.db.articles.map(a => a.id)) + 1 : 1;
+                    this.db.articles.push({ id: newId, ...newArticleData });
+                    this.showAlert('Artigo criado com sucesso!');
+                }
+
+                this.resetForm();
+                this.loadAdminList();
+            },
+
+            editArticle(articleId) {
+                const article = this.db.articles.find(a => a.id === articleId);
+                if (!article) return;
+
+                this.editingArticleId = article.id;
+                
+                document.getElementById('admin-title').value = article.title;
+                document.getElementById('admin-sector').value = article.sector_id;
+                document.getElementById('admin-category').value = article.category;
+                document.getElementById('admin-content').value = article.content;
+                document.getElementById('admin-steps').value = article.steps.join('\n');
+                document.getElementById('admin-message').value = article.message_to_client;
+                document.getElementById('admin-tags').value = article.tags.join(', ');
+
+                document.getElementById('admin-form-title').innerText = 'Editando Artigo';
+                document.getElementById('admin-form-submit').innerText = 'Atualizar Artigo';
+                
+                document.getElementById('admin-form').scrollIntoView({ behavior: 'smooth' });
+            },
+
+            deleteArticle(articleId) {
+                const index = this.db.articles.findIndex(a => a.id === articleId);
+                if (index !== -1) {
+                    this.db.articles.splice(index, 1);
+                    this.showAlert('Artigo excluído com sucesso.', true);
+                    this.loadAdminList();
+                }
+            },
+
+            resetForm() {
+                document.getElementById('admin-form').reset();
+                this.editingArticleId = null;
+                document.getElementById('admin-form-title').innerText = 'Adicionar Novo Artigo';
+                document.getElementById('admin-form-submit').innerText = 'Salvar Artigo';
+            },
+
+            // --- LÓGICA DE ADMIN (Gerenciar Usuários) ---
+
+            loadUsersAdminList() {
+                const listEl = document.getElementById('users-admin-list');
+                if (!listEl) return; 
+                
+                listEl.innerHTML = '';
+                const roles = this.roles;
+
+                this.db.users.forEach(user => {
+                    const isCurrentUser = user.id === this.currentUser.id;
+
+                    // Cria as opções do select
+                    const options = roles.map(role => 
+                        `<option value="${role}" ${user.role === role ? 'selected' : ''}>${role}</option>`
+                    ).join('');
+
+                    listEl.innerHTML += `
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg">
+                            <div class="flex items-center gap-3 mb-2 sm:mb-0">
+                                <img src="${user.avatar}" alt="${user.name}" class="w-10 h-10 rounded-full">
+                                <div>
+                                    <h4 class="font-semibold">${user.name}</h4>
+                                    <span class="text-sm text-cinza-texto">${user.username}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <select onchange="app.updateUserRole(${user.id}, this.value)" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-azul-principal outline-none bg-white" ${isCurrentUser ? 'disabled' : ''}>
+                                    ${options}
+                                </select>
+                                <button onclick="app.promptEditUser(${user.id})" class="text-azul-principal hover:underline text-sm font-medium px-2 py-1" title="Editar Usuário">
+                                    Editar
+                                </button>
+                                <button onclick="app.deleteUser(${user.id})" class="text-vermelho-erro hover:underline text-sm font-medium px-2 py-1" ${isCurrentUser ? 'disabled' : ''} title="${isCurrentUser ? 'Você não pode excluir a si mesmo' : 'Excluir usuário'}">
+                                    ${isCurrentUser ? 'Meu Usuário' : 'Excluir'}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            updateUserRole(userId, newRole) {
+                const userIndex = this.db.users.findIndex(u => u.id === userId);
+                if (userIndex === -1) return;
+
+                // Não permite rebaixar o último admin
+                if (this.db.users[userIndex].role === 'Admin' && newRole !== 'Admin') {
+                    const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+                    if (adminCount <= 1) {
+                        this.showAlert('Não é possível alterar o cargo do último Admin.', true);
+                        this.loadUsersAdminList(); // Recarrega para reverter a mudança visual
+                        return;
+                    }
+                }
+
+                this.db.users[userIndex].role = newRole;
+                this.showAlert(`Cargo de ${this.db.users[userIndex].name} atualizado para ${newRole}!`);
+                this.loadUsersAdminList(); // Recarrega a lista
+            },
+
+            deleteUser(userId) {
+                if (userId === this.currentUser.id) {
+                    this.showAlert('Você não pode excluir sua própria conta.', true);
+                    return;
+                }
+                
+                const userIndex = this.db.users.findIndex(u => u.id === userId);
+                if (userIndex === -1) return;
+
+                const userName = this.db.users[userIndex].name;
+
+                // Não permite excluir o último admin
+                if (this.db.users[userIndex].role === 'Admin') {
+                    const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+                    if (adminCount <= 1) {
+                        this.showAlert('Não é possível excluir o último Admin do sistema.', true);
+                        return;
+                    }
+                }
+                
+                this.db.users.splice(userIndex, 1);
+                this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
+                this.loadUsersAdminList(); // Recarrega a lista
+            },
+
+            // --- LÓGICA DOS MODAIS (SENHAS, EDIÇÃO) ---
+
+            // Senha Mestra
+            promptAdminPassword(target) {
+                this.adminTargetScreen = target; // Salva aonde ir (ex: 'admin' ou 'users-admin')
+                document.getElementById('admin-pass-form').reset();
+                document.getElementById('admin-pass-error').classList.add('hidden');
+                this.toggleAdminPasswordModal(true);
+            },
+            
+            toggleAdminPasswordModal(show) {
+                const modal = document.getElementById('admin-password-modal');
+                modal.classList.toggle('hidden', !show);
+                modal.classList.toggle('flex', show);
+            },
+
+            checkAdminPassword() {
+                const password = document.getElementById('admin-pass-input').value;
+                const errorEl = document.getElementById('admin-pass-error');
+
+                if (password === this.db.masterPassword) {
+                    this.toggleAdminPasswordModal(false);
+                    this.showScreen(this.adminTargetScreen); // Vai para o destino salvo
+                } else {
+                    errorEl.classList.remove('hidden');
+                    this.shakeElement('admin-pass-form');
+                }
+            },
+
+            // Senha Pessoal
+            promptChangeMyPassword() {
+                document.getElementById('change-my-pass-form').reset();
+                document.getElementById('change-my-pass-error').classList.add('hidden');
+                document.getElementById('change-my-pass-success').classList.add('hidden');
+                this.toggleChangeMyPasswordModal(true);
+            },
+
+            toggleChangeMyPasswordModal(show) {
+                const modal = document.getElementById('change-password-modal');
+                modal.classList.toggle('hidden', !show);
+                modal.classList.toggle('flex', show);
+            },
+
+            handleChangeMyPassword() {
+                const currentPass = document.getElementById('my-pass-current').value;
+                const newPass = document.getElementById('my-pass-new').value;
+                const confirmPass = document.getElementById('my-pass-confirm').value;
+                
+                const errorEl = document.getElementById('change-my-pass-error');
+                const successEl = document.getElementById('change-my-pass-success');
+                
+                errorEl.classList.add('hidden');
+                successEl.classList.add('hidden');
+
+                if (currentPass !== this.currentUser.password) {
+                    errorEl.innerText = 'Senha atual incorreta.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+                
+                if (newPass.length < 3) {
+                    errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                if (newPass !== confirmPass) {
+                    errorEl.innerText = 'As novas senhas não conferem.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                this.currentUser.password = newPass;
+                const userIndex = this.db.users.findIndex(u => u.id === this.currentUser.id);
+                if (userIndex !== -1) {
+                    this.db.users[userIndex].password = newPass;
+                }
+                
+                successEl.innerText = 'Senha alterada com sucesso!';
+                successEl.classList.remove('hidden');
+                
+                document.getElementById('change-my-pass-form').reset();
+                setTimeout(() => this.toggleChangeMyPasswordModal(false), 2000);
+            },
+
+            // Editar Usuário
+            promptEditUser(userId) {
+                const user = this.db.users.find(u => u.id === userId);
+                if (!user) return;
+
+                document.getElementById('edit-user-form').reset();
+                document.getElementById('edit-user-error').classList.add('hidden');
+                
+                document.getElementById('edit-user-id').value = user.id;
+                document.getElementById('edit-user-name').value = user.name;
+                document.getElementById('edit-user-username').value = user.username;
+                
+                // Popula o select de cargos
+                const roleSelect = document.getElementById('edit-user-role');
+                roleSelect.innerHTML = this.roles.map(role => 
+                    `<option value="${role}" ${user.role === role ? 'selected' : ''}>${role}</option>`
+                ).join('');
+                
+                this.toggleEditUserModal(true);
+            },
+            
+            toggleEditUserModal(show) {
+                const modal = document.getElementById('edit-user-modal');
+                modal.classList.toggle('hidden', !show);
+                modal.classList.toggle('flex', show);
+            },
+
+            handleEditUser() {
+                const userId = parseInt(document.getElementById('edit-user-id').value);
+                const name = document.getElementById('edit-user-name').value.trim();
+                const username = document.getElementById('edit-user-username').value.trim();
+                const role = document.getElementById('edit-user-role').value;
+                const newPassword = document.getElementById('edit-user-password').value; 
+                
+                const errorEl = document.getElementById('edit-user-error');
+                errorEl.classList.add('hidden');
+
+                const userIndex = this.db.users.findIndex(u => u.id === userId);
+                if (userIndex === -1) {
+                    this.showAlert('Erro: Usuário não encontrado.', true);
+                    return;
+                }
+                
+                // Verifica se o novo username já existe (e não é do próprio usuário)
+                if (this.db.users.some(u => u.username === username && u.id !== userId)) {
+                    errorEl.innerText = 'Este nome de usuário já está em uso.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                // Atualiza dados
+                this.db.users[userIndex].name = name;
+                this.db.users[userIndex].username = username;
+                
+                // Lógica de segurança para cargo
+                this.updateUserRole(userId, role); // Usa a função que já tem a trava de segurança
+                this.db.users[userIndex].role = document.getElementById('edit-user-role').value; // Garante que o select foi lido
+                
+                if (newPassword.trim().length > 0) {
+                    if (newPassword.trim().length < 3) {
+                         errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
+                         errorEl.classList.remove('hidden');
+                         return;
+                    }
+                    this.db.users[userIndex].password = newPassword.trim();
+                }
+                
+                this.showAlert(`Usuário ${name} atualizado com sucesso!`);
+                this.toggleEditUserModal(false);
+                this.loadUsersAdminList(); // Recarrega a lista
+            },
+
+            // Senha Mestra
+            handleChangeMasterPassword() {
+                const currentPass = document.getElementById('master-pass-current').value;
+                const newPass = document.getElementById('master-pass-new').value;
+                const confirmPass = document.getElementById('master-pass-confirm').value;
+
+                const errorEl = document.getElementById('change-master-pass-error');
+                const successEl = document.getElementById('change-master-pass-success');
+
+                errorEl.classList.add('hidden');
+                successEl.classList.add('hidden');
+
+                if (currentPass !== this.db.masterPassword) {
+                    errorEl.innerText = 'Senha mestra atual incorreta.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                if (newPass.length < 3) {
+                    errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                if (newPass !== confirmPass) {
+                    errorEl.innerText = 'As novas senhas não conferem.';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                this.db.masterPassword = newPass;
+                
+                successEl.innerText = 'Senha mestra alterada com sucesso!';
+                successEl.classList.remove('hidden');
+                document.getElementById('change-master-pass-form').reset();
+            }
+        };
+
+        // Inicia a aplicação quando o DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
+</body>
+</html>
