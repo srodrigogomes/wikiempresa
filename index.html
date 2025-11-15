@@ -44,8 +44,12 @@
         .text-cinza-texto { color: var(--cinza-texto); }
         .text-verde-sucesso { color: var(--verde-sucesso); }
         .text-vermelho-erro { color: var(--vermelho-erro); }
+        
+        .hover\:bg-vermelho-erro\/20:hover { background-color: rgba(232, 122, 122, 0.2); }
+        .hover\:bg-vermelho-erro\/30:hover { background-color: rgba(232, 122, 122, 0.3); }
 
         .border-azul-principal { border-color: var(--azul-principal); }
+        .border-vermelho-erro { border-color: var(--vermelho-erro); }
 
         .ring-azul-principal { --tw-ring-color: var(--azul-principal); }
 
@@ -124,6 +128,15 @@
         .animate-shake {
             animation: shake 0.5s ease-in-out;
         }
+
+        /* Estilo para Modal de Confirmação */
+        .modal {
+            display: none; /* Oculto por padrão */
+        }
+        .modal.flex {
+            display: flex; /* Mostra quando ativo */
+        }
+
     </style>
 </head>
 <body class="bg-cinza-fundo text-azul-escuro overflow-x-hidden">
@@ -266,7 +279,7 @@
                 
                 <!-- Bloco Admin: Gerenciar Conteúdo (CRUD de Artigos) -->
                 <div id="admin-articles-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.promptAdminPassword('admin')">
+                     onclick="app.accessAdminScreen('admin')">
                     <i class="ph-bold ph-pencil-simple-line text-7xl text-azul-principal mb-4"></i>
                     <h2 class="text-2xl font-bold mb-2">Gerenciar Conteúdo</h2>
                     <p class="text-cinza-texto">Adicionar, editar ou remover artigos da base de conhecimento.</p>
@@ -274,7 +287,7 @@
                 
                 <!-- Bloco Admin: Gerenciar Usuários (Somente Admin) -->
                 <div id="admin-users-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.promptAdminPassword('users-admin')">
+                     onclick="app.accessAdminScreen('users-admin')">
                     <i class="ph-bold ph-users-three text-7xl text-azul-principal mb-4"></i>
                     <h2 class="text-2xl font-bold mb-2">Gerenciar Usuários</h2>
                     <p class="text-cinza-texto">Editar cargos, senhas e excluir usuários do sistema.</p>
@@ -509,7 +522,7 @@
     <!-- MODAIS (Fora do <main> para garantir o z-index) -->
 
     <!-- MODAL: Verificação de Senha Admin -->
-    <div id="admin-password-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+    <div id="admin-password-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <form id="admin-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
             <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Acesso Restrito</h2>
             <p class="text-cinza-texto text-center mb-6">Por favor, insira a senha mestra de administrador para continuar.</p>
@@ -535,7 +548,7 @@
     </div>
 
     <!-- MODAL: Alteração de Senha Pessoal -->
-    <div id="change-password-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+    <div id="change-password-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <form id="change-my-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
             <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Alterar Minha Senha</h2>
             
@@ -569,7 +582,7 @@
     </div>
 
     <!-- MODAL: Editar Usuário (Admin) -->
-    <div id="edit-user-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+    <div id="edit-user-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <form id="edit-user-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
             <h2 class="text-2xl font-bold text-azul-escuro mb-6">Editar Usuário</h2>
             <input type="hidden" id="edit-user-id">
@@ -611,7 +624,7 @@
     </div>
 
     <!-- NOVO MODAL: Adicionar/Editar Contato (Admin) -->
-    <div id="edit-contact-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-6">
+    <div id="edit-contact-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <form id="edit-contact-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
             <h2 id="edit-contact-title" class="text-2xl font-bold text-azul-escuro mb-6">Adicionar Contato</h2>
             <input type="hidden" id="edit-contact-id">
@@ -644,6 +657,28 @@
                 </button>
             </div>
         </form>
+    </div>
+
+    <!-- NOVO MODAL: Confirmação de Exclusão -->
+    <div id="confirm-modal" class="modal fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+        <div class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-vermelho-erro/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="ph-bold ph-trash text-vermelho-erro text-4xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-azul-escuro mb-4">Confirmar Exclusão</h2>
+                <p id="confirm-modal-text" class="text-cinza-texto text-center mb-6">Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.</p>
+            </div>
+            
+            <div class="flex items-center justify-center space-x-4 mt-6">
+                <button type="button" id="confirm-modal-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+                    Cancelar
+                </button>
+                <button type="button" id="confirm-modal-delete" class="bg-vermelho-erro text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-all">
+                    Excluir
+                </button>
+            </div>
+        </div>
     </div>
 
 
@@ -747,6 +782,7 @@
             adminTargetScreen: null, // Para onde ir após senha mestra
             roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], // Cargos Padrão
             editingContactId: null, // Para CRUD de contatos
+            deleteAction: { type: null, id: null }, // Para modal de confirmação
 
             init() {
                 // Formulários de Autenticação
@@ -777,6 +813,10 @@
                 // NOVO: CRUD de Contatos
                 document.getElementById('edit-contact-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleEditContact(); });
                 document.getElementById('edit-contact-cancel').addEventListener('click', () => this.toggleEditContactModal(false));
+
+                // NOVO: Modal de Confirmação
+                document.getElementById('confirm-modal-cancel').addEventListener('click', () => this.toggleConfirmModal(false));
+                document.getElementById('confirm-modal-delete').addEventListener('click', () => this.handleConfirmDelete());
 
                 // Popula selects de cargo
                 this.populateRoleSelects();
@@ -812,11 +852,11 @@
                 
                 // Proteção extra para admin
                 if (this.currentUser) {
-                    const isSupervisorOrAdmin = ['Supervisor', 'Admin'].includes(this.currentUser.role);
+                    const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role); // <-- MODIFICADO
                     const isAdmin = this.currentUser.role === 'Admin';
 
-                    if (screenId === 'admin' && !isSupervisorOrAdmin) {
-                        this.showAlert('Acesso negado. Apenas Supervisor ou Admin.', true);
+                    if (screenId === 'admin' && !canManageContent) { // <-- MODIFICADO
+                        this.showAlert('Acesso negado. Apenas Nível 3 ou superior.', true); // <-- MODIFICADO
                         screenId = 'home';
                     }
                     if ((screenId === 'users-admin' || screenId === 'register') && !isAdmin) {
@@ -971,7 +1011,7 @@
                                 ${isAdmin ? `
                                 <div class="flex gap-2 w-full">
                                     <button onclick="app.promptEditContact(${contact.id})" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 text-sm flex-1 justify-center">Editar</button>
-                                    <button onclick="app.deleteContact(${contact.id})" class="bg-vermelho-erro/20 text-vermelho-erro px-4 py-2 rounded-lg font-medium hover:bg-vermelho-erro/30 text-sm flex-1 justify-center">Excluir</button>
+                                    <button onclick="app.deleteContact(${contact.id}, '${contact.name}')" class="bg-vermelho-erro/20 text-vermelho-erro px-4 py-2 rounded-lg font-medium hover:bg-vermelho-erro/30 text-sm flex-1 justify-center">Excluir</button>
                                 </div>
                                 ` : ''}
                             </div>
@@ -1054,6 +1094,9 @@
             toggleSearchResults(show) {
                 document.getElementById('search-results-container').classList.toggle('hidden', !show);
                 document.getElementById('categories-container').classList.toggle('hidden', show);
+                if (show && !document.getElementById('search-results-title').innerText.startsWith("Resultados para:")) {
+                    document.getElementById('search-results-title').innerText = "Resultados da Busca";
+                }
             },
 
             showArticlesByCategory(category) {
@@ -1176,11 +1219,11 @@
                 const firstName = this.currentUser.name.split(' ')[0];
                 document.getElementById('home-welcome-title').innerText = `Bem-vindo(a), ${firstName}. O que você precisa?`;
 
-                const adminRoles = ['Supervisor', 'Admin'];
+                const contentAdminRoles = ['Atendente N3', 'Supervisor', 'Admin']; // <-- MODIFICADO
                 const articleAdminCard = document.getElementById('admin-articles-card');
                 const userAdminCard = document.getElementById('admin-users-card');
 
-                articleAdminCard.classList.toggle('hidden', !adminRoles.includes(this.currentUser.role));
+                articleAdminCard.classList.toggle('hidden', !contentAdminRoles.includes(this.currentUser.role)); // <-- MODIFICADO
                 userAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
             },
 
@@ -1203,7 +1246,7 @@
                             </div>
                             <div class="space-x-2 flex-shrink-0">
                                 <button onclick="app.editArticle(${article.id})" class="text-azul-principal hover:underline text-sm font-medium">Editar</button>
-                                <button onclick="app.deleteArticle(${article.id})" class="text-vermelho-erro hover:underline text-sm font-medium">Excluir</button>
+                                <button onclick="app.deleteArticle(${article.id}, '${article.title}')" class="text-vermelho-erro hover:underline text-sm font-medium">Excluir</button>
                             </div>
                         </div>
                     `;
@@ -1268,15 +1311,9 @@
                 document.getElementById('admin-form').scrollIntoView({ behavior: 'smooth' });
             },
 
-            deleteArticle(articleId) {
-                if (confirm('Tem certeza que deseja excluir este artigo?')) {
-                    const index = this.db.articles.findIndex(a => a.id === articleId);
-                    if (index !== -1) {
-                        this.db.articles.splice(index, 1);
-                        this.showAlert('Artigo excluído com sucesso.', true);
-                        this.loadAdminList();
-                    }
-                }
+            deleteArticle(articleId, title) {
+                // USA O MODAL
+                this.promptDelete('article', articleId, `Tem certeza que deseja excluir o artigo "${title}"?`);
             },
 
             resetForm() {
@@ -1327,7 +1364,7 @@
                                 <button onclick="app.promptEditUser(${user.id})" class="text-azul-principal hover:underline text-sm font-medium px-2 py-1" title="Editar Usuário">
                                     Editar
                                 </button>
-                                <button onclick="app.deleteUser(${user.id})" class="text-vermelho-erro hover:underline text-sm font-medium px-2 py-1" ${isCurrentUser ? 'disabled' : ''} title="${isCurrentUser ? 'Você não pode excluir a si mesmo' : 'Excluir usuário'}">
+                                <button onclick="app.deleteUser(${user.id}, '${user.name}')" class="text-vermelho-erro hover:underline text-sm font-medium px-2 py-1" ${isCurrentUser ? 'disabled' : ''} title="${isCurrentUser ? 'Você não pode excluir a si mesmo' : 'Excluir usuário'}">
                                     ${isCurrentUser ? 'Meu Usuário' : 'Excluir'}
                                 </button>
                             </div>
@@ -1354,33 +1391,44 @@
                 this.loadUsersAdminList(); 
             },
 
-            deleteUser(userId) {
-                if (userId === this.currentUser.id) {
-                    this.showAlert('Você não pode excluir sua própria conta.', true);
-                    return;
-                }
-
-                const userIndex = this.db.users.findIndex(u => u.id === userId);
-                if (userIndex === -1) return;
-
-                const userName = this.db.users[userIndex].name;
-                
-                if (confirm(`Tem certeza que deseja excluir o usuário ${userName}?`)) {
-                    if (this.db.users[userIndex].role === 'Admin') {
-                        const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
-                        if (adminCount <= 1) {
-                            this.showAlert('Não é possível excluir o último Admin do sistema.', true);
-                            return;
-                        }
-                    }
-                    
-                    this.db.users.splice(userIndex, 1);
-                    this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
-                    this.loadUsersAdminList(); 
-                }
+            deleteUser(userId, name) {
+                // USA O MODAL
+                this.promptDelete('user', userId, `Tem certeza que deseja excluir o usuário ${name}?`);
             },
 
             // --- LÓGICA DOS MODAIS (SENHAS, EDIÇÃO) ---
+
+            /**
+             * NOVO: Verifica as permissões antes de tentar acessar uma tela de admin.
+             * Para "Gerenciar Conteúdo", o N3+ entra direto.
+             * Para "Gerenciar Usuários", o Admin ainda precisa da senha mestra.
+             */
+            accessAdminScreen(target) {
+                if (!this.currentUser) {
+                    this.showScreen('login'); // Segurança
+                    return;
+                }
+
+                const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
+                const isAdmin = this.currentUser.role === 'Admin';
+
+                if (target === 'admin') {
+                    if (canManageContent) {
+                        this.showScreen('admin'); // N3+ entra direto no Gerenciar Conteúdo
+                    } else {
+                        this.showAlert('Acesso negado.', true);
+                        this.showScreen('home');
+                    }
+                } else if (target === 'users-admin') {
+                    if (isAdmin) {
+                        // Apenas Admins podem *tentar* ver, e pedimos a senha mestra
+                        this.promptAdminPassword('users-admin');
+                    } else {
+                        this.showAlert('Acesso negado.', true);
+                        this.showScreen('home');
+                    }
+                }
+            },
 
             // Senha Mestra
             promptAdminPassword(target) {
@@ -1630,15 +1678,77 @@
                 this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
             },
 
-            deleteContact(contactId) {
-                if (confirm('Tem certeza que deseja excluir este contato?')) {
-                    const index = this.db.contacts.findIndex(c => c.id === contactId);
-                    if (index !== -1) {
-                        this.db.contacts.splice(index, 1);
-                        this.showAlert('Contato excluído com sucesso.', true);
-                        this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
-                    }
+            deleteContact(contactId, name) {
+                // USA O MODAL
+                this.promptDelete('contact', contactId, `Tem certeza que deseja excluir o contato ${name}?`);
+            },
+
+            // --- NOVO: LÓGICA DO MODAL DE CONFIRMAÇÃO ---
+            
+            /**
+             * Exibe o modal de confirmação para uma ação de exclusão.
+             * @param {string} type - O tipo de item a ser excluído ('article', 'user', 'contact').
+             * @param {number} id - O ID do item.
+             * @param {string} message - A mensagem a ser exibida no modal.
+             */
+            promptDelete(type, id, message) {
+                this.deleteAction = { type, id };
+                document.getElementById('confirm-modal-text').innerText = message || 'Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.';
+                this.toggleConfirmModal(true);
+            },
+
+            toggleConfirmModal(show) {
+                const modal = document.getElementById('confirm-modal');
+                modal.classList.toggle('hidden', !show);
+                modal.classList.toggle('flex', show);
+            },
+
+            handleConfirmDelete() {
+                const { type, id } = this.deleteAction;
+                if (!type || id === null) return;
+
+                switch (type) {
+                    case 'article':
+                        const articleIndex = this.db.articles.findIndex(a => a.id === id);
+                        if (articleIndex !== -1) {
+                            this.db.articles.splice(articleIndex, 1);
+                            this.showAlert('Artigo excluído com sucesso.', true);
+                            this.loadAdminList();
+                        }
+                        break;
+                    
+                    case 'user':
+                        const userIndex = this.db.users.findIndex(u => u.id === id);
+                        if (userIndex === -1) return;
+                        
+                        const userName = this.db.users[userIndex].name;
+                        
+                        if (this.db.users[userIndex].role === 'Admin') {
+                            const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+                            if (adminCount <= 1) {
+                                this.showAlert('Não é possível excluir o último Admin do sistema.', true);
+                                this.toggleConfirmModal(false); // Fecha o modal sem excluir
+                                return;
+                            }
+                        }
+                        
+                        this.db.users.splice(userIndex, 1);
+                        this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
+                        this.loadUsersAdminList(); 
+                        break;
+                    
+                    case 'contact':
+                        const contactIndex = this.db.contacts.findIndex(c => c.id === id);
+                        if (contactIndex !== -1) {
+                            this.db.contacts.splice(contactIndex, 1);
+                            this.showAlert('Contato excluído com sucesso.', true);
+                            this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
+                        }
+                        break;
                 }
+
+                this.toggleConfirmModal(false);
+                this.deleteAction = { type: null, id: null }; // Limpa a ação
             }
         };
 
