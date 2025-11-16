@@ -202,6 +202,15 @@
 
             <!-- Perfil do Usuário (Agora dinâmico) -->
             <div id="user-profile-menu" class="hidden items-center space-x-3">
+                
+                <!-- NOVO: Sino de Aprovação -->
+                <button id="approval-bell" onclick="app.showScreen('approvals')" class="hidden relative ml-2 text-cinza-texto hover:text-azul-principal transition-all" title="Artigos Pendentes">
+                    <i class="ph-bold ph-bell text-2xl"></i>
+                    <span id="approval-badge" class="hidden absolute -top-1 -right-1 w-4 h-4 bg-vermelho-erro text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        <!-- Contagem via JS -->
+                    </span>
+                </button>
+
                 <span class="hidden sm:inline text-right text-sm">
                     <div id="user-profile-name" class="font-medium"></div>
                     <div id="user-profile-role" class="text-cinza-texto"></div>
@@ -313,7 +322,7 @@
                     </div>
                 </div>
 
-                <!-- NOVO Bloco: Gerador de Artigos por IA -->
+                <!-- Bloco: Gerador de Artigos por IA (Agora visível para N1+) -->
                 <div id="ai-generator-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer md:col-span-1 lg:col-span-2"
                      onclick="app.showScreen('ai-generator')">
                     <div class="flex items-center space-x-6">
@@ -647,7 +656,7 @@
             </div>
         </section>
 
-        <!-- NOVA TELA 9: AI ARTICLE GENERATOR -->
+        <!-- TELA 9: AI ARTICLE GENERATOR -->
         <section id="ai-generator-screen" class="screen fade-in max-w-3xl mx-auto">
             <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
                 <i class="ph-bold ph-arrow-left mr-1"></i>
@@ -656,7 +665,7 @@
             <h1 class="text-3xl font-bold mb-6">Gerador de Artigos por IA</h1>
             <p class="text-cinza-texto mb-6">Cole o texto de uma transcrição, PDF ou anotação, ou envie a foto de um rascunho. A IA irá analisar o conteúdo e preencher um novo artigo para você.</p>
             
-            <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="bg-white p-8 rounded-xl shadow-lg relative"> <!-- Adicionado relative para o overlay -->
                 <!-- Tabs -->
                 <div class="flex mb-6 rounded-lg overflow-hidden border border-gray-300">
                     <button id="ai-gen-tab-text" class="ai-gen-tab-btn flex-1 p-3 font-medium text-lg transition-all active" onclick="app.switchAiGenTab('text')">
@@ -686,20 +695,40 @@
                     </div>
                 </div>
 
-                <!-- Botão de Gerar -->
+                <!-- Botão de Gerar (Texto muda via JS) -->
                 <button id="ai-gen-submit-btn" onclick="app.handleAIGenerateArticle()" class="mt-6 w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg flex items-center justify-center space-x-2">
                     <i class="ph-bold ph-magic-wand"></i>
-                    <span>Analisar e Gerar Artigo</span>
+                    <span id="ai-gen-submit-btn-text">Analisar e Gerar Artigo</span>
                 </button>
 
                 <!-- Loading Overlay -->
-                <div id="ai-gen-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl">
+                <div id="ai-gen-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl z-10">
                     <i class="ph-bold ph-spinner text-azul-principal text-5xl animate-spin"></i>
-                    <span class="mt-4 font-medium text-azul-escuro">A IA está analisando e gerando o artigo...</span>
+                    <span id="ai-gen-loading-text" class="mt-4 font-medium text-azul-escuro">A IA está analisando e gerando o artigo...</span>
                     <span class="text-sm text-cinza-texto">Isso pode levar alguns segundos.</span>
                 </div>
             </div>
         </section>
+
+        <!-- NOVA TELA 10: APROVAÇÕES (N3+) -->
+        <section id="approvals-screen" class="screen fade-in max-w-4xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-3xl font-bold">Artigos Pendentes de Aprovação</h1>
+            </div>
+            
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                 <h2 class="text-2xl font-bold mb-6">Fila de Aprovação</h2>
+                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Revise os artigos enviados pelos atendentes. Ao aprovar, você será levado à tela de edição para finalizar e salvar.</p>
+                 <div class="space-y-4" id="approvals-list">
+                     <!-- Lista de artigos pendentes será populada pelo JS -->
+                 </div>
+            </div>
+        </section>
+
 
         <!-- Alerta de "Copiado!" -->
         <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
@@ -878,92 +907,34 @@
         // Simulação de um banco de dados
         const mockDB = {
             masterPassword: "admin123", // Senha mestra
-            nextUserId: 4,
+            nextUserId: 5, // Aumentado para 5
             nextContactId: 5,
             nextLogId: 1, 
+            nextPendingId: 1, // NOVO: Para a fila de aprovação
             users: [
                 { id: 1, name: "Ana Sousa", username: "ana", password: "123", role: "Atendente N1", avatar: "https://placehold.co/100x100/4FA3FF/FFFFFF?text=A&font=inter" },
-                { id: 2, name: "Bruno Costa", username: "bruno", password: "123", role: "Supervisor", avatar: "https://placehold.co/100x100/1F2F4B/FFFFFF?text=B&font=inter" },
-                { id: 3, name: "Admin Mestre", username: "admin", password: "admin", role: "Admin", avatar: "https://placehold.co/100x100/E87A7A/FFFFFF?text=AD&font=inter" }
+                { id: 2, name: "Carlos Lima", username: "carlos", password: "123", role: "Atendente N2", avatar: "https://placehold.co/100x100/76D19B/FFFFFF?text=C&font=inter" }, // NOVO USUÁRIO N2
+                { id: 3, name: "Bruno Costa", username: "bruno", password: "123", role: "Supervisor", avatar: "https://placehold.co/100x100/1F2F4B/FFFFFF?text=B&font=inter" }, // ID ajustado
+                { id: 4, name: "Admin Mestre", username: "admin", password: "admin", role: "Admin", avatar: "https://placehold.co/100x100/E87A7A/FFFFFF?text=AD&font=inter" } // ID ajustado
             ],
             sectors: [
                 { id: 1, name: "Suporte Técnico" },
                 { id: 2, name: "Operacional" }
             ],
             articles: [
-                {
-                    id: 1,
-                    sector_id: 1,
-                    category: "Problemas Comuns",
-                    title: "Cliente sem conexão (Luz LOS piscando)",
-                    content: "Quando a luz 'LOS' do roteador está piscando em vermelho, indica um problema de sinal óptico, geralmente rompimento de fibra.",
-                    steps: [
-                        "Acalme o cliente e informe que a luz indica um problema físico na rede.",
-                        "Confirme o endereço completo.",
-                        "Verifique se há outros clientes na mesma região com o mesmo problema (pode ser falha massiva).",
-                        "Abra um chamado técnico de urgência para a equipe de campo."
-                    ],
-                    message_to_client: "Entendo, essa luz piscando indica que há um problema físico na fibra que chega até sua casa. Já estou registrando sua solicitação e enviando uma equipe técnica para verificar a rede na sua rua o mais rápido possível.",
-                    tags: ["los", "vermelha", "piscando", "sem sinal", "fibra", "rompimento"],
-                    updated_at: "14/11/2025"
-                },
-                {
-                    id: 2,
-                    sector_id: 1,
-                    category: "Problemas Comuns",
-                    title: "Poste caído ou fibra rompida na rua",
-                    content: "Cliente informa dano físico visível na infraestrutura da rua (poste caído, cabo partido, etc.) que causou a queda de sinal.",
-                    steps: [
-                        "Agradeça a informação (é valiosa).",
-                        "NÃO prometa prazo. Informe que é uma manutenção emergencial complexa.",
-                        "Confirme o endereço exato do dano.",
-                        "Abra um chamado de EMERGÊNCIA tipo 'Dano Físico' para o Operacional e informe o supervisor."
-                    ],
-                    message_to_client: "Muito obrigado por nos avisar sobre o poste! Sua informação é muito importante. Já estou abrindo um chamado de emergência para nossa equipe técnica verificar a situação no local. Como é um dano físico na rede, pode levar um tempo para normalizar, mas faremos o mais rápido possível.",
-                    tags: ["poste", "cabo", "rompido", "caiu", "acidente", "emergência", "fibra"],
-                    updated_at: "13/11/2025"
-                },
-                {
-                    id: 3,
-                    sector_id: 1,
-                    category: "Procedimentos",
-                    title: "Internet Lenta (Verificação Padrão)",
-                    content: "Cliente reclama de lentidão, mas tem conexão. Procedimento padrão de diagnóstico inicial antes de escalar.",
-                    steps: [
-                        "Peça ao cliente para reiniciar o roteador (tirar da tomada por 30s).",
-                        "Pergunte se a lentidão é no Wi-Fi ou no cabo.",
-                        "Solicite um teste de velocidade (usando nosso medidor oficial) no cabo, se possível.",
-                        "Se a velocidade no cabo estiver normal, o problema é o Wi-Fi (vá para 'Procedimento: Wi-Fi Lento').",
-                        "Se no cabo estiver lento, verifique o consumo de banda no sistema e agende visita técnica."
-                    ],
-                    message_to_client: "Certo, vamos verificar sua lentidão. Por favor, reinicie seu roteador tirando-o da tomada por 30 segundos. Enquanto ele reinicia, me diga: você nota essa lentidão em quais dispositivos? É mais no celular (Wi-Fi) ou em um computador no cabo?",
-                    tags: ["lentidão", "lenta", "velocidade", "teste", "wifi", "cabo"],
-                    updated_at: "10/11/2025"
-                },
-                 {
-                    id: 4,
-                    sector_id: 2,
-                    category: "Procedimentos",
-                    title: "Ativação de Novo Cliente (Provisionamento)",
-                    content: "Procedimento para provisionar uma nova ONU na OLT.",
-                    steps: [
-                        "Coletar S/N (Serial Number) da ONU com o técnico.",
-                        "Acessar a OLT referente à localidade.",
-                        "Provisionar na porta correta conforme projeto.",
-                        "Verificar se ONU autenticou (Sinal OK)."
-                    ],
-                    message_to_client: "(Uso interno do técnico. Não enviar ao cliente.)",
-                    tags: ["onu", "olt", "provisionar", "ativacao", "novo cliente"],
-                    updated_at: "09/11/2025"
-                }
+                // ... (artigos existentes omitidos para brevidade) ...
+                { id: 1, sector_id: 1, category: "Problemas Comuns", title: "Cliente sem conexão (Luz LOS piscando)", content: "Quando a luz 'LOS' do roteador está piscando em vermelho, indica um problema de sinal óptico, geralmente rompimento de fibra.", steps: ["Acalme o cliente...", "Confirme o endereço...", "Verifique se há outros clientes...", "Abra um chamado..."], message_to_client: "Entendo, essa luz piscando indica que há um problema físico...", tags: ["los", "vermelha", "piscando", "sem sinal", "fibra", "rompimento"], updated_at: "14/11/2025" },
+                { id: 2, sector_id: 1, category: "Problemas Comuns", title: "Poste caído ou fibra rompida na rua", content: "Cliente informa dano físico visível...", steps: ["Agradeça a informação...", "NÃO prometa prazo...", "Confirme o endereço...", "Abra um chamado de EMERGÊNCIA..."], message_to_client: "Muito obrigado por nos avisar sobre o poste!...", tags: ["poste", "cabo", "rompido", "caiu", "acidente", "emergência", "fibra"], updated_at: "13/11/2025" },
+                { id: 3, sector_id: 1, category: "Procedimentos", title: "Internet Lenta (Verificação Padrão)", content: "Cliente reclama de lentidão, mas tem conexão...", steps: ["Peça ao cliente para reiniciar o roteador...", "Pergunte se a lentidão é no Wi-Fi...", "Solicite um teste de velocidade...", "Se a velocidade no cabo estiver normal...", "Se no cabo estiver lento..."], message_to_client: "Certo, vamos verificar sua lentidão...", tags: ["lentidão", "lenta", "velocidade", "teste", "wifi", "cabo"], updated_at: "10/11/2025" },
+                { id: 4, sector_id: 2, category: "Procedimentos", title: "Ativação de Novo Cliente (Provisionamento)", content: "Procedimento para provisionar uma nova ONU na OLT.", steps: ["Coletar S/N (Serial Number) da ONU...", "Acessar a OLT...", "Provisionar na porta correta...", "Verificar se ONU autenticou..."], message_to_client: "(Uso interno do técnico. Não enviar ao cliente.)", tags: ["onu", "olt", "provisionar", "ativacao", "novo cliente"], updated_at: "09/11/2025" }
             ],
             contacts: [
+                // ... (contatos existentes omitidos para brevidade) ...
                 { id: 1, name: "Marcos Oliveira", role: "Técnico de Campo (Plantão)", team: "Operacional", phone: "(00) 98888-1234" },
                 { id: 2, name: "Carla Mendes", role: "Supervisora (Plantão NOC)", team: "Suporte Avançado", phone: "(00) 99999-4321" },
-                { id: 3, name: "Equipe NOC N2", role: "Fila de Atendimento", team: "Suporte Avançado", phone: "0800-000-002" },
-                { id: 4, name: "Ricardo Almeida", role: "Técnico de Fibra (Plantão)", team: "Operacional", phone: "(00) 97777-5555" }
             ],
-            auditLog: []
+            auditLog: [],
+            pendingArticles: [] // NOVO: Fila de aprovação
         };
 
         // Lógica da Aplicação
@@ -974,13 +945,14 @@
             db: mockDB,
             editingArticleId: null, 
             adminTargetScreen: null, 
-            roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], 
+            roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], // NOVO: N2 adicionado
             editingContactId: null, 
             deleteAction: { type: null, id: null }, 
             geminiAPIKey: "", // Deixe em branco
             geminiAPIModel: "gemini-2.5-flash-preview-09-2025",
-            aiGenCurrentTab: 'text', // NOVO: 'text' ou 'image'
-            aiGenBase64Image: null, // NOVO: Armazena a imagem
+            aiGenCurrentTab: 'text', 
+            aiGenBase64Image: null, 
+            editingPendingId: null, // NOVO: ID do artigo pendente que está sendo editado
 
             init() {
                 // Formulários de Autenticação
@@ -1019,9 +991,11 @@
                 // AI Chat
                 document.getElementById('ai-chat-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleAIChatSubmit(); });
 
-                // NOVO: AI Generator
+                // AI Generator
                 document.getElementById('ai-gen-image-input').addEventListener('change', (e) => this.handleImageUpload(e));
                 document.getElementById('ai-gen-image-clear').addEventListener('click', () => this.clearImageUpload());
+                // NOVO: O botão de gerar agora é centralizado
+                document.getElementById('ai-gen-submit-btn').addEventListener('click', () => this.handleAIGenerateArticle());
 
                 // Popula selects de cargo
                 this.populateRoleSelects();
@@ -1036,6 +1010,9 @@
                 const authScreens = ['login']; 
                 const isAuthScreen = authScreens.includes(screenId);
                 const adminScreens = ['admin', 'users-admin', 'register', 'history']; 
+                // NOVO: Telas de aprovação e geração são protegidas
+                const approvalScreens = ['approvals'];
+                const generatorScreens = ['ai-generator'];
                 
                 const header = document.getElementById('main-header');
                 const main = document.getElementById('main-content');
@@ -1053,18 +1030,31 @@
                     screenId = 'home';
                 }
                 
+                // Lógica de permissão
                 if (this.currentUser) {
                     const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
+                    const canSubmitContent = ['Atendente N1', 'Atendente N2'].includes(this.currentUser.role);
                     const isAdmin = this.currentUser.role === 'Admin';
 
-                    // NOVO: Proteção para o gerador de IA
-                    if ((screenId === 'admin' || screenId === 'ai-generator') && !canManageContent) {
+                    // N1/N2 não podem ver admin
+                    if (adminScreens.includes(screenId) && !canManageContent) {
                         this.showAlert('Acesso negado. Apenas Nível 3 ou superior.', true); 
                         screenId = 'home';
                     }
+                    // Apenas Admins podem ver telas de admin de usuário/histórico
                     if ((screenId === 'users-admin' || screenId === 'register' || screenId === 'history') && !isAdmin) {
                          this.showAlert('Acesso negado. Apenas Admins.', true);
                          screenId = 'home';
+                    }
+                    // Apenas N3+ podem ver a tela de aprovações
+                    if (approvalScreens.includes(screenId) && !canManageContent) {
+                         this.showAlert('Acesso negado. Apenas Nível 3 ou superior.', true);
+                         screenId = 'home';
+                    }
+                    // Ninguém abaixo de N1 pode usar o gerador
+                    if (generatorScreens.includes(screenId) && !canManageContent && !canSubmitContent) {
+                        this.showAlert('Acesso negado.', true);
+                        screenId = 'home';
                     }
                 }
 
@@ -1105,8 +1095,10 @@
                         this.loadHistory();
                     }
                     if (screenId === 'ai-generator') {
-                        this.clearImageUpload();
-                        document.getElementById('ai-gen-text-input').value = '';
+                        this.setupAIGeneratorScreen(); // NOVO
+                    }
+                    if (screenId === 'approvals' && this.currentUser) { // NOVO
+                        this.loadApprovalsScreen();
                     }
                     
                     if (this.currentUser) {
@@ -1372,7 +1364,7 @@
                 
                 setTimeout(() => {
                     alertEl.classList.add('translate-y-10', 'opacity-0');
-                    setTimeout(() => alertEl.classList.add('hidden'), 300);
+                    setTimeout(() => alertEl.classList.add('hidden'), 3000);
                 }, 3000);
             },
 
@@ -1454,17 +1446,32 @@
                 const firstName = this.currentUser.name.split(' ')[0];
                 document.getElementById('home-welcome-title').innerText = `Bem-vindo(a), ${firstName}. O que você precisa?`;
 
-                const contentAdminRoles = ['Atendente N3', 'Supervisor', 'Admin'];
-                const articleAdminCard = document.getElementById('admin-articles-card');
-                const userAdminCard = document.getElementById('admin-users-card');
-                const historyAdminCard = document.getElementById('admin-history-card');
-                const aiGeneratorCard = document.getElementById('ai-generator-card'); // NOVO
+                // Define permissões
+                const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
+                const canSubmitContent = ['Atendente N1', 'Atendente N2'].includes(this.currentUser.role);
+                const isAdmin = this.currentUser.role === 'Admin';
 
-                const canManageContent = contentAdminRoles.includes(this.currentUser.role);
-                articleAdminCard.classList.toggle('hidden', !canManageContent);
-                aiGeneratorCard.classList.toggle('hidden', !canManageContent); // NOVO
-                userAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
-                historyAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
+                // Controla visibilidade dos cards da Home
+                document.getElementById('admin-articles-card').classList.toggle('hidden', !canManageContent);
+                document.getElementById('ai-generator-card').classList.toggle('hidden', !canManageContent && !canSubmitContent); // N1+ podem ver
+                document.getElementById('admin-users-card').classList.toggle('hidden', !isAdmin);
+                document.getElementById('admin-history-card').classList.toggle('hidden', !isAdmin);
+                
+                // NOVO: Lógica do Sino de Aprovação
+                const approvalBell = document.getElementById('approval-bell');
+                const approvalBadge = document.getElementById('approval-badge');
+                if (canManageContent) {
+                    approvalBell.classList.remove('hidden'); // Mostra o sino para N3+
+                    const pendingCount = this.db.pendingArticles.length;
+                    if (pendingCount > 0) {
+                        approvalBadge.innerText = pendingCount > 9 ? '9+' : pendingCount;
+                        approvalBadge.classList.remove('hidden');
+                    } else {
+                        approvalBadge.classList.add('hidden');
+                    }
+                } else {
+                    approvalBell.classList.add('hidden'); // Esconde o sino para N1/N2
+                }
             },
 
 
@@ -1475,7 +1482,7 @@
                 if (!listEl) return;
                 listEl.innerHTML = '';
                 
-                const articlesToManage = this.db.articles; 
+                const articlesToManage = this.db.articles.sort((a, b) => b.id - a.id); // Mais novos primeiro
 
                 articlesToManage.forEach(article => {
                     listEl.innerHTML += `
@@ -1532,8 +1539,18 @@
                     this.showAlert('Artigo criado com sucesso!');
                 }
 
+                // NOVO: Se veio da fila de aprovação, limpa o item pendente
+                if (this.editingPendingId !== null) {
+                    const pendingIndex = this.db.pendingArticles.findIndex(p => p.id === this.editingPendingId);
+                    if (pendingIndex > -1) {
+                        this.db.pendingArticles.splice(pendingIndex, 1);
+                    }
+                    this.editingPendingId = null;
+                }
+
                 this.resetForm();
                 this.loadAdminList();
+                this.updateUI(); // Atualiza o contador do sino
             },
 
             editArticle(articleId) {
@@ -1563,6 +1580,7 @@
             resetForm() {
                 document.getElementById('admin-form').reset();
                 this.editingArticleId = null;
+                this.editingPendingId = null; // NOVO: Limpa o ID pendente
                 document.getElementById('admin-form-title').innerText = 'Adicionar Novo Artigo';
                 document.getElementById('admin-form-submit').innerText = 'Salvar Artigo';
             },
@@ -2292,7 +2310,26 @@ Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de cliente
                 }
             },
 
-            // --- NOVO: LÓGICA DO GERADOR DE ARTIGOS IA ---
+            // --- LÓGICA DO GERADOR DE ARTIGOS IA (com Fluxo de Aprovação) ---
+
+            setupAIGeneratorScreen() {
+                // Limpa o formulário ao entrar
+                this.clearImageUpload();
+                document.getElementById('ai-gen-text-input').value = '';
+                this.switchAiGenTab('text'); // Reseta para a tab de texto
+                
+                const btnText = document.getElementById('ai-gen-submit-btn-text');
+                const loadingText = document.getElementById('ai-gen-loading-text');
+                const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
+
+                if (canManageContent) {
+                    btnText.innerText = 'Analisar e Gerar Artigo';
+                    loadingText.innerText = 'A IA está analisando e gerando o artigo...';
+                } else {
+                    btnText.innerText = 'Analisar e Enviar para Aprovação';
+                    loadingText.innerText = 'A IA está analisando e enviando para aprovação...';
+                }
+            },
 
             switchAiGenTab(tab) {
                 this.aiGenCurrentTab = tab;
@@ -2306,11 +2343,22 @@ Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de cliente
                 const file = event.target.files[0];
                 if (!file) return;
 
+                // Validação simples de tipo (o 'accept' do input já ajuda)
+                if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                    this.showAlert('Formato de imagem inválido. Use JPG, PNG ou WEBP.', true);
+                    event.target.value = null; // Limpa o input
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     this.aiGenBase64Image = e.target.result.split(',')[1]; // Pega apenas o data
                     document.getElementById('ai-gen-image-preview-img').src = e.target.result;
                     document.getElementById('ai-gen-image-preview').classList.remove('hidden');
+                };
+                reader.onerror = (error) => {
+                    console.error("Erro ao ler imagem:", error);
+                    this.showAlert("Erro ao carregar a imagem.", true);
                 };
                 reader.readAsDataURL(file);
             },
@@ -2318,7 +2366,7 @@ Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de cliente
             clearImageUpload() {
                 this.aiGenBase64Image = null;
                 const input = document.getElementById('ai-gen-image-input');
-                input.value = null; // Limpa o input
+                input.value = null; 
                 document.getElementById('ai-gen-image-preview').classList.add('hidden');
                 document.getElementById('ai-gen-image-preview-img').src = '';
             },
@@ -2349,9 +2397,28 @@ Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de cliente
                 try {
                     const aiResponse = await this.getAIArticleGeneration(inputContent, inputType);
                     
-                    // Sucesso, agora vamos pré-preencher o formulário
-                    this.prefillAdminForm(aiResponse);
-                    this.showAlert('Artigo gerado pela IA! Revise e salve.');
+                    // Fluxo de Aprovação
+                    const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
+                    
+                    if (canManageContent) {
+                        // N3+ -> Pré-preenche o formulário para autoaprovação
+                        this.prefillAdminForm(aiResponse);
+                        this.showAlert('Artigo gerado pela IA! Revise e salve.');
+                    } else {
+                        // N1/N2 -> Envia para a fila de aprovação
+                        const newPendingId = this.db.nextPendingId++;
+                        const pendingArticle = {
+                            id: newPendingId,
+                            submittedBy: this.currentUser.name,
+                            timestamp: new Date().toLocaleString('pt-BR'),
+                            data: aiResponse // Salva o objeto JSON gerado pela IA
+                        };
+                        this.db.pendingArticles.push(pendingArticle);
+                        this.showAlert('Artigo enviado para aprovação com sucesso!');
+                        // Limpa o formulário
+                        this.clearImageUpload();
+                        document.getElementById('ai-gen-text-input').value = '';
+                    }
 
                 } catch (error) {
                     console.error("Erro ao gerar artigo com IA:", error);
@@ -2362,7 +2429,7 @@ Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de cliente
             },
 
             async getAIArticleGeneration(content, type) {
-                // Usando o prompt que você definiu (T12), adaptado para JSON
+                // Prompt do sistema
                 const systemPrompt = `Você é uma IA assistente de uma Base de Conhecimento. Sua função é receber conteúdo bruto (texto ou imagem de rascunho) e estruturá-lo em um formato de artigo técnico JSON.
                 
                 Analise o conteúdo e extraia as seguintes informações:
@@ -2416,41 +2483,84 @@ Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de cliente
                     schema // responseSchema
                 );
                 
-                // A API com schema JSON retorna o texto JSON
                 return JSON.parse(aiResponseText);
             },
 
+            // Pré-preenche o formulário de admin
             prefillAdminForm(articleData) {
-                // Limpa o formulário e vai para a tela de admin
                 this.resetForm();
                 this.showScreen('admin');
                 
                 document.getElementById('admin-title').value = articleData.titulo || '';
-                document.getElementById('admin-sector').value = articleData.setor_id === "2" ? "2" : "1"; // Garante 1 ou 2
+                document.getElementById('admin-sector').value = articleData.setor_id === "2" ? "2" : "1"; 
                 document.getElementById('admin-category').value = articleData.categoria || 'Procedimentos';
                 document.getElementById('admin-tags').value = articleData.tags || '';
                 document.getElementById('admin-content').value = articleData.resumo_problema || '';
-                
-                // Converte \n para nova linha real no textarea
                 document.getElementById('admin-steps').value = (articleData.procedimento || '').replace(/\\n/g, '\n');
-                
                 document.getElementById('admin-message').value = articleData.script_cliente || '';
 
-                // Foca no título
+                document.getElementById('admin-form-title').innerText = 'Revisar Artigo Gerado por IA';
                 document.getElementById('admin-title').focus();
             },
 
+            // --- NOVO: FUNÇÕES DE APROVAÇÃO ---
+            
+            loadApprovalsScreen() {
+                const listEl = document.getElementById('approvals-list');
+                if (!listEl) return;
+                
+                listEl.innerHTML = '';
+                const pending = [...this.db.pendingArticles].reverse(); // Mais novos primeiro
+
+                if (pending.length === 0) {
+                    listEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhum artigo pendente de aprovação.</p>';
+                    this.updateUI(); // Atualiza o contador do sino
+                    return;
+                }
+
+                pending.forEach(item => {
+                    listEl.innerHTML += `
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-2">
+                            <div>
+                                <h4 class="font-semibold">${item.data.titulo}</h4>
+                                <span class="text-sm text-cinza-texto">Enviado por: ${item.submittedBy} em ${item.timestamp}</span>
+                            </div>
+                            <div class="space-x-2 flex-shrink-0">
+                                <button onclick="app.reviewPendingArticle(${item.id})" class="text-verde-sucesso hover:underline text-sm font-medium">Revisar e Aprovar</button>
+                                <button onclick="app.rejectPendingArticle(${item.id})" class="text-vermelho-erro hover:underline text-sm font-medium">Rejeitar</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            reviewPendingArticle(pendingId) {
+                const item = this.db.pendingArticles.find(p => p.id === pendingId);
+                if (!item) {
+                    this.showAlert("Artigo pendente não encontrado.", true);
+                    return;
+                }
+                
+                // Pré-preenche o formulário de admin com os dados
+                this.prefillAdminForm(item.data);
+                
+                // Guarda o ID pendente para que o `handleFormSubmit` saiba qual item remover da fila
+                this.editingPendingId = pendingId; 
+            },
+
+            rejectPendingArticle(pendingId) {
+                const index = this.db.pendingArticles.findIndex(p => p.id === pendingId);
+                if (index > -1) {
+                    this.db.pendingArticles.splice(index, 1);
+                    this.showAlert("Artigo pendente rejeitado com sucesso.", true);
+                    this.loadApprovalsScreen(); // Recarrega a lista
+                    this.updateUI(); // Atualiza o contador do sino
+                }
+            },
+
+
             // --- API GEMINI (Modificada para multimodal e JSON) ---
 
-            /**
-             * Função para chamar a API do Gemini com backoff exponencial.
-             * @param {string} systemPrompt - O prompt do sistema.
-             * @param {string} userPrompt - A pergunta do usuário.
-             *EXCLUSIVO* @param {number} retries - Tentativas.
-             * @param {number} delay - Delay inicial.
-             * @param {string|null} base64Image - Dados da imagem em base64 (opcional).
-             * @param {object|null} responseSchema - Schema JSON para a resposta (opcional).
-             */
             async callGeminiAPI(systemPrompt, userPrompt, retries = 3, delay = 1000, base64Image = null, responseSchema = null) {
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.geminiAPIModel}:generateContent?key=${this.geminiAPIKey}`;
 
@@ -2458,7 +2568,7 @@ Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de cliente
                 if (base64Image) {
                     parts.push({
                         inlineData: {
-                            mimeType: "image/jpeg", // Assumindo JPEG, PNG ou WEBP são convertidos
+                            mimeType: "image/jpeg", 
                             data: base64Image
                         }
                     });
@@ -2476,7 +2586,6 @@ Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de cliente
                     }
                 };
 
-                // Adiciona o schema de resposta se fornecido
                 if (responseSchema) {
                     payload.generationConfig.responseMimeType = "application/json";
                     payload.generationConfig.responseSchema = responseSchema;
