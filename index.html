@@ -140,6 +140,51 @@
             display: flex; /* Mostra quando ativo */
         }
 
+        /* Estilos para a nova tela de Chat AI */
+        #ai-chat-history {
+            scroll-behavior: smooth;
+        }
+        /* Esconde a scrollbar mantendo a funcionalidade */
+        #ai-chat-history::-webkit-scrollbar {
+            width: 0.5em;
+        }
+        #ai-chat-history::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #ai-chat-history::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+        #ai-chat-history:hover::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Cor suave para scrollbar no hover */
+            border-radius: 4px;
+        }
+
+        /* Estilos para o Gerador de Artigos AI */
+        .ai-gen-tab-content {
+            display: none;
+        }
+        .ai-gen-tab-content.active {
+            display: block;
+        }
+        .ai-gen-tab-btn {
+            background-color: #e5e7eb; /* bg-gray-200 */
+            color: var(--cinza-texto);
+        }
+        .ai-gen-tab-btn.active {
+            background-color: var(--azul-principal);
+            color: white;
+        }
+        #ai-gen-image-preview img {
+            max-height: 200px;
+            object-fit: contain;
+        }
+        /* Spinner/Loading */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin {
+            animation: spin 1s linear infinite;
+        }
     </style>
 </head>
 <body class="bg-cinza-fundo text-azul-escuro overflow-x-hidden">
@@ -256,6 +301,30 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 
+                <!-- Bloco: Assistente de IA -->
+                <div class="sector-card bg-azul-escuro text-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                     onclick="app.showScreen('ai-chat')">
+                    <div class="flex items-center space-x-6">
+                        <i class="ph-bold ph-brain text-7xl text-azul-principal"></i>
+                        <div>
+                             <h2 class="text-2xl font-bold mb-2">Assistente de IA</h2>
+                             <p class="text-gray-300">Faça perguntas e obtenha respostas inteligentes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NOVO Bloco: Gerador de Artigos por IA -->
+                <div id="ai-generator-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer md:col-span-1 lg:col-span-2"
+                     onclick="app.showScreen('ai-generator')">
+                    <div class="flex items-center space-x-6">
+                        <i class="ph-bold ph-magic-wand text-7xl text-azul-principal"></i>
+                        <div>
+                             <h2 class="text-2xl font-bold mb-2">Gerar Artigo com IA</h2>
+                             <p class="text-cinza-texto">Crie novos artigos automaticamente a partir de transcrições ou fotos de anotações.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Bloco Setor: Suporte Técnico -->
                 <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                      onclick="app.loadSector(1)">
@@ -296,7 +365,7 @@
                     <p class="text-cinza-texto">Editar cargos, senhas e excluir usuários do sistema.</p>
                 </div>
 
-                <!-- NOVO Bloco Admin: Histórico (Somente Admin) -->
+                <!-- Bloco Admin: Histórico (Somente Admin) -->
                 <div id="admin-history-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                      onclick="app.accessAdminScreen('history')">
                     <i class="ph-bold ph-clock-counter-clockwise text-7xl text-amarelo-aviso mb-4"></i>
@@ -520,7 +589,7 @@
             </div>
         </section>
 
-        <!-- NOVA TELA 7: HISTÓRICO (Admin) -->
+        <!-- TELA 7: HISTÓRICO (Admin) -->
         <section id="history-screen" class="screen fade-in max-w-4xl mx-auto">
             <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
                 <i class="ph-bold ph-arrow-left mr-1"></i>
@@ -539,6 +608,99 @@
             </div>
         </section>
         
+        <!-- TELA 8: AI CHAT -->
+        <section id="ai-chat-screen" class="screen fade-in max-w-3xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <h1 class="text-3xl font-bold mb-6">Assistente de IA</h1>
+            <p class="text-cinza-texto mb-6">Faça uma pergunta em linguagem natural (ex: "o que fazer se a luz LOS piscar?"). A IA usará a base de conhecimento para encontrar a melhor resposta.</p>
+            
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <!-- Chat History -->
+                <div id="ai-chat-history" class="h-96 overflow-y-auto mb-6 p-4 bg-cinza-fundo rounded-lg space-y-4">
+                    <!-- Mensagem inicial -->
+                    <div class="flex justify-start">
+                        <div class="bg-azul-principal text-white p-3 rounded-lg rounded-bl-none max-w-md">
+                            Olá! Sou o assistente de IA da Central de Conhecimento. Faça uma pergunta sobre nossos procedimentos.
+                        </div>
+                    </div>
+                    <!-- Mensagens do chat aparecem aqui -->
+                </div>
+
+                <!-- Loading Spinner (dentro do chat) -->
+                <div id="ai-chat-loading" class="hidden flex justify-start mb-4">
+                    <div class="flex items-center space-x-2 bg-gray-200 text-gray-700 p-3 rounded-lg rounded-bl-none max-w-xs">
+                        <i class="ph-bold ph-spinner text-azul-principal text-2xl animate-spin"></i>
+                        <span>Pensando...</span>
+                    </div>
+                </div>
+
+                <!-- Input Form -->
+                <form id="ai-chat-form" class="flex items-center gap-4">
+                    <input type="text" id="ai-chat-input" placeholder="Digite sua pergunta..." class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none text-lg">
+                    <button type="submit" class="bg-azul-principal text-white p-4 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+                        <i class="ph-bold ph-paper-plane-right text-2xl"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- NOVA TELA 9: AI ARTICLE GENERATOR -->
+        <section id="ai-generator-screen" class="screen fade-in max-w-3xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <h1 class="text-3xl font-bold mb-6">Gerador de Artigos por IA</h1>
+            <p class="text-cinza-texto mb-6">Cole o texto de uma transcrição, PDF ou anotação, ou envie a foto de um rascunho. A IA irá analisar o conteúdo e preencher um novo artigo para você.</p>
+            
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <!-- Tabs -->
+                <div class="flex mb-6 rounded-lg overflow-hidden border border-gray-300">
+                    <button id="ai-gen-tab-text" class="ai-gen-tab-btn flex-1 p-3 font-medium text-lg transition-all active" onclick="app.switchAiGenTab('text')">
+                        <i class="ph-bold ph-text-t mr-2"></i>
+                        Colar Texto
+                    </button>
+                    <button id="ai-gen-tab-image" class="ai-gen-tab-btn flex-1 p-3 font-medium text-lg transition-all" onclick="app.switchAiGenTab('image')">
+                        <i class="ph-bold ph-image mr-2"></i>
+                        Enviar Imagem
+                    </button>
+                </div>
+
+                <!-- Tab: Texto -->
+                <div id="ai-gen-content-text" class="ai-gen-tab-content active">
+                    <label for="ai-gen-text-input" class="block text-sm font-medium mb-2">Cole a transcrição, anotação, ou texto do PDF aqui:</label>
+                    <textarea id="ai-gen-text-input" rows="12" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" placeholder="Ex: Cliente ligou (Maria, 12:35) reclamando de lentidão. Feito reset da ONU..."></textarea>
+                </div>
+
+                <!-- Tab: Imagem -->
+                <div id="ai-gen-content-image" class="ai-gen-tab-content">
+                    <label for="ai-gen-image-input" class="block text-sm font-medium mb-2">Envie uma foto de um rascunho ou anotação:</label>
+                    <input type="file" id="ai-gen-image-input" accept="image/jpeg, image/png, image/webp" class="w-full border border-gray-300 rounded-lg p-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-azul-principal/10 file:text-azul-principal hover:file:bg-azul-principal/20">
+                    <div id="ai-gen-image-preview" class="mt-4 hidden w-full text-center p-4 bg-cinza-fundo rounded-lg">
+                        <p class="text-sm font-medium mb-2">Pré-visualização:</p>
+                        <img id="ai-gen-image-preview-img" src="" alt="Preview da Imagem" class="rounded-lg mx-auto border border-gray-300">
+                        <button id="ai-gen-image-clear" class="text-sm text-vermelho-erro hover:underline mt-2">Remover Imagem</button>
+                    </div>
+                </div>
+
+                <!-- Botão de Gerar -->
+                <button id="ai-gen-submit-btn" onclick="app.handleAIGenerateArticle()" class="mt-6 w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg flex items-center justify-center space-x-2">
+                    <i class="ph-bold ph-magic-wand"></i>
+                    <span>Analisar e Gerar Artigo</span>
+                </button>
+
+                <!-- Loading Overlay -->
+                <div id="ai-gen-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl">
+                    <i class="ph-bold ph-spinner text-azul-principal text-5xl animate-spin"></i>
+                    <span class="mt-4 font-medium text-azul-escuro">A IA está analisando e gerando o artigo...</span>
+                    <span class="text-sm text-cinza-texto">Isso pode levar alguns segundos.</span>
+                </div>
+            </div>
+        </section>
+
         <!-- Alerta de "Copiado!" -->
         <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
             <span id="alert-text"></span>
@@ -653,7 +815,7 @@
         </form>
     </div>
 
-    <!-- NOVO MODAL: Adicionar/Editar Contato (Admin) -->
+    <!-- MODAL: Adicionar/Editar Contato (Admin) -->
     <div id="edit-contact-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <form id="edit-contact-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
             <h2 id="edit-contact-title" class="text-2xl font-bold text-azul-escuro mb-6">Adicionar Contato</h2>
@@ -689,7 +851,7 @@
         </form>
     </div>
 
-    <!-- NOVO MODAL: Confirmação de Exclusão -->
+    <!-- MODAL: Confirmação de Exclusão -->
     <div id="confirm-modal" class="modal fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm items-center justify-center p-6">
         <div class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
             <div class="text-center">
@@ -718,7 +880,7 @@
             masterPassword: "admin123", // Senha mestra
             nextUserId: 4,
             nextContactId: 5,
-            nextLogId: 1, // NOVO
+            nextLogId: 1, 
             users: [
                 { id: 1, name: "Ana Sousa", username: "ana", password: "123", role: "Atendente N1", avatar: "https://placehold.co/100x100/4FA3FF/FFFFFF?text=A&font=inter" },
                 { id: 2, name: "Bruno Costa", username: "bruno", password: "123", role: "Supervisor", avatar: "https://placehold.co/100x100/1F2F4B/FFFFFF?text=B&font=inter" },
@@ -801,13 +963,7 @@
                 { id: 3, name: "Equipe NOC N2", role: "Fila de Atendimento", team: "Suporte Avançado", phone: "0800-000-002" },
                 { id: 4, name: "Ricardo Almeida", role: "Técnico de Fibra (Plantão)", team: "Operacional", phone: "(00) 97777-5555" }
             ],
-            // NOVO: Log de Auditoria
-            auditLog: [
-                // Exemplo de entrada:
-                // { id: 1, timestamp: '15/11/2025 10:30:05', userId: 3, userName: 'Admin Mestre', 
-                //   action: 'update', entityType: 'article', entityId: 1, entityName: 'Cliente sem conexão...', 
-                //   previousState: { ...artigo_antigo }, newState: { ...artigo_novo }, reverted: false }
-            ]
+            auditLog: []
         };
 
         // Lógica da Aplicação
@@ -816,11 +972,15 @@
             currentSectorId: null,
             currentUser: null,
             db: mockDB,
-            editingArticleId: null, // Para saber se estamos editando ou criando
-            adminTargetScreen: null, // Para onde ir após senha mestra
-            roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], // Cargos Padrão
-            editingContactId: null, // Para CRUD de contatos
-            deleteAction: { type: null, id: null }, // Para modal de confirmação
+            editingArticleId: null, 
+            adminTargetScreen: null, 
+            roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], 
+            editingContactId: null, 
+            deleteAction: { type: null, id: null }, 
+            geminiAPIKey: "", // Deixe em branco
+            geminiAPIModel: "gemini-2.5-flash-preview-09-2025",
+            aiGenCurrentTab: 'text', // NOVO: 'text' ou 'image'
+            aiGenBase64Image: null, // NOVO: Armazena a imagem
 
             init() {
                 // Formulários de Autenticação
@@ -848,13 +1008,20 @@
                 
                 document.getElementById('change-master-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleChangeMasterPassword(); });
 
-                // NOVO: CRUD de Contatos
+                // CRUD de Contatos
                 document.getElementById('edit-contact-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleEditContact(); });
                 document.getElementById('edit-contact-cancel').addEventListener('click', () => this.toggleEditContactModal(false));
 
-                // NOVO: Modal de Confirmação
+                // Modal de Confirmação
                 document.getElementById('confirm-modal-cancel').addEventListener('click', () => this.toggleConfirmModal(false));
                 document.getElementById('confirm-modal-delete').addEventListener('click', () => this.handleConfirmDelete());
+
+                // AI Chat
+                document.getElementById('ai-chat-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleAIChatSubmit(); });
+
+                // NOVO: AI Generator
+                document.getElementById('ai-gen-image-input').addEventListener('change', (e) => this.handleImageUpload(e));
+                document.getElementById('ai-gen-image-clear').addEventListener('click', () => this.clearImageUpload());
 
                 // Popula selects de cargo
                 this.populateRoleSelects();
@@ -866,13 +1033,10 @@
             // --- NAVEGAÇÃO ---
             
             showScreen(screenId) {
-                // Lógica de proteção de rotas
                 const authScreens = ['login']; 
                 const isAuthScreen = authScreens.includes(screenId);
-                // adminScreens agora inclui 'history'
                 const adminScreens = ['admin', 'users-admin', 'register', 'history']; 
                 
-                // Oculta/Mostra header
                 const header = document.getElementById('main-header');
                 const main = document.getElementById('main-content');
                 if (isAuthScreen) {
@@ -889,13 +1053,13 @@
                     screenId = 'home';
                 }
                 
-                // Proteção extra para admin
                 if (this.currentUser) {
-                    const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role); // <-- MODIFICADO
+                    const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
                     const isAdmin = this.currentUser.role === 'Admin';
 
-                    if (screenId === 'admin' && !canManageContent) { // <-- MODIFICADO
-                        this.showAlert('Acesso negado. Apenas Nível 3 ou superior.', true); // <-- MODIFICADO
+                    // NOVO: Proteção para o gerador de IA
+                    if ((screenId === 'admin' || screenId === 'ai-generator') && !canManageContent) {
+                        this.showAlert('Acesso negado. Apenas Nível 3 ou superior.', true); 
                         screenId = 'home';
                     }
                     if ((screenId === 'users-admin' || screenId === 'register' || screenId === 'history') && !isAdmin) {
@@ -907,13 +1071,12 @@
 
                 document.querySelectorAll('.screen').forEach(screen => {
                     screen.classList.remove('active', 'fade-in');
-                    screen.style.display = 'none'; // Correção do Bug
+                    screen.style.display = 'none'; 
                 });
                 
                 const activeScreen = document.getElementById(`${screenId}-screen`);
                 
                 if (activeScreen) {
-                    // Correção de display para login
                     if (screenId === 'login') {
                         activeScreen.style.display = 'flex';
                     } else {
@@ -925,7 +1088,7 @@
                     activeScreen.classList.add('fade-in');
                     
                     window.scrollTo(0, 0); 
-                    this.currentScreen = screenId; // CORREÇÃO: Armazena o ID base
+                    this.currentScreen = screenId; 
 
                     // Ações específicas ao entrar na tela
                     if(screenId === 'admin') {
@@ -936,11 +1099,14 @@
                         this.loadUsersAdminList();
                     }
                     if (screenId === 'contacts') {
-                        this.loadContacts(); // Carrega contatos e decide se mostra botões admin
+                        this.loadContacts(); 
                     }
-                    // NOVO: Carrega histórico ao entrar na tela
                     if (screenId === 'history' && this.currentUser?.role === 'Admin') {
                         this.loadHistory();
+                    }
+                    if (screenId === 'ai-generator') {
+                        this.clearImageUpload();
+                        document.getElementById('ai-gen-text-input').value = '';
                     }
                     
                     if (this.currentUser) {
@@ -1004,9 +1170,8 @@
 
             // LÓGICA DE CONTATOS (Com CRUD)
             loadContacts(searchQuery = '') {
-                // CORREÇÃO: Verifica se a tela atual é 'contacts', não 'contacts-screen'
                 if (this.currentScreen !== 'contacts') { 
-                    this.showScreen('contacts'); // CORREÇÃO: Chama o ID base
+                    this.showScreen('contacts'); 
                     return; 
                 }
                 
@@ -1014,7 +1179,6 @@
                 const lowerQuery = searchQuery.toLowerCase().trim();
                 const isAdmin = this.currentUser && this.currentUser.role === 'Admin';
 
-                // Mostra/oculta botão de Adicionar
                 document.getElementById('add-contact-btn').classList.toggle('hidden', !isAdmin);
 
                 let filteredContacts = this.db.contacts;
@@ -1102,15 +1266,7 @@
                     this.toggleSearchResults(false); 
                     return;
                 }
-
-                const articles = this.db.articles.filter(a => a.sector_id === this.currentSectorId);
-                const results = articles.filter(article => {
-                    const inTitle = article.title.toLowerCase().includes(lowerQuery);
-                    const inContent = article.content.toLowerCase().includes(lowerQuery);
-                    const inTags = article.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
-                    return inTitle || inContent || inTags;
-                });
-
+                const results = this.findRelevantArticles(query, this.currentSectorId);
                 this.renderSearchResults(results);
                 this.toggleSearchResults(true);
             },
@@ -1151,7 +1307,6 @@
 
             // --- UTILITÁRIOS ---
 
-            // NOVO: Função para clonar objetos para o log (evita problemas de referência)
             clone(obj) {
                 if (obj === null || typeof obj !== 'object') {
                     return obj;
@@ -1164,7 +1319,6 @@
                 }
             },
 
-            // NOVO: Função central de log
             logAction(action, entityType, entityId, entityName, previousState, newState) {
                 if (!this.currentUser) {
                     console.warn("Tentativa de log sem usuário. Ação:", action, entityType);
@@ -1176,13 +1330,13 @@
                     timestamp: new Date().toLocaleString('pt-BR'),
                     userId: this.currentUser.id,
                     userName: this.currentUser.name,
-                    action: action, // 'create', 'update', 'delete', 'revert'
-                    entityType: entityType, // 'article', 'user', 'contact', 'masterPassword', 'userPassword'
+                    action: action, 
+                    entityType: entityType, 
                     entityId: entityId,
-                    entityName: entityName, // Título do artigo, nome do usuário, etc.
-                    previousState: this.clone(previousState), // Estado anterior
-                    newState: this.clone(newState), // Novo estado
-                    reverted: false // Se este log específico já foi revertido
+                    entityName: entityName, 
+                    previousState: this.clone(previousState), 
+                    newState: this.clone(newState), 
+                    reverted: false 
                 };
                 
                 this.db.auditLog.push(logEntry);
@@ -1277,10 +1431,7 @@
                 };
                 
                 this.db.users.push(newUser);
-                
-                // LOG
                 this.logAction('create', 'user', newId, name, null, newUser);
-                
                 this.showAlert(`Usuário ${name} cadastrado com sucesso!`);
                 this.showScreen('users-admin'); 
                 errorEl.classList.add('hidden');
@@ -1303,14 +1454,17 @@
                 const firstName = this.currentUser.name.split(' ')[0];
                 document.getElementById('home-welcome-title').innerText = `Bem-vindo(a), ${firstName}. O que você precisa?`;
 
-                const contentAdminRoles = ['Atendente N3', 'Supervisor', 'Admin']; // <-- MODIFICADO
+                const contentAdminRoles = ['Atendente N3', 'Supervisor', 'Admin'];
                 const articleAdminCard = document.getElementById('admin-articles-card');
                 const userAdminCard = document.getElementById('admin-users-card');
-                const historyAdminCard = document.getElementById('admin-history-card'); // NOVO
+                const historyAdminCard = document.getElementById('admin-history-card');
+                const aiGeneratorCard = document.getElementById('ai-generator-card'); // NOVO
 
-                articleAdminCard.classList.toggle('hidden', !contentAdminRoles.includes(this.currentUser.role)); // <-- MODIFICADO
+                const canManageContent = contentAdminRoles.includes(this.currentUser.role);
+                articleAdminCard.classList.toggle('hidden', !canManageContent);
+                aiGeneratorCard.classList.toggle('hidden', !canManageContent); // NOVO
                 userAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
-                historyAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin'); // NOVO
+                historyAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
             },
 
 
@@ -1364,22 +1518,17 @@
                 if (this.editingArticleId) {
                     const index = this.db.articles.findIndex(a => a.id === this.editingArticleId);
                     if (index !== -1) {
-                        const previousState = this.clone(this.db.articles[index]); // LOG: Captura estado anterior
-                        
+                        const previousState = this.clone(this.db.articles[index]); 
                         this.db.articles[index] = { ...this.db.articles[index], ...newArticleData };
-                        
-                        const newState = this.clone(this.db.articles[index]); // LOG: Captura novo estado
-                        this.logAction('update', 'article', this.editingArticleId, title, previousState, newState); // LOG
-                        
+                        const newState = this.clone(this.db.articles[index]); 
+                        this.logAction('update', 'article', this.editingArticleId, title, previousState, newState);
                         this.showAlert('Artigo atualizado com sucesso!');
                     }
                 } else {
                     const newId = this.db.articles.length > 0 ? Math.max(...this.db.articles.map(a => a.id)) + 1 : 1;
                     const newArticle = { id: newId, ...newArticleData };
                     this.db.articles.push(newArticle);
-                    
-                    this.logAction('create', 'article', newId, title, null, newArticle); // LOG
-                    
+                    this.logAction('create', 'article', newId, title, null, newArticle); 
                     this.showAlert('Artigo criado com sucesso!');
                 }
 
@@ -1408,7 +1557,6 @@
             },
 
             deleteArticle(articleId, title) {
-                // USA O MODAL
                 this.promptDelete('article', articleId, `Tem certeza que deseja excluir o artigo "${title}"?`);
             },
 
@@ -1473,7 +1621,7 @@
                 const userIndex = this.db.users.findIndex(u => u.id === userId);
                 if (userIndex === -1) return;
 
-                const previousState = this.clone(this.db.users[userIndex]); // LOG
+                const previousState = this.clone(this.db.users[userIndex]);
 
                 if (this.db.users[userIndex].role === 'Admin' && newRole !== 'Admin') {
                     const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
@@ -1486,27 +1634,22 @@
 
                 this.db.users[userIndex].role = newRole;
                 
-                const newState = this.clone(this.db.users[userIndex]); // LOG
-                this.logAction('update', 'user', userId, newState.name, previousState, newState); // LOG
+                const newState = this.clone(this.db.users[userIndex]); 
+                this.logAction('update', 'user', userId, newState.name, previousState, newState);
                 
                 this.showAlert(`Cargo de ${this.db.users[userIndex].name} atualizado para ${newRole}!`);
                 this.loadUsersAdminList(); 
             },
 
             deleteUser(userId, name) {
-                // USA O MODAL
                 this.promptDelete('user', userId, `Tem certeza que deseja excluir o usuário ${name}?`);
             },
 
             // --- LÓGICA DOS MODAIS (SENHAS, EDIÇÃO) ---
 
-            /**
-             * MODIFICADO: Verifica permissões e/ou pede senha mestra.
-             * 'history' é um novo target.
-             */
             accessAdminScreen(target) {
                 if (!this.currentUser) {
-                    this.showScreen('login'); // Segurança
+                    this.showScreen('login'); 
                     return;
                 }
 
@@ -1515,15 +1658,14 @@
 
                 if (target === 'admin') {
                     if (canManageContent) {
-                        this.showScreen('admin'); // N3+ entra direto
+                        this.showScreen('admin'); 
                     } else {
                         this.showAlert('Acesso negado.', true);
                         this.showScreen('home');
                     }
-                } else if (target === 'users-admin' || target === 'history') { // NOVO: history aqui
+                } else if (target === 'users-admin' || target === 'history') { 
                     if (isAdmin) {
-                        // Apenas Admins podem *tentar* ver, e pedimos a senha mestra
-                        this.promptAdminPassword(target); // 'users-admin' ou 'history'
+                        this.promptAdminPassword(target); 
                     } else {
                         this.showAlert('Acesso negado.', true);
                         this.showScreen('home');
@@ -1601,7 +1743,7 @@
                     return;
                 }
 
-                const previousState = { password: this.currentUser.password }; // LOG
+                const previousState = { password: this.currentUser.password }; 
                 
                 this.currentUser.password = newPass;
                 const userIndex = this.db.users.findIndex(u => u.id === this.currentUser.id);
@@ -1609,8 +1751,8 @@
                     this.db.users[userIndex].password = newPass;
                 }
                 
-                const newState = { password: newPass }; // LOG
-                this.logAction('update', 'userPassword', this.currentUser.id, this.currentUser.name, previousState, newState); // LOG
+                const newState = { password: newPass }; 
+                this.logAction('update', 'userPassword', this.currentUser.id, this.currentUser.name, previousState, newState);
                 
                 successEl.innerText = 'Senha alterada com sucesso!';
                 successEl.classList.remove('hidden');
@@ -1659,7 +1801,7 @@
                     return;
                 }
                 
-                const previousState = this.clone(this.db.users[userIndex]); // LOG: Captura antes de qualquer mudança
+                const previousState = this.clone(this.db.users[userIndex]); 
                 
                 if (this.db.users.some(u => u.username === username && u.id !== userId)) {
                     errorEl.innerText = 'Este nome de usuário já está em uso.';
@@ -1667,20 +1809,17 @@
                     return;
                 }
 
-                // Atualiza dados
                 this.db.users[userIndex].name = name;
                 this.db.users[userIndex].username = username;
                 
-                // Lógica de segurança para cargo (só atualiza se a função de updateRole permitir)
                 const currentRole = this.db.users[userIndex].role;
                 if (currentRole !== role) {
-                    // Simula a verificação de segurança
                     if (currentRole === 'Admin' && role !== 'Admin') {
                         const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
                         if (adminCount <= 1) {
                              this.showAlert('Não é possível alterar o cargo do último Admin.', true);
-                             this.loadUsersAdminList(); // Recarrega a lista para resetar o select
-                             return; // Não salva
+                             this.loadUsersAdminList(); 
+                             return; 
                         }
                     }
                     this.db.users[userIndex].role = role;
@@ -1695,8 +1834,8 @@
                     this.db.users[userIndex].password = newPassword.trim();
                 }
                 
-                const newState = this.clone(this.db.users[userIndex]); // LOG: Captura estado final
-                this.logAction('update', 'user', userId, name, previousState, newState); // LOG
+                const newState = this.clone(this.db.users[userIndex]); 
+                this.logAction('update', 'user', userId, name, previousState, newState); 
                 
                 this.showAlert(`Usuário ${name} atualizado com sucesso!`);
                 this.toggleEditUserModal(false);
@@ -1734,8 +1873,6 @@
                 }
 
                 this.db.masterPassword = newPass;
-                
-                // LOG (sem salvar senhas)
                 this.logAction('update', 'masterPassword', 0, 'Senha Mestra', null, null);
                 
                 successEl.innerText = 'Senha mestra alterada com sucesso!';
@@ -1743,16 +1880,14 @@
                 document.getElementById('change-master-pass-form').reset();
             },
 
-            // NOVO: CRUD de Contatos
+            // CRUD de Contatos
             promptEditContact(contactId) {
                 document.getElementById('edit-contact-form').reset();
                 this.editingContactId = contactId;
 
                 if (contactId === null) {
-                    // Adicionando
                     document.getElementById('edit-contact-title').innerText = 'Adicionar Novo Contato';
                 } else {
-                    // Editando
                     document.getElementById('edit-contact-title').innerText = 'Editar Contato';
                     const contact = this.db.contacts.find(c => c.id === contactId);
                     if (contact) {
@@ -1784,46 +1919,32 @@
                 }
 
                 if (this.editingContactId === null) {
-                    // Adicionar
                     const newId = this.db.nextContactId++;
                     const newContact = { id: newId, name, phone, team, role };
                     this.db.contacts.push(newContact);
-                    
-                    this.logAction('create', 'contact', newId, name, null, newContact); // LOG
-                    
+                    this.logAction('create', 'contact', newId, name, null, newContact); 
                     this.showAlert('Contato adicionado com sucesso!');
                 } else {
-                    // Editar
                     const index = this.db.contacts.findIndex(c => c.id === this.editingContactId);
                     if (index !== -1) {
-                        const previousState = this.clone(this.db.contacts[index]); // LOG
-                        
+                        const previousState = this.clone(this.db.contacts[index]); 
                         this.db.contacts[index] = { id: this.editingContactId, name, phone, team, role };
-                        
-                        const newState = this.clone(this.db.contacts[index]); // LOG
-                        this.logAction('update', 'contact', this.editingContactId, name, previousState, newState); // LOG
-                        
+                        const newState = this.clone(this.db.contacts[index]); 
+                        this.logAction('update', 'contact', this.editingContactId, name, previousState, newState); 
                         this.showAlert('Contato atualizado com sucesso!');
                     }
                 }
 
                 this.toggleEditContactModal(false);
-                this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
+                this.loadContacts(document.getElementById('contacts-search-input').value); 
             },
 
             deleteContact(contactId, name) {
-                // USA O MODAL
                 this.promptDelete('contact', contactId, `Tem certeza que deseja excluir o contato ${name}?`);
             },
 
-            // --- NOVO: LÓGICA DO MODAL DE CONFIRMAÇÃO ---
+            // --- LÓGICA DO MODAL DE CONFIRMAÇÃO ---
             
-            /**
-             * Exibe o modal de confirmação para uma ação de exclusão.
-             * @param {string} type - O tipo de item a ser excluído ('article', 'user', 'contact').
-             * @param {number} id - O ID do item.
-             * @param {string} message - A mensagem a ser exibida no modal.
-             */
             promptDelete(type, id, message) {
                 this.deleteAction = { type, id };
                 document.getElementById('confirm-modal-text').innerText = message || 'Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.';
@@ -1844,13 +1965,10 @@
                     case 'article':
                         const articleIndex = this.db.articles.findIndex(a => a.id === id);
                         if (articleIndex !== -1) {
-                            const previousState = this.clone(this.db.articles[articleIndex]); // LOG
+                            const previousState = this.clone(this.db.articles[articleIndex]); 
                             const articleName = previousState.title;
-                            
                             this.db.articles.splice(articleIndex, 1);
-                            
-                            this.logAction('delete', 'article', id, articleName, previousState, null); // LOG
-                            
+                            this.logAction('delete', 'article', id, articleName, previousState, null); 
                             this.showAlert('Artigo excluído com sucesso.', true);
                             this.loadAdminList();
                         }
@@ -1860,22 +1978,20 @@
                         const userIndex = this.db.users.findIndex(u => u.id === id);
                         if (userIndex === -1) return;
                         
-                        const previousStateUser = this.clone(this.db.users[userIndex]); // LOG
+                        const previousStateUser = this.clone(this.db.users[userIndex]); 
                         const userName = previousStateUser.name;
                         
                         if (this.db.users[userIndex].role === 'Admin') {
                             const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
                             if (adminCount <= 1) {
                                 this.showAlert('Não é possível excluir o último Admin do sistema.', true);
-                                this.toggleConfirmModal(false); // Fecha o modal sem excluir
+                                this.toggleConfirmModal(false); 
                                 return;
                             }
                         }
                         
                         this.db.users.splice(userIndex, 1);
-                        
-                        this.logAction('delete', 'user', id, userName, previousStateUser, null); // LOG
-                        
+                        this.logAction('delete', 'user', id, userName, previousStateUser, null); 
                         this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
                         this.loadUsersAdminList(); 
                         break;
@@ -1883,32 +1999,27 @@
                     case 'contact':
                         const contactIndex = this.db.contacts.findIndex(c => c.id === id);
                         if (contactIndex !== -1) {
-                            const previousStateContact = this.clone(this.db.contacts[contactIndex]); // LOG
+                            const previousStateContact = this.clone(this.db.contacts[contactIndex]); 
                             const contactName = previousStateContact.name;
-                            
                             this.db.contacts.splice(contactIndex, 1);
-                            
-                            this.logAction('delete', 'contact', id, contactName, previousStateContact, null); // LOG
-                            
+                            this.logAction('delete', 'contact', id, contactName, previousStateContact, null); 
                             this.showAlert('Contato excluído com sucesso.', true);
-                            this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
+                            this.loadContacts(document.getElementById('contacts-search-input').value); 
                         }
                         break;
                 }
 
                 this.toggleConfirmModal(false);
-                this.deleteAction = { type: null, id: null }; // Limpa a ação
+                this.deleteAction = { type: null, id: null }; 
             },
 
-            // --- NOVO: LÓGICA DE HISTÓRICO E REVERSÃO ---
+            // --- LÓGICA DE HISTÓRICO E REVERSÃO ---
 
             loadHistory() {
                 const listEl = document.getElementById('history-log-list');
                 if (!listEl) return;
                 
                 listEl.innerHTML = '';
-                
-                // Exibe do mais novo para o mais antigo
                 const logs = [...this.db.auditLog].reverse(); 
                 
                 if (logs.length === 0) {
@@ -1948,10 +2059,8 @@
                             color = 'text-cinza-texto';
                     }
 
-                    // Botão de Reverter
                     let revertButton = '';
                     if (log.action !== 'revert' && !log.reverted) {
-                         // Só pode reverter se não for uma reversão e se já não foi revertido
                         revertButton = `<button onclick="app.revertChange(${log.id})" class="text-azul-principal hover:underline text-sm font-medium">Reverter</button>`;
                     } else if (log.reverted) {
                         revertButton = `<span class="text-cinza-texto text-sm font-medium">Já Revertido</span>`;
@@ -1986,7 +2095,6 @@
                     let logMessage = '';
 
                     switch (logEntry.action) {
-                        // Reverter uma ATUALIZAÇÃO = Voltar ao estado anterior
                         case 'update':
                             if (logEntry.entityType === 'article') {
                                 const index = this.db.articles.findIndex(e => e.id === logEntry.entityId);
@@ -2010,7 +2118,6 @@
                             logMessage = `Reversão de 'update' para ${logEntry.entityType} ID ${logEntry.entityId}`;
                             break;
                         
-                        // Reverter uma EXCLUSÃO = Recriar o item
                         case 'delete':
                             if (logEntry.entityType === 'article') {
                                 this.db.articles.push(this.clone(logEntry.previousState));
@@ -2025,7 +2132,6 @@
                             logMessage = `Reversão de 'delete' para ${logEntry.entityType} ID ${logEntry.entityId}`;
                             break;
 
-                        // Reverter uma CRIAÇÃO = Excluir o item
                         case 'create':
                             if (logEntry.entityType === 'article') {
                                 const index = this.db.articles.findIndex(e => e.id === logEntry.entityId);
@@ -2055,13 +2161,10 @@
                     }
 
                     if (success) {
-                        logEntry.reverted = true; // Marca o log original como revertido
-                        
-                        // Loga a própria reversão
+                        logEntry.reverted = true; 
                         this.logAction('revert', logEntry.entityType, logEntry.entityId, logEntry.entityName, logEntry.newState, logEntry.previousState);
-                        
                         this.showAlert(`Ação (Log ID: ${logId}) foi revertida com sucesso!`);
-                        this.loadHistory(); // Recarrega a tela de histórico
+                        this.loadHistory(); 
                     } else {
                         this.showAlert(`Falha ao reverter: O item (ID: ${logEntry.entityId}) não foi encontrado. Talvez já tenha sido excluído?`, true);
                     }
@@ -2070,7 +2173,361 @@
                     console.error("Erro ao reverter:", e);
                     this.showAlert('Ocorreu um erro grave durante a reversão.', true);
                 }
+            },
+
+            // --- LÓGICA DO ASSISTENTE DE IA (GEMINI) ---
+
+            handleAIChatSubmit() {
+                const input = document.getElementById('ai-chat-input');
+                const query = input.value.trim();
+                if (query === '') return;
+
+                this.renderChatMessage(query, 'user');
+                input.value = '';
+
+                const loadingEl = document.getElementById('ai-chat-loading');
+                loadingEl.classList.remove('hidden');
+                this.scrollChatHistory();
+
+                this.getAIChatResponse(query).then(aiResponse => {
+                    loadingEl.classList.add('hidden');
+                    this.renderChatMessage(aiResponse, 'ai');
+                }).catch(error => {
+                    console.error("Erro no handleAIChatSubmit:", error);
+                    loadingEl.classList.add('hidden');
+                    this.renderChatMessage("Desculpe, ocorreu um erro ao processar sua solicitação.", 'ai');
+                });
+            },
+
+            renderChatMessage(message, sender) {
+                const historyEl = document.getElementById('ai-chat-history');
+                const messageDiv = document.createElement('div');
+                
+                if (sender === 'user') {
+                    messageDiv.className = 'flex justify-end';
+                    messageDiv.innerHTML = `
+                        <div class="bg-blue-100 text-azul-escuro p-3 rounded-lg rounded-br-none max-w-md">
+                            ${message}
+                        </div>`;
+                } else {
+                    messageDiv.className = 'flex justify-start';
+                    messageDiv.innerHTML = `
+                        <div class="bg-azul-principal text-white p-3 rounded-lg rounded-bl-none max-w-md">
+                            ${message.replace(/\n/g, '<br>')}
+                        </div>`;
+                }
+                
+                historyEl.appendChild(messageDiv);
+                this.scrollChatHistory();
+            },
+
+            scrollChatHistory() {
+                const historyEl = document.getElementById('ai-chat-history');
+                historyEl.scrollTop = historyEl.scrollHeight;
+            },
+
+            findRelevantArticles(query, sectorId = null) {
+                const lowerQuery = query.toLowerCase().trim();
+                let articles = this.db.articles;
+
+                if (sectorId) {
+                    articles = articles.filter(a => a.sector_id === sectorId);
+                }
+
+                const results = articles.filter(article => {
+                    const inTitle = article.title.toLowerCase().includes(lowerQuery);
+                    const inContent = article.content.toLowerCase().includes(lowerQuery);
+                    const inTags = article.tags.some(tag => lowerQuery.includes(tag.toLowerCase()));
+                    const queryInTags = article.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+                    return inTitle || inContent || inTags || queryInTags;
+                });
+                return results;
+            },
+
+            async getAIChatResponse(query) {
+                const relevantArticles = this.findRelevantArticles(query);
+                
+                const systemPrompt = `Você é um assistente de IA especialista em suporte técnico de provedores de internet. Você trabalha na "Central de Conhecimento".
+Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de clientes de forma rápida e precisa.
+- Você SÓ PODE usar as informações dos "Artigos de Conhecimento" fornecidos no contexto.
+- Não invente informações ou procedimentos que não estão listados.
+- Se a pergunta não puder ser respondida com o contexto, informe que não encontrou informações sobre isso na base de conhecimento.
+- Seja direto, profissional e formate sua resposta de forma clara (use listas se necessário).
+- Se o artigo tiver um "Script para Cliente", inclua-o na sua resposta quando for relevante.`;
+
+                let userPrompt;
+
+                if (relevantArticles.length > 0) {
+                    const context = relevantArticles.map(a => `
+                        ---
+                        Artigo: ${a.title}
+                        Setor: ${a.sector_id === 1 ? 'Suporte Técnico' : 'Operacional'}
+                        Conteúdo: ${a.content}
+                        Passo a Passo: ${a.steps.join('; ')}
+                        Script para Cliente: ${a.message_to_client}
+                        Tags: ${a.tags.join(', ')}
+                        ---
+                    `).join('\n');
+
+                    userPrompt = `Baseado SOMENTE no contexto de artigos a seguir, responda a pergunta do atendente.
+                    
+                    Contexto Fornecido:
+                    ${context}
+                    
+                    Pergunta do Atendente: "${query}"
+                    
+                    Sua resposta (use o contexto acima):`;
+                } else {
+                    userPrompt = `A pergunta do atendente é: "${query}".
+                    NENHUM artigo foi encontrado na base de conhecimento sobre este assunto.
+                    Informe ao atendente, de forma amigável, que você não encontrou informações sobre isso no banco de dados da Central de Conhecimento.`;
+                }
+
+                try {
+                    const aiText = await this.callGeminiAPI(systemPrompt, userPrompt);
+                    return aiText;
+                } catch (error) {
+                    console.error("Erro ao chamar Gemini API:", error);
+                    return "Desculpe, ocorreu um erro ao tentar me conectar à IA. Tente novamente.";
+                }
+            },
+
+            // --- NOVO: LÓGICA DO GERADOR DE ARTIGOS IA ---
+
+            switchAiGenTab(tab) {
+                this.aiGenCurrentTab = tab;
+                document.getElementById('ai-gen-tab-text').classList.toggle('active', tab === 'text');
+                document.getElementById('ai-gen-tab-image').classList.toggle('active', tab === 'image');
+                document.getElementById('ai-gen-content-text').classList.toggle('active', tab === 'text');
+                document.getElementById('ai-gen-content-image').classList.toggle('active', tab === 'image');
+            },
+
+            handleImageUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    this.aiGenBase64Image = e.target.result.split(',')[1]; // Pega apenas o data
+                    document.getElementById('ai-gen-image-preview-img').src = e.target.result;
+                    document.getElementById('ai-gen-image-preview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            },
+
+            clearImageUpload() {
+                this.aiGenBase64Image = null;
+                const input = document.getElementById('ai-gen-image-input');
+                input.value = null; // Limpa o input
+                document.getElementById('ai-gen-image-preview').classList.add('hidden');
+                document.getElementById('ai-gen-image-preview-img').src = '';
+            },
+
+            async handleAIGenerateArticle() {
+                const textInput = document.getElementById('ai-gen-text-input').value.trim();
+                
+                let inputContent = null;
+                let inputType = this.aiGenCurrentTab; // 'text' ou 'image'
+
+                if (inputType === 'text' && textInput === '') {
+                    this.showAlert('Por favor, cole o texto da transcrição ou anotação.', true);
+                    return;
+                } else if (inputType === 'text') {
+                    inputContent = textInput;
+                }
+
+                if (inputType === 'image' && !this.aiGenBase64Image) {
+                    this.showAlert('Por favor, envie uma imagem.', true);
+                    return;
+                } else if (inputType === 'image') {
+                    inputContent = this.aiGenBase64Image;
+                }
+
+                const loadingOverlay = document.getElementById('ai-gen-loading');
+                loadingOverlay.classList.remove('hidden');
+
+                try {
+                    const aiResponse = await this.getAIArticleGeneration(inputContent, inputType);
+                    
+                    // Sucesso, agora vamos pré-preencher o formulário
+                    this.prefillAdminForm(aiResponse);
+                    this.showAlert('Artigo gerado pela IA! Revise e salve.');
+
+                } catch (error) {
+                    console.error("Erro ao gerar artigo com IA:", error);
+                    this.showAlert("Ocorreu um erro ao gerar o artigo. Tente novamente.", true);
+                } finally {
+                    loadingOverlay.classList.add('hidden');
+                }
+            },
+
+            async getAIArticleGeneration(content, type) {
+                // Usando o prompt que você definiu (T12), adaptado para JSON
+                const systemPrompt = `Você é uma IA assistente de uma Base de Conhecimento. Sua função é receber conteúdo bruto (texto ou imagem de rascunho) e estruturá-lo em um formato de artigo técnico JSON.
+                
+                Analise o conteúdo e extraia as seguintes informações:
+                1.  **titulo**: Um título curto e direto para o problema.
+                2.  **resumo_problema**: Um resumo do problema descrito.
+                3.  **resumo_solucao**: Um resumo da solução aplicada (se houver).
+                4.  **causa_provavel**: A causa provável (se mencionada).
+                5.  **tags**: Uma lista de 3 a 5 palavras-chave (tags) em uma string, separadas por vírgula.
+                6.  **categoria**: A categoria principal (ex: Problemas Comuns, Procedimentos).
+                7.  **setor_id**: O setor responsável (1 para Suporte Técnico, 2 para Operacional).
+                8.  **procedimento**: Um passo a passo da solução, formatado como uma string com \\n para novas linhas.
+                9.  **script_cliente**: O que deve ser dito ao cliente (se mencionado).
+                
+                Se uma informação não for encontrada, retorne "Não informado" no campo correspondente.
+                Seja objetivo e use linguagem técnica padronizada.`;
+
+                let userPrompt;
+                if (type === 'text') {
+                    userPrompt = `Analise o seguinte texto (transcrição/anotação) e gere o artigo estruturado:
+                    
+                    ---
+                    ${content}
+                    ---`;
+                } else { // type === 'image'
+                    userPrompt = `Analise a imagem deste rascunho/anotação e gere o artigo estruturado com base no texto que você ler nela.`;
+                }
+
+                // Define o schema de resposta JSON
+                const schema = {
+                    type: "OBJECT",
+                    properties: {
+                        "titulo": { "type": "STRING" },
+                        "resumo_problema": { "type": "STRING" },
+                        "resumo_solucao": { "type": "STRING", "description": "Se não houver, coloque 'Não informado'" },
+                        "causa_provavel": { "type": "STRING", "description": "Se não houver, coloque 'Não informado'" },
+                        "tags": { "type": "STRING", "description": "Ex: tag1, tag2, tag3" },
+                        "categoria": { "type": "STRING", "description": "Ex: Problemas Comuns, Procedimentos" },
+                        "setor_id": { "type": "STRING", "description": "1 para Suporte Técnico, 2 para Operacional" },
+                        "procedimento": { "type": "STRING", "description": "Passos separados por \\n" },
+                        "script_cliente": { "type": "STRING", "description": "O que dizer ao cliente. Se não houver, coloque 'Não informado'" }
+                    },
+                    required: ["titulo", "resumo_problema", "resumo_solucao", "tags", "categoria", "setor_id", "procedimento", "script_cliente"]
+                };
+
+                const aiResponseText = await this.callGeminiAPI(
+                    systemPrompt, 
+                    userPrompt,
+                    3, // retries
+                    1000, // delay
+                    (type === 'image' ? content : null), // base64Image
+                    schema // responseSchema
+                );
+                
+                // A API com schema JSON retorna o texto JSON
+                return JSON.parse(aiResponseText);
+            },
+
+            prefillAdminForm(articleData) {
+                // Limpa o formulário e vai para a tela de admin
+                this.resetForm();
+                this.showScreen('admin');
+                
+                document.getElementById('admin-title').value = articleData.titulo || '';
+                document.getElementById('admin-sector').value = articleData.setor_id === "2" ? "2" : "1"; // Garante 1 ou 2
+                document.getElementById('admin-category').value = articleData.categoria || 'Procedimentos';
+                document.getElementById('admin-tags').value = articleData.tags || '';
+                document.getElementById('admin-content').value = articleData.resumo_problema || '';
+                
+                // Converte \n para nova linha real no textarea
+                document.getElementById('admin-steps').value = (articleData.procedimento || '').replace(/\\n/g, '\n');
+                
+                document.getElementById('admin-message').value = articleData.script_cliente || '';
+
+                // Foca no título
+                document.getElementById('admin-title').focus();
+            },
+
+            // --- API GEMINI (Modificada para multimodal e JSON) ---
+
+            /**
+             * Função para chamar a API do Gemini com backoff exponencial.
+             * @param {string} systemPrompt - O prompt do sistema.
+             * @param {string} userPrompt - A pergunta do usuário.
+             *EXCLUSIVO* @param {number} retries - Tentativas.
+             * @param {number} delay - Delay inicial.
+             * @param {string|null} base64Image - Dados da imagem em base64 (opcional).
+             * @param {object|null} responseSchema - Schema JSON para a resposta (opcional).
+             */
+            async callGeminiAPI(systemPrompt, userPrompt, retries = 3, delay = 1000, base64Image = null, responseSchema = null) {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.geminiAPIModel}:generateContent?key=${this.geminiAPIKey}`;
+
+                let parts = [{ text: userPrompt }];
+                if (base64Image) {
+                    parts.push({
+                        inlineData: {
+                            mimeType: "image/jpeg", // Assumindo JPEG, PNG ou WEBP são convertidos
+                            data: base64Image
+                        }
+                    });
+                }
+
+                const payload = {
+                    contents: [{ parts: parts }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    generationConfig: {
+                        temperature: 0.5,
+                        topK: 1,
+                        topP: 1,
+                    }
+                };
+
+                // Adiciona o schema de resposta se fornecido
+                if (responseSchema) {
+                    payload.generationConfig.responseMimeType = "application/json";
+                    payload.generationConfig.responseSchema = responseSchema;
+                }
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429 && retries > 0) {
+                        await this.exponentialBackoff(delay);
+                        return this.callGeminiAPI(systemPrompt, userPrompt, retries - 1, delay * 2, base64Image, responseSchema);
+                    }
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Erro na API Gemini:", response.status, errorData);
+                        throw new Error(`Erro da API: ${errorData?.error?.message || response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        return text;
+                    } else if (result.promptFeedback) {
+                        console.warn("Prompt bloqueado:", result.promptFeedback);
+                        throw new Error("Não consegui processar essa solicitação. O conteúdo pode ter sido bloqueado por razões de segurança.");
+                    }
+
+                    throw new Error("Não recebi uma resposta válida da IA.");
+
+                } catch (error) {
+                    console.error("Falha ao chamar a API Gemini:", error);
+                    if (retries > 0) {
+                        await this.exponentialBackoff(delay);
+                        return this.callGeminiAPI(systemPrompt, userPrompt, retries - 1, delay * 2, base64Image, responseSchema);
+                    }
+                    throw error; 
+                }
+            },
+            
+            exponentialBackoff(delay) {
+                return new Promise(resolve => setTimeout(resolve, delay));
             }
+
         };
 
         // Inicia a aplicação quando o DOM estiver pronto
