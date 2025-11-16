@@ -62,6 +62,8 @@
 
             --vermelho-erro: #E87A7A;
 
+            --amarelo-aviso: #facc15; /* Amarelo (para histórico) */
+
         }
 
 
@@ -78,6 +80,8 @@
 
         .bg-vermelho-erro { background-color: var(--vermelho-erro); }
 
+        .bg-amarelo-aviso { background-color: var(--amarelo-aviso); }
+
 
 
         .text-azul-principal { color: var(--azul-principal); }
@@ -90,9 +94,19 @@
 
         .text-vermelho-erro { color: var(--vermelho-erro); }
 
+        .text-amarelo-aviso { color: var(--amarelo-aviso); }
+
+        
+
+        .hover\:bg-vermelho-erro\/20:hover { background-color: rgba(232, 122, 122, 0.2); }
+
+        .hover\:bg-vermelho-erro\/30:hover { background-color: rgba(232, 122, 122, 0.3); }
+
 
 
         .border-azul-principal { border-color: var(--azul-principal); }
+
+        .border-vermelho-erro { border-color: var(--vermelho-erro); }
 
 
 
@@ -104,15 +118,43 @@
 
         .screen {
 
-            display: none;
+            display: none; /* Oculto por padrão */
 
         }
+
+        
+
+        /* Correção para centralizar Login */
+
+        #login-screen.screen {
+
+            display: none; /* JS vai trocar para 'flex' */
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            min-height: 80vh;
+
+        }
+
+        #login-screen.screen.active {
+
+            display: flex; /* Garante a centralização */
+
+        }
+
+        
 
         .screen.active {
 
-            display: block;
+            display: block; /* Telas normais */
 
         }
+
+        
 
         @keyframes fadeIn {
 
@@ -146,7 +188,7 @@
 
             height: 100vh;
 
-            background-image: url('https://placehold.co/1920x1080/1F2F4B/4FA3FF?text=Fibra&font=inter'); /* Placeholder para fibra óptica */
+            background-image: url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
 
             background-size: cover;
 
@@ -164,11 +206,11 @@
 
 
 
-        /* Estilo para login/cadastro */
+        /* Estilo para login/cadastro/modais */
 
         .auth-card {
 
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
 
             backdrop-filter: blur(10px);
 
@@ -202,6 +244,44 @@
 
         }
 
+
+
+        /* Animação de Shake para erros */
+
+        @keyframes shake {
+
+            '0%, 100%': { transform: 'translateX(0)' },
+
+            '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-10px)' },
+
+            '20%, 40%, 60%, 80%': { transform: 'translateX(10px)' },
+
+        }
+
+        .animate-shake {
+
+            animation: shake 0.5s ease-in-out;
+
+        }
+
+
+
+        /* Estilo para Modal de Confirmação */
+
+        .modal {
+
+            display: none; /* Oculto por padrão */
+
+        }
+
+        .modal.flex {
+
+            display: flex; /* Mostra quando ativo */
+
+        }
+
+
+
     </style>
 
 </head>
@@ -212,7 +292,7 @@
 
     <!-- Topo Fixo -->
 
-    <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-md z-50">
+    <header id="main-header" class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-md z-50 transition-all duration-300 hidden">
 
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
 
@@ -246,6 +326,18 @@
 
                 <img id="user-profile-avatar" alt="Avatar do Usuário" class="w-10 h-10 rounded-full border-2 border-azul-principal/50">
 
+                
+
+                <!-- Botão Alterar Senha Pessoal -->
+
+                <button onclick="app.promptChangeMyPassword()" class="ml-2 text-cinza-texto hover:text-azul-principal transition-all" title="Alterar minha senha">
+
+                    <i class="ph-bold ph-key text-2xl"></i>
+
+                </button>
+
+                
+
                 <button onclick="app.logout()" class="ml-2 text-cinza-texto hover:text-vermelho-erro transition-all" title="Sair">
 
                     <i class="ph-bold ph-sign-out text-2xl"></i>
@@ -262,15 +354,15 @@
 
     <!-- Conteúdo Principal -->
 
-    <main class="pt-24 container mx-auto px-6 py-8">
+    <main id="main-content" class="container mx-auto px-6 py-8 transition-all duration-300">
 
 
 
         <!-- TELA 0: LOGIN -->
 
-        <section id="login-screen" class="screen active fade-in">
+        <section id="login-screen" class="screen fade-in active">
 
-            <div class="max-w-md mx-auto mt-12">
+            <div class="max-w-md w-full mt-12">
 
                 <form id="login-form" class="auth-card p-8 rounded-xl shadow-lg">
 
@@ -322,14 +414,6 @@
 
                     
 
-                    <p class="text-center text-sm text-cinza-texto mt-6">
-
-                        Não tem uma conta? 
-
-                        <a href="#" onclick="app.showScreen('register')" class="font-medium text-azul-principal hover:underline">Cadastre-se</a>
-
-                    </p>
-
                 </form>
 
             </div>
@@ -338,7 +422,7 @@
 
         
 
-        <!-- TELA 0.1: CADASTRO -->
+        <!-- TELA 0.1: CADASTRO (Agora acessada pelo Admin) -->
 
         <section id="register-screen" class="screen fade-in">
 
@@ -346,7 +430,7 @@
 
                 <form id="register-form" class="auth-card p-8 rounded-xl shadow-lg">
 
-                    <h1 class="text-3xl font-bold text-azul-escuro text-center mb-6">Criar Conta</h1>
+                    <h1 class="text-3xl font-bold text-azul-escuro text-center mb-6">Cadastrar Novo Usuário</h1>
 
                     
 
@@ -386,15 +470,7 @@
 
                             <select id="register-role" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
 
-                                <option value="Atendente N1">Atendente Nível 1</option>
-
-                                <option value="Atendente N2">Atendente Nível 2</option>
-
-                                <option value="Atendente N3">Atendente Nível 3</option>
-
-                                <option value="Supervisor">Supervisor</option>
-
-                                <option value="Admin">Admin</option>
+                                <!-- Opções de cargo populadas por JS -->
 
                             </select>
 
@@ -412,9 +488,7 @@
 
                     <p class="text-center text-sm text-cinza-texto mt-6">
 
-                        Já tem uma conta? 
-
-                        <a href="#" onclick="app.showScreen('login')" class="font-medium text-azul-principal hover:underline">Faça login</a>
+                        <a href="#" onclick="app.showScreen('users-admin')" class="font-medium text-azul-principal hover:underline">Voltar ao Gerenciamento</a>
 
                     </p>
 
@@ -436,7 +510,7 @@
 
             
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
 
                 
 
@@ -472,11 +546,27 @@
 
                 
 
+                <!-- Bloco: Contatos de Emergência -->
+
+                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+
+                     onclick="app.loadContacts()">
+
+                    <i class="ph-bold ph-phone-call text-7xl text-azul-principal mb-4"></i>
+
+                    <h2 class="text-2xl font-bold mb-2">Contatos de Emergência</h2>
+
+                    <p class="text-cinza-texto">Técnicos de plantão, supervisores e telefones de campo.</p>
+
+                </div>
+
+                
+
                 <!-- Bloco Admin: Gerenciar Conteúdo (CRUD de Artigos) -->
 
-                <div id="admin-articles-card" class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                <div id="admin-articles-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
 
-                     onclick="app.attemptAdminAccess()">
+                     onclick="app.accessAdminScreen('admin')">
 
                     <i class="ph-bold ph-pencil-simple-line text-7xl text-azul-principal mb-4"></i>
 
@@ -488,17 +578,33 @@
 
                 
 
-                <!-- NOVO Bloco Admin: Gerenciar Usuários (Somente Admin) -->
+                <!-- Bloco Admin: Gerenciar Usuários (Somente Admin) -->
 
                 <div id="admin-users-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
 
-                     onclick="app.showScreen('users-admin')">
+                     onclick="app.accessAdminScreen('users-admin')">
 
                     <i class="ph-bold ph-users-three text-7xl text-azul-principal mb-4"></i>
 
                     <h2 class="text-2xl font-bold mb-2">Gerenciar Usuários</h2>
 
-                    <p class="text-cinza-texto">Editar cargos e excluir usuários do sistema.</p>
+                    <p class="text-cinza-texto">Editar cargos, senhas e excluir usuários do sistema.</p>
+
+                </div>
+
+
+
+                <!-- NOVO Bloco Admin: Histórico (Somente Admin) -->
+
+                <div id="admin-history-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+
+                     onclick="app.accessAdminScreen('history')">
+
+                    <i class="ph-bold ph-clock-counter-clockwise text-7xl text-amarelo-aviso mb-4"></i>
+
+                    <h2 class="text-2xl font-bold mb-2">Histórico de Edições</h2>
+
+                    <p class="text-cinza-texto">Verificar e reverter alterações feitas no sistema.</p>
 
                 </div>
 
@@ -560,39 +666,9 @@
 
                 <h2 class="text-2xl font-bold mb-6">Categorias Principais</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div id="categories-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('Problemas Comuns')">
-
-                        <i class="ph-bold ph-warning-circle text-4xl text-azul-principal mb-3"></i>
-
-                        <h3 class="text-lg font-semibold">Problemas Comuns</h3>
-
-                    </div>
-
-                    <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('Procedimentos')">
-
-                        <i class="ph-bold ph-list-checks text-4xl text-azul-principal mb-3"></i>
-
-                        <h3 class="text-lg font-semibold">Procedimentos</h3>
-
-                    </div>
-
-                    <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('Roteiros')">
-
-                        <i class="ph-bold ph-microphone-stage text-4xl text-azul-principal mb-3"></i>
-
-                        <h3 class="text-lg font-semibold">Roteiros de Atendimento</h3>
-
-                    </div>
-
-                    <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('Encaminhamentos')">
-
-                        <i class="ph-bold ph-arrow-square-out text-4xl text-azul-principal mb-3"></i>
-
-                        <h3 class="text-lg font-semibold">Encaminhamentos</h3>
-
-                    </div>
+                        <!-- Categorias populadas por JS -->
 
                 </div>
 
@@ -730,17 +806,7 @@
 
                         <label for="admin-category" class="block text-sm font-medium mb-1">Categoria</label>
 
-                        <select id="admin-category" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
-
-                            <option value="Problemas Comuns">Problemas Comuns</option>
-
-                            <option value="Procedimentos">Procedimentos</option>
-
-                            <option value="Roteiros">Roteiros</option>
-
-                            <option value="Encaminhamentos">Encaminhamentos</option>
-
-                        </select>
+                        <input type="text" id="admin-category" placeholder="Ex: Problemas Comuns" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
 
                     </div>
 
@@ -822,7 +888,7 @@
 
 
 
-        <!-- NOVA TELA 5: ADMIN (Gerenciar Usuários) -->
+        <!-- TELA 5: ADMIN (Gerenciar Usuários) -->
 
         <section id="users-admin-screen" class="screen fade-in max-w-4xl mx-auto">
 
@@ -834,21 +900,141 @@
 
             </button>
 
-            <h1 class="text-3xl font-bold mb-8">Gerenciar Usuários</h1>
+            <div class="flex justify-between items-center mb-8">
+
+                <h1 class="text-3xl font-bold">Gerenciar Usuários</h1>
+
+                <button onclick="app.showScreen('register')" class="bg-azul-principal text-white px-5 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center space-x-2">
+
+                    <i class="ph-bold ph-plus"></i>
+
+                    <span>Cadastrar Usuário</span>
+
+                </button>
+
+            </div>
 
             
 
-            <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
 
                  <h2 class="text-2xl font-bold mb-6">Lista de Usuários</h2>
 
-                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Altere o cargo de um usuário selecionando a opção ou exclua-o. Você não pode excluir sua própria conta.</p>
+                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Edite, altere o cargo ou exclua usuários. Você não pode excluir sua própria conta.</p>
 
                  <div class="space-y-4" id="users-admin-list">
 
-                    <!-- Lista de usuários será populada pelo JS -->
+                     <!-- Lista de usuários será populada pelo JS -->
 
                  </div>
+
+            </div>
+
+
+
+            <!-- Card para Alterar Senha Mestra -->
+
+            <form id="change-master-pass-form" class="bg-white p-8 rounded-xl shadow-lg">
+
+                <h2 class="text-2xl font-bold mb-6">Alterar Senha Mestra</h2>
+
+                <p class="text-sm text-cinza-texto mb-6 -mt-4">Esta é a senha usada para acessar as telas de Gerenciamento.</p>
+
+                
+
+                <div id="change-master-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+
+                <div id="change-master-pass-success" class="hidden bg-verde-sucesso/10 text-verde-sucesso p-3 rounded-lg text-sm mb-4"></div>
+
+
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <div>
+
+                        <label for="master-pass-current" class="block text-sm font-medium mb-1">Senha Mestra Atual</label>
+
+                        <input type="password" id="master-pass-current" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                    </div>
+
+                    <div>
+
+                        <label for="master-pass-new" class="block text-sm font-medium mb-1">Nova Senha Mestra</label>
+
+                        <input type="password" id="master-pass-new" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                    </div>
+
+                    <div>
+
+                        <label for="master-pass-confirm" class="block text-sm font-medium mb-1">Confirmar Nova Senha</label>
+
+                        <input type="password" id="master-pass-confirm" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                    </div>
+
+                </div>
+
+                <div class="flex justify-end mt-6">
+
+                    <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+
+                        Salvar Nova Senha Mestra
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+
+        <!-- TELA 6: CONTATOS DE EMERGÊNCIA (Com CRUD) -->
+
+        <section id="contacts-screen" class="screen fade-in max-w-4xl mx-auto">
+
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+
+                Voltar para Home
+
+            </button>
+
+            <div class="flex justify-between items-center mb-8">
+
+                <h1 class="text-3xl font-bold">Contatos de Emergência</h1>
+
+                <button id="add-contact-btn" onclick="app.promptEditContact(null)" class="hidden bg-azul-principal text-white px-5 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center space-x-2">
+
+                    <i class="ph-bold ph-plus"></i>
+
+                    <span>Adicionar Contato</span>
+
+                </button>
+
+            </div>
+
+            
+
+            <!-- Barra de Busca de Contatos -->
+
+            <form class="relative mb-8">
+
+                <i class="ph-bold ph-magnifying-glass text-cinza-texto text-2xl absolute left-6 top-1/2 -translate-y-1/2"></i>
+
+                <input type="text" id="contacts-search-input" placeholder="Buscar por nome, cargo ou equipe..." class="huge-search-bar w-full text-lg pl-16 pr-6 py-5 rounded-xl border-2 border-transparent focus:border-azul-principal focus:ring-2 focus:ring-azul-principal/50 outline-none">
+
+            </form>
+
+
+
+            <div id="contacts-list" class="space-y-8">
+
+                <!-- Grupos de contatos serão populados pelo JS -->
 
             </div>
 
@@ -856,11 +1042,47 @@
 
 
 
+        <!-- NOVA TELA 7: HISTÓRICO (Admin) -->
+
+        <section id="history-screen" class="screen fade-in max-w-4xl mx-auto">
+
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+
+                Voltar para Home
+
+            </button>
+
+            <div class="flex justify-between items-center mb-8">
+
+                <h1 class="text-3xl font-bold">Histórico de Edições</h1>
+
+            </div>
+
+            
+
+            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+
+                 <h2 class="text-2xl font-bold mb-6">Log de Alterações</h2>
+
+                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Exibindo as alterações mais recentes primeiro. A reversão de uma ação também gera um log.</p>
+
+                 <div class="space-y-4" id="history-log-list">
+
+                     <!-- Lista de logs será populada pelo JS -->
+
+                 </div>
+
+            </div>
+
+        </section>
+
         
 
         <!-- Alerta de "Copiado!" -->
 
-        <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-50 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
+        <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
 
             <span id="alert-text"></span>
 
@@ -878,11 +1100,345 @@
 
 
 
+    <!-- MODAIS (Fora do <main> para garantir o z-index) -->
+
+
+
+    <!-- MODAL: Verificação de Senha Admin -->
+
+    <div id="admin-password-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+
+        <form id="admin-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
+
+            <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Acesso Restrito</h2>
+
+            <p class="text-cinza-texto text-center mb-6">Por favor, insira a senha mestra de administrador para continuar.</p>
+
+            
+
+            <div id="admin-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4">
+
+                Senha mestra incorreta.
+
+            </div>
+
+
+
+            <div>
+
+                <label for="admin-pass-input" class="block text-sm font-medium mb-1">Senha Mestra</label>
+
+                <input type="password" id="admin-pass-input" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+            </div>
+
+            
+
+            <div class="flex items-center justify-end space-x-4 mt-6">
+
+                <button type="button" id="admin-pass-cancel" onclick="app.toggleAdminPasswordModal(false)" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+
+                    Cancelar
+
+                </button>
+
+                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+
+                    Verificar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- MODAL: Alteração de Senha Pessoal -->
+
+    <div id="change-password-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+
+        <form id="change-my-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
+
+            <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Alterar Minha Senha</h2>
+
+            
+
+            <div id="change-my-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+
+            <div id="change-my-pass-success" class="hidden bg-verde-sucesso/10 text-verde-sucesso p-3 rounded-lg text-sm mb-4"></div>
+
+
+
+            <div class="space-y-4">
+
+                <div>
+
+                    <label for="my-pass-current" class="block text-sm font-medium mb-1">Senha Atual</label>
+
+                    <input type="password" id="my-pass-current" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+                <div>
+
+                    <label for="my-pass-new" class="block text-sm font-medium mb-1">Nova Senha</label>
+
+                    <input type="password" id="my-pass-new" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+                <div>
+
+                    <label for="my-pass-confirm" class="block text-sm font-medium mb-1">Confirmar Nova Senha</label>
+
+                    <input type="password" id="my-pass-confirm" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+            </div>
+
+            
+
+            <div class="flex items-center justify-end space-x-4 mt-6">
+
+                <button type="button" id="my-pass-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+
+                    Cancelar
+
+                </button>
+
+                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+
+                    Salvar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- MODAL: Editar Usuário (Admin) -->
+
+    <div id="edit-user-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+
+        <form id="edit-user-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
+
+            <h2 class="text-2xl font-bold text-azul-escuro mb-6">Editar Usuário</h2>
+
+            <input type="hidden" id="edit-user-id">
+
+
+
+            <div id="edit-user-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+                <div>
+
+                    <label for="edit-user-name" class="block text-sm font-medium mb-1">Nome Completo</label>
+
+                    <input type="text" id="edit-user-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+                <div>
+
+                    <label for="edit-user-username" class="block text-sm font-medium mb-1">Nome de Usuário (login)</label>
+
+                    <input type="text" id="edit-user-username" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+                 <div>
+
+                    <label for="edit-user-role" class="block text-sm font-medium mb-1">Cargo</label>
+
+                    <select id="edit-user-role" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
+
+                         <!-- Opções de cargo populadas por JS -->
+
+                    </select>
+
+                </div>
+
+                <div>
+
+                    <label for="edit-user-password" class="block text-sm font-medium mb-1">Nova Senha (Opcional)</label>
+
+                    <input type="password" id="edit-user-password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" placeholder="Deixe em branco para manter">
+
+                </div>
+
+            </div>
+
+
+
+            <div class="flex items-center justify-end space-x-4 mt-6">
+
+                <button type="button" id="edit-user-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+
+                    Cancelar
+
+                </button>
+
+                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+
+                    Salvar Alterações
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- NOVO MODAL: Adicionar/Editar Contato (Admin) -->
+
+    <div id="edit-contact-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+
+        <form id="edit-contact-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
+
+            <h2 id="edit-contact-title" class="text-2xl font-bold text-azul-escuro mb-6">Adicionar Contato</h2>
+
+            <input type="hidden" id="edit-contact-id">
+
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <div>
+
+                    <label for="edit-contact-name" class="block text-sm font-medium mb-1">Nome Completo</label>
+
+                    <input type="text" id="edit-contact-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+                <div>
+
+                    <label for="edit-contact-phone" class="block text-sm font-medium mb-1">Telefone</label>
+
+                    <input type="text" id="edit-contact-phone" placeholder="(00) 90000-0000" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+                <div>
+
+                    <label for="edit-contact-team" class="block text-sm font-medium mb-1">Equipe</label>
+
+                    <input type="text" id="edit-contact-team" placeholder="Ex: Operacional" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+                 <div>
+
+                    <label for="edit-contact-role" class="block text-sm font-medium mb-1">Cargo / Função</label>
+
+                    <input type="text" id="edit-contact-role" placeholder="Ex: Técnico de Plantão" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="flex items-center justify-end space-x-4 mt-6">
+
+                <button type="button" id="edit-contact-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+
+                    Cancelar
+
+                </button>
+
+                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+
+                    Salvar Contato
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+
+    <!-- NOVO MODAL: Confirmação de Exclusão -->
+
+    <div id="confirm-modal" class="modal fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm items-center justify-center p-6">
+
+        <div class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
+
+            <div class="text-center">
+
+                <div class="w-16 h-16 bg-vermelho-erro/10 rounded-full flex items-center justify-center mx-auto mb-4">
+
+                    <i class="ph-bold ph-trash text-vermelho-erro text-4xl"></i>
+
+                </div>
+
+                <h2 class="text-2xl font-bold text-azul-escuro mb-4">Confirmar Exclusão</h2>
+
+                <p id="confirm-modal-text" class="text-cinza-texto text-center mb-6">Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.</p>
+
+            </div>
+
+            
+
+            <div class="flex items-center justify-center space-x-4 mt-6">
+
+                <button type="button" id="confirm-modal-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+
+                    Cancelar
+
+                </button>
+
+                <button type="button" id="confirm-modal-delete" class="bg-vermelho-erro text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-all">
+
+                    Excluir
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+
+
     <script>
 
         // Simulação de um banco de dados
 
         const mockDB = {
+
+            masterPassword: "admin123", // Senha mestra
+
+            nextUserId: 4,
+
+            nextContactId: 5,
+
+            nextLogId: 1, // NOVO
 
             users: [
 
@@ -1000,7 +1556,65 @@
 
                     updated_at: "10/11/2025"
 
+                },
+
+                 {
+
+                    id: 4,
+
+                    sector_id: 2,
+
+                    category: "Procedimentos",
+
+                    title: "Ativação de Novo Cliente (Provisionamento)",
+
+                    content: "Procedimento para provisionar uma nova ONU na OLT.",
+
+                    steps: [
+
+                        "Coletar S/N (Serial Number) da ONU com o técnico.",
+
+                        "Acessar a OLT referente à localidade.",
+
+                        "Provisionar na porta correta conforme projeto.",
+
+                        "Verificar se ONU autenticou (Sinal OK)."
+
+                    ],
+
+                    message_to_client: "(Uso interno do técnico. Não enviar ao cliente.)",
+
+                    tags: ["onu", "olt", "provisionar", "ativacao", "novo cliente"],
+
+                    updated_at: "09/11/2025"
+
                 }
+
+            ],
+
+            contacts: [
+
+                { id: 1, name: "Marcos Oliveira", role: "Técnico de Campo (Plantão)", team: "Operacional", phone: "(00) 98888-1234" },
+
+                { id: 2, name: "Carla Mendes", role: "Supervisora (Plantão NOC)", team: "Suporte Avançado", phone: "(00) 99999-4321" },
+
+                { id: 3, name: "Equipe NOC N2", role: "Fila de Atendimento", team: "Suporte Avançado", phone: "0800-000-002" },
+
+                { id: 4, name: "Ricardo Almeida", role: "Técnico de Fibra (Plantão)", team: "Operacional", phone: "(00) 97777-5555" }
+
+            ],
+
+            // NOVO: Log de Auditoria
+
+            auditLog: [
+
+                // Exemplo de entrada:
+
+                // { id: 1, timestamp: '15/11/2025 10:30:05', userId: 3, userName: 'Admin Mestre', 
+
+                //   action: 'update', entityType: 'article', entityId: 1, entityName: 'Cliente sem conexão...', 
+
+                //   previousState: { ...artigo_antigo }, newState: { ...artigo_novo }, reverted: false }
 
             ]
 
@@ -1022,6 +1636,14 @@
 
             editingArticleId: null, // Para saber se estamos editando ou criando
 
+            adminTargetScreen: null, // Para onde ir após senha mestra
+
+            roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], // Cargos Padrão
+
+            editingContactId: null, // Para CRUD de contatos
+
+            deleteAction: { type: null, id: null }, // Para modal de confirmação
+
 
 
             init() {
@@ -1040,9 +1662,11 @@
 
                 document.getElementById('search-form').addEventListener('submit', (e) => e.preventDefault());
 
+                document.getElementById('contacts-search-input').addEventListener('input', (e) => app.loadContacts(e.target.value));
 
+                
 
-                // Admin CRUD
+                // Admin CRUD Artigos
 
                 document.getElementById('admin-form').addEventListener('submit', (e) => this.handleFormSubmit(e));
 
@@ -1050,7 +1674,53 @@
 
 
 
-                // Mostra a tela inicial (agora login)
+                // Listeners dos Modais
+
+                document.getElementById('admin-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.checkAdminPassword(); });
+
+                document.getElementById('admin-pass-cancel').addEventListener('click', () => this.toggleAdminPasswordModal(false));
+
+
+
+                document.getElementById('change-my-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleChangeMyPassword(); });
+
+                document.getElementById('my-pass-cancel').addEventListener('click', () => this.toggleChangeMyPasswordModal(false));
+
+
+
+                document.getElementById('edit-user-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleEditUser(); });
+
+                document.getElementById('edit-user-cancel').addEventListener('click', () => this.toggleEditUserModal(false));
+
+                
+
+                document.getElementById('change-master-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleChangeMasterPassword(); });
+
+
+
+                // NOVO: CRUD de Contatos
+
+                document.getElementById('edit-contact-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleEditContact(); });
+
+                document.getElementById('edit-contact-cancel').addEventListener('click', () => this.toggleEditContactModal(false));
+
+
+
+                // NOVO: Modal de Confirmação
+
+                document.getElementById('confirm-modal-cancel').addEventListener('click', () => this.toggleConfirmModal(false));
+
+                document.getElementById('confirm-modal-delete').addEventListener('click', () => this.handleConfirmDelete());
+
+
+
+                // Popula selects de cargo
+
+                this.populateRoleSelects();
+
+
+
+                // Mostra a tela inicial (login)
 
                 this.showScreen('login');
 
@@ -1066,31 +1736,87 @@
 
                 // Lógica de proteção de rotas
 
-                const authScreens = ['login', 'register'];
+                const authScreens = ['login']; 
 
                 const isAuthScreen = authScreens.includes(screenId);
 
+                // adminScreens agora inclui 'history'
 
+                const adminScreens = ['admin', 'users-admin', 'register', 'history']; 
 
-                if (!this.currentUser && !isAuthScreen) {
+                
 
-                    // Se não está logado e tenta acessar tela protegida, vai para login
+                // Oculta/Mostra header
 
-                    screenId = 'login';
+                const header = document.getElementById('main-header');
 
-                } else if (this.currentUser && isAuthScreen) {
+                const main = document.getElementById('main-content');
 
-                    // Se está logado e tenta acessar login/registro, vai para home
+                if (isAuthScreen) {
 
-                    screenId = 'home';
+                    header.classList.add('hidden');
+
+                    main.classList.remove('pt-24');
+
+                } else {
+
+                    header.classList.remove('hidden');
+
+                    main.classList.add('pt-24');
 
                 }
 
 
 
+                if (!this.currentUser && !isAuthScreen) {
+
+                    screenId = 'login';
+
+                } else if (this.currentUser && isAuthScreen) {
+
+                    screenId = 'home';
+
+                }
+
+                
+
+                // Proteção extra para admin
+
+                if (this.currentUser) {
+
+                    const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role); // <-- MODIFICADO
+
+                    const isAdmin = this.currentUser.role === 'Admin';
+
+
+
+                    if (screenId === 'admin' && !canManageContent) { // <-- MODIFICADO
+
+                        this.showAlert('Acesso negado. Apenas Nível 3 ou superior.', true); // <-- MODIFICADO
+
+                        screenId = 'home';
+
+                    }
+
+                    if ((screenId === 'users-admin' || screenId === 'register' || screenId === 'history') && !isAdmin) {
+
+                         this.showAlert('Acesso negado. Apenas Admins.', true);
+
+                         screenId = 'home';
+
+                    }
+
+                }
+
+
+
+
+
                 document.querySelectorAll('.screen').forEach(screen => {
 
-                    screen.classList.remove('active');
+                    screen.classList.remove('active', 'fade-in');
+
+                    screen.style.display = 'none'; // Correção do Bug
 
                 });
 
@@ -1102,11 +1828,31 @@
 
                 if (activeScreen) {
 
-                    activeScreen.classList.add('active', 'fade-in');
+                    // Correção de display para login
 
-                    window.scrollTo(0, 0); // Rola para o topo
+                    if (screenId === 'login') {
 
-                    this.currentScreen = screenId;
+                        activeScreen.style.display = 'flex';
+
+                    } else {
+
+                         activeScreen.style.display = 'block';
+
+                    }
+
+
+
+                    activeScreen.classList.add('active');
+
+                    void activeScreen.offsetWidth; 
+
+                    activeScreen.classList.add('fade-in');
+
+                    
+
+                    window.scrollTo(0, 0); 
+
+                    this.currentScreen = screenId; // CORREÇÃO: Armazena o ID base
 
 
 
@@ -1114,21 +1860,33 @@
 
                     if(screenId === 'admin') {
 
-                        this.loadAdminList(); // Recarrega a lista ao entrar
+                        this.loadAdminList(); 
 
                         this.resetForm();
 
                     }
 
-                    if(screenId === 'users-admin' && this.currentUser && this.currentUser.role === 'Admin') {
+                    if(screenId === 'users-admin' && this.currentUser?.role === 'Admin') {
 
                         this.loadUsersAdminList();
 
                     }
 
-                    
+                    if (screenId === 'contacts') {
 
-                    // Atualiza a UI se o usuário estiver logado
+                        this.loadContacts(); // Carrega contatos e decide se mostra botões admin
+
+                    }
+
+                    // NOVO: Carrega histórico ao entrar na tela
+
+                    if (screenId === 'history' && this.currentUser?.role === 'Admin') {
+
+                        this.loadHistory();
+
+                    }
+
+                    
 
                     if (this.currentUser) {
 
@@ -1137,8 +1895,6 @@
                     }
 
                     
-
-                    // Mostra ou oculta o menu do usuário
 
                     document.getElementById('user-profile-menu').classList.toggle('hidden', !this.currentUser);
 
@@ -1162,8 +1918,6 @@
 
                 this.showScreen('sector');
 
-                // Limpa a busca ao voltar
-
                 document.getElementById('search-input').value = '';
 
                 this.toggleSearchResults(false);
@@ -1184,17 +1938,209 @@
 
                 document.getElementById('sector-title').innerText = sector.name;
 
-                document.getElementById('search-input').value = ''; // Limpa busca
+                document.getElementById('search-input').value = ''; 
 
                 this.toggleSearchResults(false);
 
                 
 
-                // TODO: Popular categorias dinamicamente com base no setor
+                this.loadCategories(sectorId);
 
                 
 
                 this.showScreen('sector');
+
+            },
+
+
+
+            loadCategories(sectorId) {
+
+                const listEl = document.getElementById('categories-list');
+
+                const articlesInSector = this.db.articles.filter(a => a.sector_id === sectorId);
+
+                
+
+                const categories = [...new Set(articlesInSector.map(a => a.category))];
+
+                
+
+                const icons = {
+
+                    "Problemas Comuns": "ph-warning-circle",
+
+                    "Procedimentos": "ph-list-checks",
+
+                    "Roteiros": "ph-microphone-stage",
+
+                    "Encaminhamentos": "ph-arrow-square-out",
+
+                    "default": "ph-book-open"
+
+                };
+
+                
+
+                listEl.innerHTML = ''; 
+
+                categories.forEach(category => {
+
+                    const icon = icons[category] || icons['default'];
+
+                    listEl.innerHTML += `
+
+                        <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('${category}')">
+
+                            <i class="ph-bold ${icon} text-4xl text-azul-principal mb-3"></i>
+
+                            <h3 class="text-lg font-semibold">${category}</h3>
+
+                        </div>
+
+                    `;
+
+                });
+
+            },
+
+
+
+            // LÓGICA DE CONTATOS (Com CRUD)
+
+            loadContacts(searchQuery = '') {
+
+                // CORREÇÃO: Verifica se a tela atual é 'contacts', não 'contacts-screen'
+
+                if (this.currentScreen !== 'contacts') { 
+
+                    this.showScreen('contacts'); // CORREÇÃO: Chama o ID base
+
+                    return; 
+
+                }
+
+                
+
+                const listEl = document.getElementById('contacts-list');
+
+                const lowerQuery = searchQuery.toLowerCase().trim();
+
+                const isAdmin = this.currentUser && this.currentUser.role === 'Admin';
+
+
+
+                // Mostra/oculta botão de Adicionar
+
+                document.getElementById('add-contact-btn').classList.toggle('hidden', !isAdmin);
+
+
+
+                let filteredContacts = this.db.contacts;
+
+
+
+                if (lowerQuery.length > 0) {
+
+                    filteredContacts = this.db.contacts.filter(c => 
+
+                        c.name.toLowerCase().includes(lowerQuery) ||
+
+                        c.role.toLowerCase().includes(lowerQuery) ||
+
+                        c.team.toLowerCase().includes(lowerQuery)
+
+                    );
+
+                }
+
+
+
+                const groups = filteredContacts.reduce((acc, contact) => {
+
+                    (acc[contact.team] = acc[contact.team] || []).push(contact);
+
+                    return acc;
+
+                }, {});
+
+
+
+                listEl.innerHTML = ''; 
+
+
+
+                if (filteredContacts.length === 0) {
+
+                    listEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhum contato encontrado.</p>';
+
+                    return;
+
+                }
+
+
+
+                for (const team in groups) {
+
+                    const contactsHTML = groups[team].map(contact => `
+
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-4">
+
+                            <div>
+
+                                <h4 class="font-semibold">${contact.name}</h4>
+
+                                <p class="text-sm text-cinza-texto">${contact.role}</p>
+
+                            </div>
+
+                            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-shrink-0">
+
+                                <a href="tel:${contact.phone}" class="bg-azul-principal text-white px-4 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all text-sm flex items-center justify-center space-x-2 w-full">
+
+                                    <i class="ph-bold ph-phone"></i>
+
+                                    <span>${contact.phone}</span>
+
+                                </a>
+
+                                ${isAdmin ? `
+
+                                <div class="flex gap-2 w-full">
+
+                                    <button onclick="app.promptEditContact(${contact.id})" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 text-sm flex-1 justify-center">Editar</button>
+
+                                    <button onclick="app.deleteContact(${contact.id}, '${contact.name}')" class="bg-vermelho-erro/20 text-vermelho-erro px-4 py-2 rounded-lg font-medium hover:bg-vermelho-erro/30 text-sm flex-1 justify-center">Excluir</button>
+
+                                </div>
+
+                                ` : ''}
+
+                            </div>
+
+                        </div>
+
+                    `).join('');
+
+
+
+                    listEl.innerHTML += `
+
+                        <div class="mb-8">
+
+                            <h2 class="text-2xl font-bold mb-4">${team}</h2>
+
+                            <div class="space-y-4">
+
+                                ${contactsHTML}
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                }
 
             },
 
@@ -1248,15 +2194,13 @@
 
 
 
-            // Simulação de "Fuzzy Search"
-
             search(query) {
 
                 const lowerQuery = query.toLowerCase().trim();
 
                 if (lowerQuery.length < 2) {
 
-                    this.toggleSearchResults(false); // Esconde resultados se busca for curta
+                    this.toggleSearchResults(false); 
 
                     return;
 
@@ -1292,7 +2236,7 @@
 
                 const resultsEl = document.getElementById('search-results');
 
-                resultsEl.innerHTML = ''; // Limpa resultados anteriores
+                resultsEl.innerHTML = ''; 
 
 
 
@@ -1332,6 +2276,12 @@
 
                 document.getElementById('categories-container').classList.toggle('hidden', show);
 
+                if (show && !document.getElementById('search-results-title').innerText.startsWith("Resultados para:")) {
+
+                    document.getElementById('search-results-title').innerText = "Resultados da Busca";
+
+                }
+
             },
 
 
@@ -1351,6 +2301,80 @@
 
 
             // --- UTILITÁRIOS ---
+
+
+
+            // NOVO: Função para clonar objetos para o log (evita problemas de referência)
+
+            clone(obj) {
+
+                if (obj === null || typeof obj !== 'object') {
+
+                    return obj;
+
+                }
+
+                try {
+
+                    return JSON.parse(JSON.stringify(obj));
+
+                } catch (e) {
+
+                    console.error("Falha ao clonar objeto:", obj, e);
+
+                    return null;
+
+                }
+
+            },
+
+
+
+            // NOVO: Função central de log
+
+            logAction(action, entityType, entityId, entityName, previousState, newState) {
+
+                if (!this.currentUser) {
+
+                    console.warn("Tentativa de log sem usuário. Ação:", action, entityType);
+
+                    return;
+
+                }
+
+                
+
+                const logEntry = {
+
+                    id: this.db.nextLogId++,
+
+                    timestamp: new Date().toLocaleString('pt-BR'),
+
+                    userId: this.currentUser.id,
+
+                    userName: this.currentUser.name,
+
+                    action: action, // 'create', 'update', 'delete', 'revert'
+
+                    entityType: entityType, // 'article', 'user', 'contact', 'masterPassword', 'userPassword'
+
+                    entityId: entityId,
+
+                    entityName: entityName, // Título do artigo, nome do usuário, etc.
+
+                    previousState: this.clone(previousState), // Estado anterior
+
+                    newState: this.clone(newState), // Novo estado
+
+                    reverted: false // Se este log específico já foi revertido
+
+                };
+
+                
+
+                this.db.auditLog.push(logEntry);
+
+            },
 
 
 
@@ -1390,7 +2414,7 @@
 
                 alertText.innerText = message;
 
-                alertEl.className = 'fixed bottom-5 right-5 z-50 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform'; // Reset
+                alertEl.className = 'fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform'; // Reset
 
                 
 
@@ -1422,37 +2446,19 @@
 
 
 
-            // --- LÓGICA DE AUTENTICAÇÃO ---
+            shakeElement(elementId) {
 
+                const el = document.getElementById(elementId);
 
+                el.classList.add('animate-shake');
 
-            attemptAdminAccess() {
-
-                if (!this.currentUser) {
-
-                    this.showScreen('login'); // Salvaguarda, não deve acontecer se logado
-
-                    return;
-
-                }
-
-                
-
-                const adminRoles = ['Supervisor', 'Admin'];
-
-                
-
-                if (adminRoles.includes(this.currentUser.role)) {
-
-                    this.showScreen('admin');
-
-                } else {
-
-                    this.showAlert('Acesso negado. Permissão de Supervisor ou Admin necessária.', true);
-
-                }
+                setTimeout(() => el.classList.remove('animate-shake'), 500);
 
             },
+
+
+
+            // --- LÓGICA DE AUTENTICAÇÃO ---
 
 
 
@@ -1460,7 +2466,7 @@
 
                 e.preventDefault();
 
-                const username = document.getElementById('login-username').value;
+                const username = document.getElementById('login-username').value.trim();
 
                 const password = document.getElementById('login-password').value;
 
@@ -1490,6 +2496,8 @@
 
                     errorEl.classList.remove('hidden');
 
+                    this.shakeElement('login-form');
+
                 }
 
             },
@@ -1506,13 +2514,11 @@
 
                 const password = document.getElementById('register-password').value;
 
-                const role = document.getElementById('register-role').value; // Pega o cargo do select
+                const role = document.getElementById('register-role').value;
 
                 const errorEl = document.getElementById('register-error');
 
                 
-
-                // Verifica se usuário já existe
 
                 const existingUser = this.db.users.find(u => u.username === username);
 
@@ -1528,9 +2534,7 @@
 
                 
 
-                // Cria novo usuário
-
-                const newId = this.db.users.length > 0 ? Math.max(...this.db.users.map(u => u.id)) + 1 : 1;
+                const newId = this.db.nextUserId++; 
 
                 const newUser = {
 
@@ -1540,9 +2544,9 @@
 
                     username: username,
 
-                    password: password, // Em um app real, use hash!
+                    password: password,
 
-                    role: role, // Usa o cargo selecionado
+                    role: role, 
 
                     avatar: `https://placehold.co/100x100/9AA1AC/FFFFFF?text=${name.charAt(0).toUpperCase()}&font=inter`
 
@@ -1552,9 +2556,17 @@
 
                 this.db.users.push(newUser);
 
-                this.currentUser = newUser;
+                
 
-                this.showScreen('home');
+                // LOG
+
+                this.logAction('create', 'user', newId, name, null, newUser);
+
+                
+
+                this.showAlert(`Usuário ${name} cadastrado com sucesso!`);
+
+                this.showScreen('users-admin'); 
 
                 errorEl.classList.add('hidden');
 
@@ -1580,8 +2592,6 @@
 
                 
 
-                // Atualiza Header
-
                 document.getElementById('user-profile-name').innerText = this.currentUser.name;
 
                 document.getElementById('user-profile-role').innerText = this.currentUser.role;
@@ -1592,51 +2602,27 @@
 
                 
 
-                // Atualiza Título da Home
-
                 const firstName = this.currentUser.name.split(' ')[0];
 
                 document.getElementById('home-welcome-title').innerText = `Bem-vindo(a), ${firstName}. O que você precisa?`;
 
 
 
-                // Controla visibilidade dos cards de Admin na Home
-
-                const adminRoles = ['Supervisor', 'Admin'];
+                const contentAdminRoles = ['Atendente N3', 'Supervisor', 'Admin']; // <-- MODIFICADO
 
                 const articleAdminCard = document.getElementById('admin-articles-card');
 
                 const userAdminCard = document.getElementById('admin-users-card');
 
-
-
-                // Gerenciar Conteúdo (Artigos) - Supervisor ou Admin
-
-                if (adminRoles.includes(this.currentUser.role)) {
-
-                    articleAdminCard.classList.remove('hidden');
-
-                } else {
-
-                    articleAdminCard.classList.add('hidden');
-
-                }
+                const historyAdminCard = document.getElementById('admin-history-card'); // NOVO
 
 
 
-                // Gerenciar Usuários - Apenas Admin
+                articleAdminCard.classList.toggle('hidden', !contentAdminRoles.includes(this.currentUser.role)); // <-- MODIFICADO
 
-                if (this.currentUser.role === 'Admin') {
+                userAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
 
-                    userAdminCard.classList.remove('hidden');
-
-                    this.loadUsersAdminList(); // Pré-carrega a lista de usuários
-
-                } else {
-
-                    userAdminCard.classList.add('hidden');
-
-                }
+                historyAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin'); // NOVO
 
             },
 
@@ -1658,7 +2644,7 @@
 
                 
 
-                const articlesToManage = this.db.articles; // Em app real, filtrar por permissão
+                const articlesToManage = this.db.articles; 
 
 
 
@@ -1666,7 +2652,7 @@
 
                     listEl.innerHTML += `
 
-                        <div class="flex justify-between items-center bg-cinza-fundo p-4 rounded-lg">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-2">
 
                             <div>
 
@@ -1680,7 +2666,7 @@
 
                                 <button onclick="app.editArticle(${article.id})" class="text-azul-principal hover:underline text-sm font-medium">Editar</button>
 
-                                <button onclick="app.deleteArticle(${article.id})" class="text-vermelho-erro hover:underline text-sm font-medium">Excluir</button>
+                                <button onclick="app.deleteArticle(${article.id}, '${article.title}')" class="text-vermelho-erro hover:underline text-sm font-medium">Excluir</button>
 
                             </div>
 
@@ -1740,13 +2726,23 @@
 
                 if (this.editingArticleId) {
 
-                    // Atualiza Artigo
-
                     const index = this.db.articles.findIndex(a => a.id === this.editingArticleId);
 
                     if (index !== -1) {
 
+                        const previousState = this.clone(this.db.articles[index]); // LOG: Captura estado anterior
+
+                        
+
                         this.db.articles[index] = { ...this.db.articles[index], ...newArticleData };
+
+                        
+
+                        const newState = this.clone(this.db.articles[index]); // LOG: Captura novo estado
+
+                        this.logAction('update', 'article', this.editingArticleId, title, previousState, newState); // LOG
+
+                        
 
                         this.showAlert('Artigo atualizado com sucesso!');
 
@@ -1754,11 +2750,17 @@
 
                 } else {
 
-                    // Cria Novo Artigo
-
                     const newId = this.db.articles.length > 0 ? Math.max(...this.db.articles.map(a => a.id)) + 1 : 1;
 
-                    this.db.articles.push({ id: newId, ...newArticleData });
+                    const newArticle = { id: newId, ...newArticleData };
+
+                    this.db.articles.push(newArticle);
+
+                    
+
+                    this.logAction('create', 'article', newId, title, null, newArticle); // LOG
+
+                    
 
                     this.showAlert('Artigo criado com sucesso!');
 
@@ -1808,35 +2810,17 @@
 
                 
 
-                window.scrollTo(0, document.getElementById('admin-form').offsetTop);
+                document.getElementById('admin-form').scrollIntoView({ behavior: 'smooth' });
 
             },
 
 
 
-            deleteArticle(articleId) {
+            deleteArticle(articleId, title) {
 
-                // Em um app real, use um modal, não window.confirm
+                // USA O MODAL
 
-                // if (!window.confirm('Tem certeza que deseja excluir este artigo?')) {
-
-                //     return;
-
-                // }
-
-                
-
-                const index = this.db.articles.findIndex(a => a.id === articleId);
-
-                if (index !== -1) {
-
-                    this.db.articles.splice(index, 1);
-
-                    this.showAlert('Artigo excluído com sucesso.', true);
-
-                    this.loadAdminList();
-
-                }
+                this.promptDelete('article', articleId, `Tem certeza que deseja excluir o artigo "${title}"?`);
 
             },
 
@@ -1856,7 +2840,25 @@
 
 
 
-            // --- NOVA LÓGICA DE ADMIN (Gerenciar Usuários) ---
+            // --- LÓGICA DE ADMIN (Gerenciar Usuários) ---
+
+            
+
+            populateRoleSelects() {
+
+                const roles = this.roles;
+
+                const registerSelect = document.getElementById('register-role');
+
+                const editSelect = document.getElementById('edit-user-role');
+
+                
+
+                registerSelect.innerHTML = roles.map(role => `<option value="${role}">${role}</option>`).join('');
+
+                editSelect.innerHTML = roles.map(role => `<option value="${role}">${role}</option>`).join('');
+
+            },
 
 
 
@@ -1864,13 +2866,13 @@
 
                 const listEl = document.getElementById('users-admin-list');
 
-                if (!listEl) return; // Não executa se a tela não estiver visível/pronta
+                if (!listEl) return; 
 
                 
 
                 listEl.innerHTML = '';
 
-                const roles = ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"];
+                const roles = this.roles;
 
 
 
@@ -1879,8 +2881,6 @@
                     const isCurrentUser = user.id === this.currentUser.id;
 
 
-
-                    // Cria as opções do select
 
                     const options = roles.map(role => 
 
@@ -1894,11 +2894,17 @@
 
                         <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg">
 
-                            <div class="mb-2 sm:mb-0">
+                            <div class="flex items-center gap-3 mb-2 sm:mb-0">
 
-                                <h4 class="font-semibold">${user.name}</h4>
+                                <img src="${user.avatar}" alt="${user.name}" class="w-10 h-10 rounded-full">
 
-                                <span class="text-sm text-cinza-texto">${user.username}</span>
+                                <div>
+
+                                    <h4 class="font-semibold">${user.name}</h4>
+
+                                    <span class="text-sm text-cinza-texto">${user.username}</span>
+
+                                </div>
 
                             </div>
 
@@ -1910,7 +2916,13 @@
 
                                 </select>
 
-                                <button onclick="app.deleteUser(${user.id})" class="text-vermelho-erro hover:underline text-sm font-medium px-2 py-1" ${isCurrentUser ? 'disabled' : ''} title="${isCurrentUser ? 'Você não pode excluir a si mesmo' : 'Excluir usuário'}">
+                                <button onclick="app.promptEditUser(${user.id})" class="text-azul-principal hover:underline text-sm font-medium px-2 py-1" title="Editar Usuário">
+
+                                    Editar
+
+                                </button>
+
+                                <button onclick="app.deleteUser(${user.id}, '${user.name}')" class="text-vermelho-erro hover:underline text-sm font-medium px-2 py-1" ${isCurrentUser ? 'disabled' : ''} title="${isCurrentUser ? 'Você não pode excluir a si mesmo' : 'Excluir usuário'}">
 
                                     ${isCurrentUser ? 'Meu Usuário' : 'Excluir'}
 
@@ -1936,7 +2948,9 @@
 
 
 
-                // Não permite rebaixar o último admin
+                const previousState = this.clone(this.db.users[userIndex]); // LOG
+
+
 
                 if (this.db.users[userIndex].role === 'Admin' && newRole !== 'Admin') {
 
@@ -1946,7 +2960,7 @@
 
                         this.showAlert('Não é possível alterar o cargo do último Admin.', true);
 
-                        this.loadUsersAdminList(); // Recarrega para reverter a mudança visual
+                        this.loadUsersAdminList(); 
 
                         return;
 
@@ -1958,19 +2972,207 @@
 
                 this.db.users[userIndex].role = newRole;
 
+                
+
+                const newState = this.clone(this.db.users[userIndex]); // LOG
+
+                this.logAction('update', 'user', userId, newState.name, previousState, newState); // LOG
+
+                
+
                 this.showAlert(`Cargo de ${this.db.users[userIndex].name} atualizado para ${newRole}!`);
 
-                this.loadUsersAdminList(); // Recarrega a lista
+                this.loadUsersAdminList(); 
 
             },
 
 
 
-            deleteUser(userId) {
+            deleteUser(userId, name) {
 
-                if (userId === this.currentUser.id) {
+                // USA O MODAL
 
-                    this.showAlert('Você não pode excluir sua própria conta.', true);
+                this.promptDelete('user', userId, `Tem certeza que deseja excluir o usuário ${name}?`);
+
+            },
+
+
+
+            // --- LÓGICA DOS MODAIS (SENHAS, EDIÇÃO) ---
+
+
+
+            /**
+
+             * MODIFICADO: Verifica permissões e/ou pede senha mestra.
+
+             * 'history' é um novo target.
+
+             */
+
+            accessAdminScreen(target) {
+
+                if (!this.currentUser) {
+
+                    this.showScreen('login'); // Segurança
+
+                    return;
+
+                }
+
+
+
+                const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
+
+                const isAdmin = this.currentUser.role === 'Admin';
+
+
+
+                if (target === 'admin') {
+
+                    if (canManageContent) {
+
+                        this.showScreen('admin'); // N3+ entra direto
+
+                    } else {
+
+                        this.showAlert('Acesso negado.', true);
+
+                        this.showScreen('home');
+
+                    }
+
+                } else if (target === 'users-admin' || target === 'history') { // NOVO: history aqui
+
+                    if (isAdmin) {
+
+                        // Apenas Admins podem *tentar* ver, e pedimos a senha mestra
+
+                        this.promptAdminPassword(target); // 'users-admin' ou 'history'
+
+                    } else {
+
+                        this.showAlert('Acesso negado.', true);
+
+                        this.showScreen('home');
+
+                    }
+
+                }
+
+            },
+
+
+
+            // Senha Mestra
+
+            promptAdminPassword(target) {
+
+                this.adminTargetScreen = target; 
+
+                document.getElementById('admin-pass-form').reset();
+
+                document.getElementById('admin-pass-error').classList.add('hidden');
+
+                this.toggleAdminPasswordModal(true);
+
+            },
+
+            
+
+            toggleAdminPasswordModal(show) {
+
+                const modal = document.getElementById('admin-password-modal');
+
+                modal.classList.toggle('hidden', !show);
+
+                modal.classList.toggle('flex', show);
+
+            },
+
+
+
+            checkAdminPassword() {
+
+                const password = document.getElementById('admin-pass-input').value;
+
+                const errorEl = document.getElementById('admin-pass-error');
+
+
+
+                if (password === this.db.masterPassword) {
+
+                    this.toggleAdminPasswordModal(false);
+
+                    this.showScreen(this.adminTargetScreen); 
+
+                } else {
+
+                    errorEl.classList.remove('hidden');
+
+                    this.shakeElement('admin-pass-form');
+
+                }
+
+            },
+
+
+
+            // Senha Pessoal
+
+            promptChangeMyPassword() {
+
+                document.getElementById('change-my-pass-form').reset();
+
+                document.getElementById('change-my-pass-error').classList.add('hidden');
+
+                document.getElementById('change-my-pass-success').classList.add('hidden');
+
+                this.toggleChangeMyPasswordModal(true);
+
+            },
+
+
+
+            toggleChangeMyPasswordModal(show) {
+
+                const modal = document.getElementById('change-password-modal');
+
+                modal.classList.toggle('hidden', !show);
+
+                modal.classList.toggle('flex', show);
+
+            },
+
+
+
+            handleChangeMyPassword() {
+
+                const currentPass = document.getElementById('my-pass-current').value;
+
+                const newPass = document.getElementById('my-pass-new').value;
+
+                const confirmPass = document.getElementById('my-pass-confirm').value;
+
+                
+
+                const errorEl = document.getElementById('change-my-pass-error');
+
+                const successEl = document.getElementById('change-my-pass-success');
+
+                
+
+                errorEl.classList.add('hidden');
+
+                successEl.classList.add('hidden');
+
+
+
+                if (currentPass !== this.currentUser.password) {
+
+                    errorEl.innerText = 'Senha atual incorreta.';
+
+                    errorEl.classList.remove('hidden');
 
                     return;
 
@@ -1978,45 +3180,967 @@
 
                 
 
-                const userIndex = this.db.users.findIndex(u => u.id === userId);
+                if (newPass.length < 3) {
 
-                if (userIndex === -1) return;
+                    errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
+
+                    errorEl.classList.remove('hidden');
+
+                    return;
+
+                }
 
 
 
-                const userName = this.db.users[userIndex].name;
+                if (newPass !== confirmPass) {
+
+                    errorEl.innerText = 'As novas senhas não conferem.';
+
+                    errorEl.classList.remove('hidden');
+
+                    return;
+
+                }
 
 
 
-                // Não permite excluir o último admin
+                const previousState = { password: this.currentUser.password }; // LOG
 
-                if (this.db.users[userIndex].role === 'Admin') {
+                
 
-                    const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+                this.currentUser.password = newPass;
 
-                    if (adminCount <= 1) {
+                const userIndex = this.db.users.findIndex(u => u.id === this.currentUser.id);
 
-                        this.showAlert('Não é possível excluir o último Admin do sistema.', true);
+                if (userIndex !== -1) {
 
-                        return;
-
-                    }
+                    this.db.users[userIndex].password = newPass;
 
                 }
 
                 
 
-                // Em um app real, use um modal, não window.confirm
+                const newState = { password: newPass }; // LOG
 
-                // if (window.confirm(`Tem certeza que deseja excluir o usuário ${userName}?`)) {
+                this.logAction('update', 'userPassword', this.currentUser.id, this.currentUser.name, previousState, newState); // LOG
 
-                    this.db.users.splice(userIndex, 1);
+                
 
-                    this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
+                successEl.innerText = 'Senha alterada com sucesso!';
 
-                    this.loadUsersAdminList(); // Recarrega a lista
+                successEl.classList.remove('hidden');
 
-                // }
+                
+
+                document.getElementById('change-my-pass-form').reset();
+
+                setTimeout(() => this.toggleChangeMyPasswordModal(false), 2000);
+
+            },
+
+
+
+            // Editar Usuário
+
+            promptEditUser(userId) {
+
+                const user = this.db.users.find(u => u.id === userId);
+
+                if (!user) return;
+
+
+
+                document.getElementById('edit-user-form').reset();
+
+                document.getElementById('edit-user-error').classList.add('hidden');
+
+                
+
+                document.getElementById('edit-user-id').value = user.id;
+
+                document.getElementById('edit-user-name').value = user.name;
+
+                document.getElementById('edit-user-username').value = user.username;
+
+
+
+                const roleSelect = document.getElementById('edit-user-role');
+
+                roleSelect.value = user.role;
+
+                
+
+                this.toggleEditUserModal(true);
+
+            },
+
+            
+
+            toggleEditUserModal(show) {
+
+                const modal = document.getElementById('edit-user-modal');
+
+                modal.classList.toggle('hidden', !show);
+
+                modal.classList.toggle('flex', show);
+
+            },
+
+
+
+            handleEditUser() {
+
+                const userId = parseInt(document.getElementById('edit-user-id').value);
+
+                const name = document.getElementById('edit-user-name').value.trim();
+
+                const username = document.getElementById('edit-user-username').value.trim();
+
+                const role = document.getElementById('edit-user-role').value;
+
+                const newPassword = document.getElementById('edit-user-password').value; 
+
+                
+
+                const errorEl = document.getElementById('edit-user-error');
+
+                errorEl.classList.add('hidden');
+
+
+
+                const userIndex = this.db.users.findIndex(u => u.id === userId);
+
+                if (userIndex === -1) {
+
+                    this.showAlert('Erro: Usuário não encontrado.', true);
+
+                    return;
+
+                }
+
+                
+
+                const previousState = this.clone(this.db.users[userIndex]); // LOG: Captura antes de qualquer mudança
+
+                
+
+                if (this.db.users.some(u => u.username === username && u.id !== userId)) {
+
+                    errorEl.innerText = 'Este nome de usuário já está em uso.';
+
+                    errorEl.classList.remove('hidden');
+
+                    return;
+
+                }
+
+
+
+                // Atualiza dados
+
+                this.db.users[userIndex].name = name;
+
+                this.db.users[userIndex].username = username;
+
+                
+
+                // Lógica de segurança para cargo (só atualiza se a função de updateRole permitir)
+
+                const currentRole = this.db.users[userIndex].role;
+
+                if (currentRole !== role) {
+
+                    // Simula a verificação de segurança
+
+                    if (currentRole === 'Admin' && role !== 'Admin') {
+
+                        const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+
+                        if (adminCount <= 1) {
+
+                             this.showAlert('Não é possível alterar o cargo do último Admin.', true);
+
+                             this.loadUsersAdminList(); // Recarrega a lista para resetar o select
+
+                             return; // Não salva
+
+                        }
+
+                    }
+
+                    this.db.users[userIndex].role = role;
+
+                }
+
+                
+
+                if (newPassword.trim().length > 0) {
+
+                    if (newPassword.trim().length < 3) {
+
+                         errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
+
+                         errorEl.classList.remove('hidden');
+
+                         return;
+
+                    }
+
+                    this.db.users[userIndex].password = newPassword.trim();
+
+                }
+
+                
+
+                const newState = this.clone(this.db.users[userIndex]); // LOG: Captura estado final
+
+                this.logAction('update', 'user', userId, name, previousState, newState); // LOG
+
+                
+
+                this.showAlert(`Usuário ${name} atualizado com sucesso!`);
+
+                this.toggleEditUserModal(false);
+
+                this.loadUsersAdminList(); 
+
+            },
+
+
+
+            // Senha Mestra
+
+            handleChangeMasterPassword() {
+
+                const currentPass = document.getElementById('master-pass-current').value;
+
+                const newPass = document.getElementById('master-pass-new').value;
+
+                const confirmPass = document.getElementById('master-pass-confirm').value;
+
+
+
+                const errorEl = document.getElementById('change-master-pass-error');
+
+                const successEl = document.getElementById('change-master-pass-success');
+
+
+
+                errorEl.classList.add('hidden');
+
+                successEl.classList.add('hidden');
+
+
+
+                if (currentPass !== this.db.masterPassword) {
+
+                    errorEl.innerText = 'Senha mestra atual incorreta.';
+
+                    errorEl.classList.remove('hidden');
+
+                    return;
+
+                }
+
+
+
+                if (newPass.length < 3) {
+
+                    errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
+
+                    errorEl.classList.remove('hidden');
+
+                    return;
+
+                }
+
+
+
+                if (newPass !== confirmPass) {
+
+                    errorEl.innerText = 'As novas senhas não conferem.';
+
+                    errorEl.classList.remove('hidden');
+
+                    return;
+
+                }
+
+
+
+                this.db.masterPassword = newPass;
+
+                
+
+                // LOG (sem salvar senhas)
+
+                this.logAction('update', 'masterPassword', 0, 'Senha Mestra', null, null);
+
+                
+
+                successEl.innerText = 'Senha mestra alterada com sucesso!';
+
+                successEl.classList.remove('hidden');
+
+                document.getElementById('change-master-pass-form').reset();
+
+            },
+
+
+
+            // NOVO: CRUD de Contatos
+
+            promptEditContact(contactId) {
+
+                document.getElementById('edit-contact-form').reset();
+
+                this.editingContactId = contactId;
+
+
+
+                if (contactId === null) {
+
+                    // Adicionando
+
+                    document.getElementById('edit-contact-title').innerText = 'Adicionar Novo Contato';
+
+                } else {
+
+                    // Editando
+
+                    document.getElementById('edit-contact-title').innerText = 'Editar Contato';
+
+                    const contact = this.db.contacts.find(c => c.id === contactId);
+
+                    if (contact) {
+
+                        document.getElementById('edit-contact-id').value = contact.id;
+
+                        document.getElementById('edit-contact-name').value = contact.name;
+
+                        document.getElementById('edit-contact-phone').value = contact.phone;
+
+                        document.getElementById('edit-contact-team').value = contact.team;
+
+                        document.getElementById('edit-contact-role').value = contact.role;
+
+                    }
+
+                }
+
+                this.toggleEditContactModal(true);
+
+            },
+
+
+
+            toggleEditContactModal(show) {
+
+                const modal = document.getElementById('edit-contact-modal');
+
+                modal.classList.toggle('hidden', !show);
+
+                modal.classList.toggle('flex', show);
+
+            },
+
+
+
+            handleEditContact() {
+
+                const name = document.getElementById('edit-contact-name').value;
+
+                const phone = document.getElementById('edit-contact-phone').value;
+
+                const team = document.getElementById('edit-contact-team').value;
+
+                const role = document.getElementById('edit-contact-role').value;
+
+
+
+                if (!name || !phone || !team || !role) {
+
+                    this.showAlert('Todos os campos são obrigatórios.', true);
+
+                    return;
+
+                }
+
+
+
+                if (this.editingContactId === null) {
+
+                    // Adicionar
+
+                    const newId = this.db.nextContactId++;
+
+                    const newContact = { id: newId, name, phone, team, role };
+
+                    this.db.contacts.push(newContact);
+
+                    
+
+                    this.logAction('create', 'contact', newId, name, null, newContact); // LOG
+
+                    
+
+                    this.showAlert('Contato adicionado com sucesso!');
+
+                } else {
+
+                    // Editar
+
+                    const index = this.db.contacts.findIndex(c => c.id === this.editingContactId);
+
+                    if (index !== -1) {
+
+                        const previousState = this.clone(this.db.contacts[index]); // LOG
+
+                        
+
+                        this.db.contacts[index] = { id: this.editingContactId, name, phone, team, role };
+
+                        
+
+                        const newState = this.clone(this.db.contacts[index]); // LOG
+
+                        this.logAction('update', 'contact', this.editingContactId, name, previousState, newState); // LOG
+
+                        
+
+                        this.showAlert('Contato atualizado com sucesso!');
+
+                    }
+
+                }
+
+
+
+                this.toggleEditContactModal(false);
+
+                this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
+
+            },
+
+
+
+            deleteContact(contactId, name) {
+
+                // USA O MODAL
+
+                this.promptDelete('contact', contactId, `Tem certeza que deseja excluir o contato ${name}?`);
+
+            },
+
+
+
+            // --- NOVO: LÓGICA DO MODAL DE CONFIRMAÇÃO ---
+
+            
+
+            /**
+
+             * Exibe o modal de confirmação para uma ação de exclusão.
+
+             * @param {string} type - O tipo de item a ser excluído ('article', 'user', 'contact').
+
+             * @param {number} id - O ID do item.
+
+             * @param {string} message - A mensagem a ser exibida no modal.
+
+             */
+
+            promptDelete(type, id, message) {
+
+                this.deleteAction = { type, id };
+
+                document.getElementById('confirm-modal-text').innerText = message || 'Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.';
+
+                this.toggleConfirmModal(true);
+
+            },
+
+
+
+            toggleConfirmModal(show) {
+
+                const modal = document.getElementById('confirm-modal');
+
+                modal.classList.toggle('hidden', !show);
+
+                modal.classList.toggle('flex', show);
+
+            },
+
+
+
+            handleConfirmDelete() {
+
+                const { type, id } = this.deleteAction;
+
+                if (!type || id === null) return;
+
+
+
+                switch (type) {
+
+                    case 'article':
+
+                        const articleIndex = this.db.articles.findIndex(a => a.id === id);
+
+                        if (articleIndex !== -1) {
+
+                            const previousState = this.clone(this.db.articles[articleIndex]); // LOG
+
+                            const articleName = previousState.title;
+
+                            
+
+                            this.db.articles.splice(articleIndex, 1);
+
+                            
+
+                            this.logAction('delete', 'article', id, articleName, previousState, null); // LOG
+
+                            
+
+                            this.showAlert('Artigo excluído com sucesso.', true);
+
+                            this.loadAdminList();
+
+                        }
+
+                        break;
+
+                    
+
+                    case 'user':
+
+                        const userIndex = this.db.users.findIndex(u => u.id === id);
+
+                        if (userIndex === -1) return;
+
+                        
+
+                        const previousStateUser = this.clone(this.db.users[userIndex]); // LOG
+
+                        const userName = previousStateUser.name;
+
+                        
+
+                        if (this.db.users[userIndex].role === 'Admin') {
+
+                            const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+
+                            if (adminCount <= 1) {
+
+                                this.showAlert('Não é possível excluir o último Admin do sistema.', true);
+
+                                this.toggleConfirmModal(false); // Fecha o modal sem excluir
+
+                                return;
+
+                            }
+
+                        }
+
+                        
+
+                        this.db.users.splice(userIndex, 1);
+
+                        
+
+                        this.logAction('delete', 'user', id, userName, previousStateUser, null); // LOG
+
+                        
+
+                        this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
+
+                        this.loadUsersAdminList(); 
+
+                        break;
+
+                    
+
+                    case 'contact':
+
+                        const contactIndex = this.db.contacts.findIndex(c => c.id === id);
+
+                        if (contactIndex !== -1) {
+
+                            const previousStateContact = this.clone(this.db.contacts[contactIndex]); // LOG
+
+                            const contactName = previousStateContact.name;
+
+                            
+
+                            this.db.contacts.splice(contactIndex, 1);
+
+                            
+
+                            this.logAction('delete', 'contact', id, contactName, previousStateContact, null); // LOG
+
+                            
+
+                            this.showAlert('Contato excluído com sucesso.', true);
+
+                            this.loadContacts(document.getElementById('contacts-search-input').value); // Recarrega a lista
+
+                        }
+
+                        break;
+
+                }
+
+
+
+                this.toggleConfirmModal(false);
+
+                this.deleteAction = { type: null, id: null }; // Limpa a ação
+
+            },
+
+
+
+            // --- NOVO: LÓGICA DE HISTÓRICO E REVERSÃO ---
+
+
+
+            loadHistory() {
+
+                const listEl = document.getElementById('history-log-list');
+
+                if (!listEl) return;
+
+                
+
+                listEl.innerHTML = '';
+
+                
+
+                // Exibe do mais novo para o mais antigo
+
+                const logs = [...this.db.auditLog].reverse(); 
+
+                
+
+                if (logs.length === 0) {
+
+                    listEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhuma alteração registrada ainda.</p>';
+
+                    return;
+
+                }
+
+
+
+                logs.forEach(log => {
+
+                    let description = '';
+
+                    let icon = '';
+
+                    let color = '';
+
+
+
+                    switch (log.action) {
+
+                        case 'create':
+
+                            description = `criou o ${log.entityType} "${log.entityName}"`;
+
+                            icon = 'ph-plus-circle';
+
+                            color = 'text-verde-sucesso';
+
+                            break;
+
+                        case 'update':
+
+                            description = `atualizou o ${log.entityType} "${log.entityName}"`;
+
+                            icon = 'ph-pencil-simple';
+
+                            color = 'text-amarelo-aviso';
+
+                            break;
+
+                        case 'delete':
+
+                            description = `excluiu o ${log.entityType} "${log.entityName}"`;
+
+                            icon = 'ph-trash';
+
+                            color = 'text-vermelho-erro';
+
+                            break;
+
+                        case 'revert':
+
+                            description = `REVERTEU a ação sobre "${log.entityName}"`;
+
+                            icon = 'ph-arrow-counter-clockwise';
+
+                            color = 'text-azul-principal';
+
+                            break;
+
+                        default:
+
+                            description = `realizou uma ação (${log.action}) em "${log.entityName}"`;
+
+                            icon = 'ph-question';
+
+                            color = 'text-cinza-texto';
+
+                    }
+
+
+
+                    // Botão de Reverter
+
+                    let revertButton = '';
+
+                    if (log.action !== 'revert' && !log.reverted) {
+
+                         // Só pode reverter se não for uma reversão e se já não foi revertido
+
+                        revertButton = `<button onclick="app.revertChange(${log.id})" class="text-azul-principal hover:underline text-sm font-medium">Reverter</button>`;
+
+                    } else if (log.reverted) {
+
+                        revertButton = `<span class="text-cinza-texto text-sm font-medium">Já Revertido</span>`;
+
+                    }
+
+
+
+                    listEl.innerHTML += `
+
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-2">
+
+                            <div class="flex items-center gap-3">
+
+                                <i class="ph-bold ${icon} ${color} text-2xl"></i>
+
+                                <div>
+
+                                    <h4 class="font-semibold">${log.userName} ${description}</h4>
+
+                                    <span class="text-sm text-cinza-texto">${log.timestamp} (Log ID: ${log.id})</span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="flex-shrink-0">
+
+                                ${revertButton}
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                });
+
+            },
+
+
+
+            revertChange(logId) {
+
+                const logEntry = this.db.auditLog.find(log => log.id === logId);
+
+                if (!logEntry || logEntry.reverted) {
+
+                    this.showAlert('Esta ação não pode ser revertida ou já foi revertida.', true);
+
+                    return;
+
+                }
+
+
+
+                try {
+
+                    let success = false;
+
+                    let logMessage = '';
+
+
+
+                    switch (logEntry.action) {
+
+                        // Reverter uma ATUALIZAÇÃO = Voltar ao estado anterior
+
+                        case 'update':
+
+                            if (logEntry.entityType === 'article') {
+
+                                const index = this.db.articles.findIndex(e => e.id === logEntry.entityId);
+
+                                if (index !== -1) {
+
+                                    this.db.articles[index] = this.clone(logEntry.previousState);
+
+                                    success = true;
+
+                                }
+
+                            } else if (logEntry.entityType === 'user' || logEntry.entityType === 'userPassword') {
+
+                                const index = this.db.users.findIndex(e => e.id === logEntry.entityId);
+
+                                if (index !== -1) {
+
+                                    this.db.users[index] = this.clone(logEntry.previousState);
+
+                                    success = true;
+
+                                }
+
+                            } else if (logEntry.entityType === 'contact') {
+
+                                const index = this.db.contacts.findIndex(e => e.id === logEntry.entityId);
+
+                                if (index !== -1) {
+
+                                    this.db.contacts[index] = this.clone(logEntry.previousState);
+
+                                    success = true;
+
+                                }
+
+                            }
+
+                            logMessage = `Reversão de 'update' para ${logEntry.entityType} ID ${logEntry.entityId}`;
+
+                            break;
+
+                        
+
+                        // Reverter uma EXCLUSÃO = Recriar o item
+
+                        case 'delete':
+
+                            if (logEntry.entityType === 'article') {
+
+                                this.db.articles.push(this.clone(logEntry.previousState));
+
+                                success = true;
+
+                            } else if (logEntry.entityType === 'user') {
+
+                                this.db.users.push(this.clone(logEntry.previousState));
+
+                                success = true;
+
+                            } else if (logEntry.entityType === 'contact') {
+
+                                this.db.contacts.push(this.clone(logEntry.previousState));
+
+                                success = true;
+
+                            }
+
+                            logMessage = `Reversão de 'delete' para ${logEntry.entityType} ID ${logEntry.entityId}`;
+
+                            break;
+
+
+
+                        // Reverter uma CRIAÇÃO = Excluir o item
+
+                        case 'create':
+
+                            if (logEntry.entityType === 'article') {
+
+                                const index = this.db.articles.findIndex(e => e.id === logEntry.entityId);
+
+                                if (index !== -1) {
+
+                                    this.db.articles.splice(index, 1);
+
+                                    success = true;
+
+                                }
+
+                            } else if (logEntry.entityType === 'user') {
+
+                                const index = this.db.users.findIndex(e => e.id === logEntry.entityId);
+
+                                if (index !== -1) {
+
+                                    this.db.users.splice(index, 1);
+
+                                    success = true;
+
+                                }
+
+                            } else if (logEntry.entityType === 'contact') {
+
+                                const index = this.db.contacts.findIndex(e => e.id === logEntry.entityId);
+
+                                if (index !== -1) {
+
+                                    this.db.contacts.splice(index, 1);
+
+                                    success = true;
+
+                                }
+
+                            }
+
+                            logMessage = `Reversão de 'create' para ${logEntry.entityType} ID ${logEntry.entityId}`;
+
+                            break;
+
+                        
+
+                        default:
+
+                            this.showAlert('Tipo de ação desconhecida, não pode ser revertida.', true);
+
+                            return;
+
+                    }
+
+
+
+                    if (success) {
+
+                        logEntry.reverted = true; // Marca o log original como revertido
+
+                        
+
+                        // Loga a própria reversão
+
+                        this.logAction('revert', logEntry.entityType, logEntry.entityId, logEntry.entityName, logEntry.newState, logEntry.previousState);
+
+                        
+
+                        this.showAlert(`Ação (Log ID: ${logId}) foi revertida com sucesso!`);
+
+                        this.loadHistory(); // Recarrega a tela de histórico
+
+                    } else {
+
+                        this.showAlert(`Falha ao reverter: O item (ID: ${logEntry.entityId}) não foi encontrado. Talvez já tenha sido excluído?`, true);
+
+                    }
+
+
+
+                } catch (e) {
+
+                    console.error("Erro ao reverter:", e);
+
+                    this.showAlert('Ocorreu um erro grave durante a reversão.', true);
+
+                }
 
             }
 
@@ -2033,4 +4157,3 @@
 </body>
 
 </html>
-
