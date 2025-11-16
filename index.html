@@ -1,2537 +1,2036 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR" class="scroll-smooth">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Central de Conhecimento</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
-    
-    <style>
-        /* Tipografia Padrão */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
 
-        /* Configuração das cores da identidade visual */
-        :root {
-            --azul-principal: #4FA3FF;
-            --azul-escuro: #1F2F4B;
-            --cinza-fundo: #F2F4F7;
-            --cinza-texto: #9AA1AC;
-            --verde-sucesso: #76D19B;
-            --vermelho-erro: #E87A7A;
-            --amarelo-aviso: #facc15; /* Amarelo (para histórico) */
-        }
+    <meta charset="UTF-8">
 
-        /* Aplicação das cores do Tailwind (para o config) */
-        .bg-azul-principal { background-color: var(--azul-principal); }
-        .bg-azul-escuro { background-color: var(--azul-escuro); }
-        .bg-cinza-fundo { background-color: var(--cinza-fundo); }
-        .bg-verde-sucesso { background-color: var(--verde-sucesso); }
-        .bg-vermelho-erro { background-color: var(--vermelho-erro); }
-        .bg-amarelo-aviso { background-color: var(--amarelo-aviso); }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .text-azul-principal { color: var(--azul-principal); }
-        .text-azul-escuro { color: var(--azul-escuro); }
-        .text-cinza-texto { color: var(--cinza-texto); }
-        .text-verde-sucesso { color: var(--verde-sucesso); }
-        .text-vermelho-erro { color: var(--vermelho-erro); }
-        .text-amarelo-aviso { color: var(--amarelo-aviso); }
-        
-        .hover\:bg-vermelho-erro\/20:hover { background-color: rgba(232, 122, 122, 0.2); }
-        .hover\:bg-vermelho-erro\/30:hover { background-color: rgba(232, 122, 122, 0.3); }
+    <title>Central de Conhecimento</title>
 
-        .border-azul-principal { border-color: var(--azul-principal); }
-        .border-vermelho-erro { border-color: var(--vermelho-erro); }
+    
 
-        .ring-azul-principal { --tw-ring-color: var(--azul-principal); }
+    <!-- Tailwind CSS -->
 
-        /* Animação de fade-in para telas */
-        .screen {
-            display: none; /* Oculto por padrão */
-        }
-        
-        /* Correção para centralizar Login */
-        #login-screen.screen {
-            display: none; /* JS vai trocar para 'flex' */
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 80vh;
-        }
-        #login-screen.screen.active {
-            display: flex; /* Garante a centralização */
-        }
-        
-        .screen.active {
-            display: block; /* Telas normais */
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        /* Imagem de Fundo Sutil */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-image: url('https://images.unsplash.com/photo-1542831371-29b0f74f9713?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.1; /* Baixa intensidade */
-            filter: blur(8px); /* Blur */
-            z-index: -1;
-            transform: scale(1.1); /* Evita bordas borradas */
-        }
+    
 
-        /* Estilo para login/cadastro/modais */
-        .auth-card {
-            background-color: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
+    <!-- Google Fonts: Inter -->
 
-        /* Estilo para o campo de busca "enorme" */
-        .huge-search-bar {
-            box-shadow: 0 10px 30px -10px rgba(79, 163, 255, 0.3);
-        }
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
-        /* Estilo para os cards de setor */
-        .sector-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .sector-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px -15px rgba(31, 47, 75, 0.2);
-        }
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        /* Animação de Shake para erros */
-        @keyframes shake {
-            '0%, 100%': { transform: 'translateX(0)' },
-            '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-10px)' },
-            '20%, 40%, 60%, 80%': { transform: 'translateX(10px)' },
-        }
-        .animate-shake {
-            animation: shake 0.5s ease-in-out;
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-        /* Estilo para Modal de Confirmação */
-        .modal {
-            display: none; /* Oculto por padrão */
-        }
-        .modal.flex {
-            display: flex; /* Mostra quando ativo */
-        }
+    
 
-        /* Estilos para a nova tela de Chat AI */
-        #ai-chat-history {
-            scroll-behavior: smooth;
-        }
-        /* Esconde a scrollbar mantendo a funcionalidade */
-        #ai-chat-history::-webkit-scrollbar {
-            width: 0.5em;
-        }
-        #ai-chat-history::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #ai-chat-history::-webkit-scrollbar-thumb {
-            background: transparent;
-        }
-        #ai-chat-history:hover::-webkit-scrollbar-thumb {
-            background: #cbd5e1; /* Cor suave para scrollbar no hover */
-            border-radius: 4px;
-        }
+    <!-- Phosphor Icons -->
 
-        /* Estilos para o Gerador de Artigos AI */
-        .ai-gen-tab-content {
-            display: none;
-        }
-        .ai-gen-tab-content.active {
-            display: block;
-        }
-        .ai-gen-tab-btn {
-            background-color: #e5e7eb; /* bg-gray-200 */
-            color: var(--cinza-texto);
-        }
-        .ai-gen-tab-btn.active {
-            background-color: var(--azul-principal);
-            color: white;
-        }
-        #ai-gen-image-preview img {
-            max-height: 200px;
-            object-fit: contain;
-        }
-        /* Spinner/Loading */
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .animate-spin {
-            animation: spin 1s linear infinite;
-        }
-    </style>
+    <script src="https://unpkg.com/@phosphor-icons/web@2.0.3"></script>
+
+    
+
+    <style>
+
+        /* Tipografia Padrão */
+
+        body {
+
+            font-family: 'Inter', sans-serif;
+
+        }
+
+
+
+        /* Configuração das cores da identidade visual */
+
+        :root {
+
+            --azul-principal: #4FA3FF;
+
+            --azul-escuro: #1F2F4B;
+
+            --cinza-fundo: #F2F4F7;
+
+            --cinza-texto: #9AA1AC;
+
+            --verde-sucesso: #76D19B;
+
+            --vermelho-erro: #E87A7A;
+
+        }
+
+
+
+        /* Aplicação das cores do Tailwind (para o config) */
+
+        .bg-azul-principal { background-color: var(--azul-principal); }
+
+        .bg-azul-escuro { background-color: var(--azul-escuro); }
+
+        .bg-cinza-fundo { background-color: var(--cinza-fundo); }
+
+        .bg-verde-sucesso { background-color: var(--verde-sucesso); }
+
+        .bg-vermelho-erro { background-color: var(--vermelho-erro); }
+
+
+
+        .text-azul-principal { color: var(--azul-principal); }
+
+        .text-azul-escuro { color: var(--azul-escuro); }
+
+        .text-cinza-texto { color: var(--cinza-texto); }
+
+        .text-verde-sucesso { color: var(--verde-sucesso); }
+
+        .text-vermelho-erro { color: var(--vermelho-erro); }
+
+
+
+        .border-azul-principal { border-color: var(--azul-principal); }
+
+
+
+        .ring-azul-principal { --tw-ring-color: var(--azul-principal); }
+
+
+
+        /* Animação de fade-in para telas */
+
+        .screen {
+
+            display: none;
+
+        }
+
+        .screen.active {
+
+            display: block;
+
+        }
+
+        @keyframes fadeIn {
+
+            from { opacity: 0; transform: translateY(10px); }
+
+            to { opacity: 1; transform: translateY(0); }
+
+        }
+
+        .fade-in {
+
+            animation: fadeIn 0.3s ease-out forwards;
+
+        }
+
+
+
+        /* Imagem de Fundo Sutil */
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100vw;
+
+            height: 100vh;
+
+            background-image: url('https://placehold.co/1920x1080/1F2F4B/4FA3FF?text=Fibra&font=inter'); /* Placeholder para fibra óptica */
+
+            background-size: cover;
+
+            background-position: center;
+
+            opacity: 0.1; /* Baixa intensidade */
+
+            filter: blur(8px); /* Blur */
+
+            z-index: -1;
+
+            transform: scale(1.1); /* Evita bordas borradas */
+
+        }
+
+
+
+        /* Estilo para login/cadastro */
+
+        .auth-card {
+
+            background-color: rgba(255, 255, 255, 0.9);
+
+            backdrop-filter: blur(10px);
+
+        }
+
+
+
+        /* Estilo para o campo de busca "enorme" */
+
+        .huge-search-bar {
+
+            box-shadow: 0 10px 30px -10px rgba(79, 163, 255, 0.3);
+
+        }
+
+
+
+        /* Estilo para os cards de setor */
+
+        .sector-card {
+
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        }
+
+        .sector-card:hover {
+
+            transform: translateY(-8px);
+
+            box-shadow: 0 20px 40px -15px rgba(31, 47, 75, 0.2);
+
+        }
+
+    </style>
+
 </head>
+
 <body class="bg-cinza-fundo text-azul-escuro overflow-x-hidden">
 
-    <!-- Topo Fixo -->
-    <header id="main-header" class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-md z-50 transition-all duration-300 hidden">
-        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <!-- Logo e Nome (Editável) -->
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-azul-principal/20 rounded-lg flex items-center justify-center">
-                    <i class="ph-bold ph-circles-four text-azul-principal text-2xl"></i>
-                </div>
-                <span class="text-xl font-bold text-azul-escuro hidden sm:block">Central de Conhecimento</span>
-            </div>
-
-            <!-- Perfil do Usuário (Agora dinâmico) -->
-            <div id="user-profile-menu" class="hidden items-center space-x-3">
-                <span class="hidden sm:inline text-right text-sm">
-                    <div id="user-profile-name" class="font-medium"></div>
-                    <div id="user-profile-role" class="text-cinza-texto"></div>
-                </span>
-                <img id="user-profile-avatar" alt="Avatar do Usuário" class="w-10 h-10 rounded-full border-2 border-azul-principal/50">
-                
-                <!-- Botão Alterar Senha Pessoal -->
-                <button onclick="app.promptChangeMyPassword()" class="ml-2 text-cinza-texto hover:text-azul-principal transition-all" title="Alterar minha senha">
-                    <i class="ph-bold ph-key text-2xl"></i>
-                </button>
-                
-                <button onclick="app.logout()" class="ml-2 text-cinza-texto hover:text-vermelho-erro transition-all" title="Sair">
-                    <i class="ph-bold ph-sign-out text-2xl"></i>
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Conteúdo Principal -->
-    <main id="main-content" class="container mx-auto px-6 py-8 transition-all duration-300">
-
-        <!-- TELA 0: LOGIN -->
-        <section id="login-screen" class="screen fade-in active">
-            <div class="max-w-md w-full mt-12">
-                <form id="login-form" class="auth-card p-8 rounded-xl shadow-lg">
-                    <div class="text-center mb-6">
-                        <div class="w-16 h-16 bg-azul-principal/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                            <i class="ph-bold ph-circles-four text-azul-principal text-4xl"></i>
-                        </div>
-                        <h1 class="text-3xl font-bold text-azul-escuro">Acessar Central</h1>
-                        <p class="text-cinza-texto mt-1">Use suas credenciais para entrar.</p>
-                    </div>
-
-                    <div id="login-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label for="login-username" class="block text-sm font-medium mb-1">Usuário</label>
-                            <input type="text" id="login-username" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                        </div>
-                        <div>
-                            <label for="login-password" class="block text-sm font-medium mb-1">Senha</label>
-                            <input type="password" id="login-password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                        </div>
-                        <button type="submit" class="w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg">
-                            Entrar
-                        </button>
-                    </div>
-                    
-                </form>
-            </div>
-        </section>
-        
-        <!-- TELA 0.1: CADASTRO (Agora acessada pelo Admin) -->
-        <section id="register-screen" class="screen fade-in">
-            <div class="max-w-md mx-auto mt-12">
-                <form id="register-form" class="auth-card p-8 rounded-xl shadow-lg">
-                    <h1 class="text-3xl font-bold text-azul-escuro text-center mb-6">Cadastrar Novo Usuário</h1>
-                    
-                    <div id="register-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label for="register-name" class="block text-sm font-medium mb-1">Nome Completo</label>
-                            <input type="text" id="register-name" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                        </div>
-                        <div>
-                            <label for="register-username" class="block text-sm font-medium mb-1">Nome de Usuário (login)</label>
-                            <input type="text" id="register-username" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                        </div>
-                        <div>
-                            <label for="register-password" class="block text-sm font-medium mb-1">Senha</label>
-                            <input type="password" id="register-password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                        </div>
-                        <div>
-                            <label for="register-role" class="block text-sm font-medium mb-1">Cargo</label>
-                            <select id="register-role" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
-                                <!-- Opções de cargo populadas por JS -->
-                            </select>
-                        </div>
-                        <button type="submit" class="w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg">
-                            Cadastrar
-                        </button>
-                    </div>
-                    
-                    <p class="text-center text-sm text-cinza-texto mt-6">
-                        <a href="#" onclick="app.showScreen('users-admin')" class="font-medium text-azul-principal hover:underline">Voltar ao Gerenciamento</a>
-                    </p>
-                </form>
-            </div>
-        </section>
-
-
-        <!-- TELA 1: HOME (Seleção de Setores) -->
-        <section id="home-screen" class="screen fade-in">
-            <h1 id="home-welcome-title" class="text-3xl font-bold mb-8 text-center"></h1>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                
-                <!-- Bloco: Assistente de IA -->
-                <div class="sector-card bg-azul-escuro text-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.showScreen('ai-chat')">
-                    <div class="flex items-center space-x-6">
-                        <i class="ph-bold ph-brain text-7xl text-azul-principal"></i>
-                        <div>
-                             <h2 class="text-2xl font-bold mb-2">Assistente de IA</h2>
-                             <p class="text-gray-300">Faça perguntas e obtenha respostas inteligentes.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- NOVO Bloco: Gerador de Artigos por IA -->
-                <div id="ai-generator-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer md:col-span-1 lg:col-span-2"
-                     onclick="app.showScreen('ai-generator')">
-                    <div class="flex items-center space-x-6">
-                        <i class="ph-bold ph-magic-wand text-7xl text-azul-principal"></i>
-                        <div>
-                             <h2 class="text-2xl font-bold mb-2">Gerar Artigo com IA</h2>
-                             <p class="text-cinza-texto">Crie novos artigos automaticamente a partir de transcrições ou fotos de anotações.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bloco Setor: Suporte Técnico -->
-                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.loadSector(1)">
-                    <i class="ph-bold ph-broadcast text-7xl text-azul-principal mb-4"></i>
-                    <h2 class="text-2xl font-bold mb-2">Suporte Técnico</h2>
-                    <p class="text-cinza-texto">Diagnósticos, falhas de conexão, lentidão e procedimentos de rede.</p>
-                </div>
-
-                <!-- Bloco Setor: Operacional -->
-                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.loadSector(2)">
-                    <i class="ph-bold ph-wrench text-7xl text-azul-principal mb-4"></i>
-                    <h2 class="text-2xl font-bold mb-2">Operacional</h2>
-                    <p class="text-cinza-texto">Instalação, manutenção de campo, equipamentos e agendamentos.</p>
-                </div>
-                
-                <!-- Bloco: Contatos de Emergência -->
-                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.loadContacts()">
-                    <i class="ph-bold ph-phone-call text-7xl text-azul-principal mb-4"></i>
-                    <h2 class="text-2xl font-bold mb-2">Contatos de Emergência</h2>
-                    <p class="text-cinza-texto">Técnicos de plantão, supervisores e telefones de campo.</p>
-                </div>
-                
-                <!-- Bloco Admin: Gerenciar Conteúdo (CRUD de Artigos) -->
-                <div id="admin-articles-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.accessAdminScreen('admin')">
-                    <i class="ph-bold ph-pencil-simple-line text-7xl text-azul-principal mb-4"></i>
-                    <h2 class="text-2xl font-bold mb-2">Gerenciar Conteúdo</h2>
-                    <p class="text-cinza-texto">Adicionar, editar ou remover artigos da base de conhecimento.</p>
-                </div>
-                
-                <!-- Bloco Admin: Gerenciar Usuários (Somente Admin) -->
-                <div id="admin-users-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.accessAdminScreen('users-admin')">
-                    <i class="ph-bold ph-users-three text-7xl text-azul-principal mb-4"></i>
-                    <h2 class="text-2xl font-bold mb-2">Gerenciar Usuários</h2>
-                    <p class="text-cinza-texto">Editar cargos, senhas e excluir usuários do sistema.</p>
-                </div>
-
-                <!-- Bloco Admin: Histórico (Somente Admin) -->
-                <div id="admin-history-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-                     onclick="app.accessAdminScreen('history')">
-                    <i class="ph-bold ph-clock-counter-clockwise text-7xl text-amarelo-aviso mb-4"></i>
-                    <h2 class="text-2xl font-bold mb-2">Histórico de Edições</h2>
-                    <p class="text-cinza-texto">Verificar e reverter alterações feitas no sistema.</p>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- TELA 2: SETOR (Busca e Categorias) -->
-        <section id="sector-screen" class="screen fade-in max-w-4xl mx-auto">
-            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
-                <i class="ph-bold ph-arrow-left mr-1"></i>
-                Voltar para Home
-            </button>
-            <h1 id="sector-title" class="text-3xl font-bold mb-8"></h1>
-            
-            <!-- Barra de Busca Enorme -->
-            <form id="search-form" class="relative mb-8">
-                <i class="ph-bold ph-magnifying-glass text-cinza-texto text-2xl absolute left-6 top-1/2 -translate-y-1/2"></i>
-                <input type="text" id="search-input" placeholder="Digite uma palavra-chave... (ex: poste caído, fibra rompida, lentidão)" class="huge-search-bar w-full text-lg pl-16 pr-6 py-5 rounded-xl border-2 border-transparent focus:border-azul-principal focus:ring-2 focus:ring-azul-principal/50 outline-none">
-            </form>
-
-            <!-- Container de Resultados da Busca -->
-            <div id="search-results-container" class="hidden">
-                <h2 id="search-results-title" class="text-2xl font-bold mb-6">Resultados da Busca</h2>
-                <div id="search-results" class="space-y-4">
-                    <!-- Resultados da busca aparecem aqui -->
-                </div>
-            </div>
-
-            <!-- Container de Categorias -->
-            <div id="categories-container">
-                <h2 class="text-2xl font-bold mb-6">Categorias Principais</h2>
-                <div id="categories-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Categorias populadas por JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- TELA 3: ARTIGO (Informação Final) -->
-        <section id="article-screen" class="screen fade-in max-w-3xl mx-auto">
-            <button onclick="app.goBackToSector()" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
-                <i class="ph-bold ph-arrow-left mr-1"></i>
-                Voltar para Busca
-            </button>
-            
-            <article class="bg-white p-8 sm:p-10 rounded-xl shadow-lg">
-                <!-- Cabeçalho -->
-                <h1 id="article-title" class="text-3xl sm:text-4xl font-bold mb-4"></h1>
-                <div class="flex flex-wrap text-sm text-cinza-texto space-x-4 mb-6">
-                    <span>Setor: <strong id="article-sector" class="text-azul-escuro"></strong></span>
-                    <span>Última atualização: <strong id="article-updated" class="text-azul-escuro"></strong></span>
-                </div>
-
-                <!-- Conteúdo -->
-                <div class="prose max-w-none">
-                    <h2 class="text-xl font-semibold mb-2">O que é?</h2>
-                    <p id="article-content" class="mb-6"></p>
-
-                    <h2 class="text-xl font-semibold mb-2">Passo a Passo (O que fazer)</h2>
-                    <ol id="article-steps" class="list-none space-y-3 mb-6 p-0">
-                        <!-- Passos gerados por JS -->
-                    </ol>
-                    
-                    <h2 class="text-xl font-semibold mb-2">O que dizer ao cliente</h2>
-                    <div class="bg-cinza-fundo p-4 rounded-lg">
-                        <p id="article-message-to-client" class="text-azul-escuro"></p>
-                    </div>
-
-                    <button id="copy-button" class="mt-6 w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center justify-center space-x-2">
-                        <i class="ph-bold ph-copy"></i>
-                        <span>Copiar texto para envio</span>
-                    </button>
-                </div>
-            </article>
-        </section>
-
-        <!-- TELA 4: ADMIN (CRUD de Artigos) -->
-        <section id="admin-screen" class="screen fade-in max-w-4xl mx-auto">
-            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
-                <i class="ph-bold ph-arrow-left mr-1"></i>
-                Voltar para Home
-            </button>
-            <h1 class="text-3xl font-bold mb-8">Gerenciar Conteúdo</h1>
-
-            <!-- Formulário de Adicionar/Editar Artigo -->
-            <form id="admin-form" class="bg-white p-8 rounded-xl shadow-lg mb-8">
-                <h2 id="admin-form-title" class="text-2xl font-bold mb-6">Adicionar Novo Artigo</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Coluna 1 -->
-                    <div>
-                        <label for="admin-title" class="block text-sm font-medium mb-1">Título do Artigo</label>
-                        <input type="text" id="admin-title" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                    </div>
-                    <div>
-                        <label for="admin-sector" class="block text-sm font-medium mb-1">Setor</label>
-                        <select id="admin-sector" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
-                            <option value="1">Suporte Técnico</option>
-                            <option value="2">Operacional</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="admin-category" class="block text-sm font-medium mb-1">Categoria</label>
-                        <input type="text" id="admin-category" placeholder="Ex: Problemas Comuns" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                    </div>
-                    <div>
-                        <label for="admin-tags" class="block text-sm font-medium mb-1">Tags (separadas por vírgula)</label>
-                        <input type="text" id="admin-tags" placeholder="ex: lentidão, queda, fibra" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none">
-                    </div>
-                    <!-- Coluna 2 (Campos de Texto Grandes) -->
-                    <div class="md:col-span-2">
-                        <label for="admin-content" class="block text-sm font-medium mb-1">Descrição / O que é?</label>
-                        <textarea id="admin-content" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="admin-steps" class="block text-sm font-medium mb-1">Passo a Passo (um por linha)</label>
-                        <textarea id="admin-steps" rows="5" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="admin-message" class="block text-sm font-medium mb-1">O que dizer ao cliente (Script)</label>
-                        <textarea id="admin-message" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
-                    </div>
-                </div>
-                <!-- Botões do Formulário -->
-                <div class="flex items-center justify-end space-x-4 mt-6">
-                    <button type="button" id="admin-form-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
-                        Cancelar
-                    </button>
-                    <button type="submit" id="admin-form-submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
-                        Salvar Artigo
-                    </button>
-                </div>
-            </form>
-            
-            <!-- Lista de Artigos Existentes -->
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-                 <h2 class="text-2xl font-bold mb-6">Artigos Existentes</h2>
-                 <div id="admin-articles-list" class="space-y-4">
-                     <!-- Artigos para gerenciar serão listados aqui -->
-                 </div>
-            </div>
-
-        </section>
-
-        <!-- TELA 5: ADMIN (Gerenciar Usuários) -->
-        <section id="users-admin-screen" class="screen fade-in max-w-4xl mx-auto">
-            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
-                <i class="ph-bold ph-arrow-left mr-1"></i>
-                Voltar para Home
-            </button>
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold">Gerenciar Usuários</h1>
-                <button onclick="app.showScreen('register')" class="bg-azul-principal text-white px-5 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center space-x-2">
-                    <i class="ph-bold ph-plus"></i>
-                    <span>Cadastrar Usuário</span>
-                </button>
-            </div>
-            
-            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
-                 <h2 class="text-2xl font-bold mb-6">Lista de Usuários</h2>
-                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Edite, altere o cargo ou exclua usuários. Você não pode excluir sua própria conta.</p>
-                 <div class="space-y-4" id="users-admin-list">
-                     <!-- Lista de usuários será populada pelo JS -->
-                 </div>
-            </div>
-
-            <!-- Card para Alterar Senha Mestra -->
-            <form id="change-master-pass-form" class="bg-white p-8 rounded-xl shadow-lg">
-                <h2 class="text-2xl font-bold mb-6">Alterar Senha Mestra</h2>
-                <p class="text-sm text-cinza-texto mb-6 -mt-4">Esta é a senha usada para acessar as telas de Gerenciamento.</p>
-                
-                <div id="change-master-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
-                <div id="change-master-pass-success" class="hidden bg-verde-sucesso/10 text-verde-sucesso p-3 rounded-lg text-sm mb-4"></div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <label for="master-pass-current" class="block text-sm font-medium mb-1">Senha Mestra Atual</label>
-                        <input type="password" id="master-pass-current" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                    </div>
-                    <div>
-                        <label for="master-pass-new" class="block text-sm font-medium mb-1">Nova Senha Mestra</label>
-                        <input type="password" id="master-pass-new" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                    </div>
-                    <div>
-                        <label for="master-pass-confirm" class="block text-sm font-medium mb-1">Confirmar Nova Senha</label>
-                        <input type="password" id="master-pass-confirm" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                    </div>
-                </div>
-                <div class="flex justify-end mt-6">
-                    <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
-                        Salvar Nova Senha Mestra
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <!-- TELA 6: CONTATOS DE EMERGÊNCIA (Com CRUD) -->
-        <section id="contacts-screen" class="screen fade-in max-w-4xl mx-auto">
-            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
-                <i class="ph-bold ph-arrow-left mr-1"></i>
-                Voltar para Home
-            </button>
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold">Contatos de Emergência</h1>
-                <button id="add-contact-btn" onclick="app.promptEditContact(null)" class="hidden bg-azul-principal text-white px-5 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center space-x-2">
-                    <i class="ph-bold ph-plus"></i>
-                    <span>Adicionar Contato</span>
-                </button>
-            </div>
-            
-            <!-- Barra de Busca de Contatos -->
-            <form class="relative mb-8">
-                <i class="ph-bold ph-magnifying-glass text-cinza-texto text-2xl absolute left-6 top-1/2 -translate-y-1/2"></i>
-                <input type="text" id="contacts-search-input" placeholder="Buscar por nome, cargo ou equipe..." class="huge-search-bar w-full text-lg pl-16 pr-6 py-5 rounded-xl border-2 border-transparent focus:border-azul-principal focus:ring-2 focus:ring-azul-principal/50 outline-none">
-            </form>
-
-            <div id="contacts-list" class="space-y-8">
-                <!-- Grupos de contatos serão populados pelo JS -->
-            </div>
-        </section>
-
-        <!-- TELA 7: HISTÓRICO (Admin) -->
-        <section id="history-screen" class="screen fade-in max-w-4xl mx-auto">
-            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
-                <i class="ph-bold ph-arrow-left mr-1"></i>
-                Voltar para Home
-            </button>
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-3xl font-bold">Histórico de Edições</h1>
-            </div>
-            
-            <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
-                 <h2 class="text-2xl font-bold mb-6">Log de Alterações</h2>
-                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Exibindo as alterações mais recentes primeiro. A reversão de uma ação também gera um log.</p>
-                 <div class="space-y-4" id="history-log-list">
-                     <!-- Lista de logs será populada pelo JS -->
-                 </div>
-            </div>
-        </section>
-        
-        <!-- TELA 8: AI CHAT -->
-        <section id="ai-chat-screen" class="screen fade-in max-w-3xl mx-auto">
-            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
-                <i class="ph-bold ph-arrow-left mr-1"></i>
-                Voltar para Home
-            </button>
-            <h1 class="text-3xl font-bold mb-6">Assistente de IA</h1>
-            <p class="text-cinza-texto mb-6">Faça uma pergunta em linguagem natural (ex: "o que fazer se a luz LOS piscar?"). A IA usará a base de conhecimento para encontrar a melhor resposta.</p>
-            
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-                <!-- Chat History -->
-                <div id="ai-chat-history" class="h-96 overflow-y-auto mb-6 p-4 bg-cinza-fundo rounded-lg space-y-4">
-                    <!-- Mensagem inicial -->
-                    <div class="flex justify-start">
-                        <div class="bg-azul-principal text-white p-3 rounded-lg rounded-bl-none max-w-md">
-                            Olá! Sou o assistente de IA da Central de Conhecimento. Faça uma pergunta sobre nossos procedimentos.
-                        </div>
-                    </div>
-                    <!-- Mensagens do chat aparecem aqui -->
-                </div>
-
-                <!-- Loading Spinner (dentro do chat) -->
-                <div id="ai-chat-loading" class="hidden flex justify-start mb-4">
-                    <div class="flex items-center space-x-2 bg-gray-200 text-gray-700 p-3 rounded-lg rounded-bl-none max-w-xs">
-                        <i class="ph-bold ph-spinner text-azul-principal text-2xl animate-spin"></i>
-                        <span>Pensando...</span>
-                    </div>
-                </div>
-
-                <!-- Input Form -->
-                <form id="ai-chat-form" class="flex items-center gap-4">
-                    <input type="text" id="ai-chat-input" placeholder="Digite sua pergunta..." class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none text-lg">
-                    <button type="submit" class="bg-azul-principal text-white p-4 rounded-lg font-medium hover:bg-azul-escuro transition-all">
-                        <i class="ph-bold ph-paper-plane-right text-2xl"></i>
-                    </button>
-                </form>
-            </div>
-        </section>
-
-        <!-- NOVA TELA 9: AI ARTICLE GENERATOR -->
-        <section id="ai-generator-screen" class="screen fade-in max-w-3xl mx-auto">
-            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
-                <i class="ph-bold ph-arrow-left mr-1"></i>
-                Voltar para Home
-            </button>
-            <h1 class="text-3xl font-bold mb-6">Gerador de Artigos por IA</h1>
-            <p class="text-cinza-texto mb-6">Cole o texto de uma transcrição, PDF ou anotação, ou envie a foto de um rascunho. A IA irá analisar o conteúdo e preencher um novo artigo para você.</p>
-            
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-                <!-- Tabs -->
-                <div class="flex mb-6 rounded-lg overflow-hidden border border-gray-300">
-                    <button id="ai-gen-tab-text" class="ai-gen-tab-btn flex-1 p-3 font-medium text-lg transition-all active" onclick="app.switchAiGenTab('text')">
-                        <i class="ph-bold ph-text-t mr-2"></i>
-                        Colar Texto
-                    </button>
-                    <button id="ai-gen-tab-image" class="ai-gen-tab-btn flex-1 p-3 font-medium text-lg transition-all" onclick="app.switchAiGenTab('image')">
-                        <i class="ph-bold ph-image mr-2"></i>
-                        Enviar Imagem
-                    </button>
-                </div>
-
-                <!-- Tab: Texto -->
-                <div id="ai-gen-content-text" class="ai-gen-tab-content active">
-                    <label for="ai-gen-text-input" class="block text-sm font-medium mb-2">Cole a transcrição, anotação, ou texto do PDF aqui:</label>
-                    <textarea id="ai-gen-text-input" rows="12" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" placeholder="Ex: Cliente ligou (Maria, 12:35) reclamando de lentidão. Feito reset da ONU..."></textarea>
-                </div>
-
-                <!-- Tab: Imagem -->
-                <div id="ai-gen-content-image" class="ai-gen-tab-content">
-                    <label for="ai-gen-image-input" class="block text-sm font-medium mb-2">Envie uma foto de um rascunho ou anotação:</label>
-                    <input type="file" id="ai-gen-image-input" accept="image/jpeg, image/png, image/webp" class="w-full border border-gray-300 rounded-lg p-2 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-azul-principal/10 file:text-azul-principal hover:file:bg-azul-principal/20">
-                    <div id="ai-gen-image-preview" class="mt-4 hidden w-full text-center p-4 bg-cinza-fundo rounded-lg">
-                        <p class="text-sm font-medium mb-2">Pré-visualização:</p>
-                        <img id="ai-gen-image-preview-img" src="" alt="Preview da Imagem" class="rounded-lg mx-auto border border-gray-300">
-                        <button id="ai-gen-image-clear" class="text-sm text-vermelho-erro hover:underline mt-2">Remover Imagem</button>
-                    </div>
-                </div>
-
-                <!-- Botão de Gerar -->
-                <button id="ai-gen-submit-btn" onclick="app.handleAIGenerateArticle()" class="mt-6 w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg flex items-center justify-center space-x-2">
-                    <i class="ph-bold ph-magic-wand"></i>
-                    <span>Analisar e Gerar Artigo</span>
-                </button>
-
-                <!-- Loading Overlay -->
-                <div id="ai-gen-loading" class="hidden absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl">
-                    <i class="ph-bold ph-spinner text-azul-principal text-5xl animate-spin"></i>
-                    <span class="mt-4 font-medium text-azul-escuro">A IA está analisando e gerando o artigo...</span>
-                    <span class="text-sm text-cinza-texto">Isso pode levar alguns segundos.</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Alerta de "Copiado!" -->
-        <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
-            <span id="alert-text"></span>
-        </div>
-        
-        <!-- Textarea oculto para cópia -->
-        <textarea id="copy-textarea" class="absolute -left-full"></textarea>
-
-    </main>
-
-    <!-- MODAIS (Fora do <main> para garantir o z-index) -->
-
-    <!-- MODAL: Verificação de Senha Admin -->
-    <div id="admin-password-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
-        <form id="admin-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
-            <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Acesso Restrito</h2>
-            <p class="text-cinza-texto text-center mb-6">Por favor, insira a senha mestra de administrador para continuar.</p>
-            
-            <div id="admin-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4">
-                Senha mestra incorreta.
-            </div>
-
-            <div>
-                <label for="admin-pass-input" class="block text-sm font-medium mb-1">Senha Mestra</label>
-                <input type="password" id="admin-pass-input" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-            </div>
-            
-            <div class="flex items-center justify-end space-x-4 mt-6">
-                <button type="button" id="admin-pass-cancel" onclick="app.toggleAdminPasswordModal(false)" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
-                    Cancelar
-                </button>
-                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
-                    Verificar
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- MODAL: Alteração de Senha Pessoal -->
-    <div id="change-password-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
-        <form id="change-my-pass-form" class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
-            <h2 class="text-2xl font-bold text-azul-escuro text-center mb-4">Alterar Minha Senha</h2>
-            
-            <div id="change-my-pass-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
-            <div id="change-my-pass-success" class="hidden bg-verde-sucesso/10 text-verde-sucesso p-3 rounded-lg text-sm mb-4"></div>
-
-            <div class="space-y-4">
-                <div>
-                    <label for="my-pass-current" class="block text-sm font-medium mb-1">Senha Atual</label>
-                    <input type="password" id="my-pass-current" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-                <div>
-                    <label for="my-pass-new" class="block text-sm font-medium mb-1">Nova Senha</label>
-                    <input type="password" id="my-pass-new" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-                <div>
-                    <label for="my-pass-confirm" class="block text-sm font-medium mb-1">Confirmar Nova Senha</label>
-                    <input type="password" id="my-pass-confirm" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-            </div>
-            
-            <div class="flex items-center justify-end space-x-4 mt-6">
-                <button type="button" id="my-pass-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
-                    Cancelar
-                </button>
-                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
-                    Salvar
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- MODAL: Editar Usuário (Admin) -->
-    <div id="edit-user-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
-        <form id="edit-user-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
-            <h2 class="text-2xl font-bold text-azul-escuro mb-6">Editar Usuário</h2>
-            <input type="hidden" id="edit-user-id">
-
-            <div id="edit-user-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label for="edit-user-name" class="block text-sm font-medium mb-1">Nome Completo</label>
-                    <input type="text" id="edit-user-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-                <div>
-                    <label for="edit-user-username" class="block text-sm font-medium mb-1">Nome de Usuário (login)</label>
-                    <input type="text" id="edit-user-username" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                 <div>
-                    <label for="edit-user-role" class="block text-sm font-medium mb-1">Cargo</label>
-                    <select id="edit-user-role" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
-                         <!-- Opções de cargo populadas por JS -->
-                    </select>
-                </div>
-                <div>
-                    <label for="edit-user-password" class="block text-sm font-medium mb-1">Nova Senha (Opcional)</label>
-                    <input type="password" id="edit-user-password" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" placeholder="Deixe em branco para manter">
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end space-x-4 mt-6">
-                <button type="button" id="edit-user-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
-                    Cancelar
-                </button>
-                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
-                    Salvar Alterações
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- MODAL: Adicionar/Editar Contato (Admin) -->
-    <div id="edit-contact-modal" class="modal fixed inset-0 z-50 bg-black/50 backdrop-blur-sm items-center justify-center p-6">
-        <form id="edit-contact-form" class="auth-card p-8 rounded-xl shadow-lg max-w-lg w-full">
-            <h2 id="edit-contact-title" class="text-2xl font-bold text-azul-escuro mb-6">Adicionar Contato</h2>
-            <input type="hidden" id="edit-contact-id">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="edit-contact-name" class="block text-sm font-medium mb-1">Nome Completo</label>
-                    <input type="text" id="edit-contact-name" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-                <div>
-                    <label for="edit-contact-phone" class="block text-sm font-medium mb-1">Telefone</label>
-                    <input type="text" id="edit-contact-phone" placeholder="(00) 90000-0000" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-                <div>
-                    <label for="edit-contact-team" class="block text-sm font-medium mb-1">Equipe</label>
-                    <input type="text" id="edit-contact-team" placeholder="Ex: Operacional" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-                 <div>
-                    <label for="edit-contact-role" class="block text-sm font-medium mb-1">Cargo / Função</label>
-                    <input type="text" id="edit-contact-role" placeholder="Ex: Técnico de Plantão" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-end space-x-4 mt-6">
-                <button type="button" id="edit-contact-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
-                    Cancelar
-                </button>
-                <button type="submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
-                    Salvar Contato
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- MODAL: Confirmação de Exclusão -->
-    <div id="confirm-modal" class="modal fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm items-center justify-center p-6">
-        <div class="auth-card p-8 rounded-xl shadow-lg max-w-sm w-full">
-            <div class="text-center">
-                <div class="w-16 h-16 bg-vermelho-erro/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="ph-bold ph-trash text-vermelho-erro text-4xl"></i>
-                </div>
-                <h2 class="text-2xl font-bold text-azul-escuro mb-4">Confirmar Exclusão</h2>
-                <p id="confirm-modal-text" class="text-cinza-texto text-center mb-6">Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.</p>
-            </div>
-            
-            <div class="flex items-center justify-center space-x-4 mt-6">
-                <button type="button" id="confirm-modal-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
-                    Cancelar
-                </button>
-                <button type="button" id="confirm-modal-delete" class="bg-vermelho-erro text-white px-6 py-2 rounded-lg font-medium hover:bg-red-700 transition-all">
-                    Excluir
-                </button>
-            </div>
-        </div>
-    </div>
-
-
-    <script>
-        // Simulação de um banco de dados
-        const mockDB = {
-            masterPassword: "admin123", // Senha mestra
-            nextUserId: 4,
-            nextContactId: 5,
-            nextLogId: 1, 
-            users: [
-                { id: 1, name: "Ana Sousa", username: "ana", password: "123", role: "Atendente N1", avatar: "https://placehold.co/100x100/4FA3FF/FFFFFF?text=A&font=inter" },
-                { id: 2, name: "Bruno Costa", username: "bruno", password: "123", role: "Supervisor", avatar: "https://placehold.co/100x100/1F2F4B/FFFFFF?text=B&font=inter" },
-                { id: 3, name: "Admin Mestre", username: "admin", password: "admin", role: "Admin", avatar: "https://placehold.co/100x100/E87A7A/FFFFFF?text=AD&font=inter" }
-            ],
-            sectors: [
-                { id: 1, name: "Suporte Técnico" },
-                { id: 2, name: "Operacional" }
-            ],
-            articles: [
-                {
-                    id: 1,
-                    sector_id: 1,
-                    category: "Problemas Comuns",
-                    title: "Cliente sem conexão (Luz LOS piscando)",
-                    content: "Quando a luz 'LOS' do roteador está piscando em vermelho, indica um problema de sinal óptico, geralmente rompimento de fibra.",
-                    steps: [
-                        "Acalme o cliente e informe que a luz indica um problema físico na rede.",
-                        "Confirme o endereço completo.",
-                        "Verifique se há outros clientes na mesma região com o mesmo problema (pode ser falha massiva).",
-                        "Abra um chamado técnico de urgência para a equipe de campo."
-                    ],
-                    message_to_client: "Entendo, essa luz piscando indica que há um problema físico na fibra que chega até sua casa. Já estou registrando sua solicitação e enviando uma equipe técnica para verificar a rede na sua rua o mais rápido possível.",
-                    tags: ["los", "vermelha", "piscando", "sem sinal", "fibra", "rompimento"],
-                    updated_at: "14/11/2025"
-                },
-                {
-                    id: 2,
-                    sector_id: 1,
-                    category: "Problemas Comuns",
-                    title: "Poste caído ou fibra rompida na rua",
-                    content: "Cliente informa dano físico visível na infraestrutura da rua (poste caído, cabo partido, etc.) que causou a queda de sinal.",
-                    steps: [
-                        "Agradeça a informação (é valiosa).",
-                        "NÃO prometa prazo. Informe que é uma manutenção emergencial complexa.",
-                        "Confirme o endereço exato do dano.",
-                        "Abra um chamado de EMERGÊNCIA tipo 'Dano Físico' para o Operacional e informe o supervisor."
-                    ],
-                    message_to_client: "Muito obrigado por nos avisar sobre o poste! Sua informação é muito importante. Já estou abrindo um chamado de emergência para nossa equipe técnica verificar a situação no local. Como é um dano físico na rede, pode levar um tempo para normalizar, mas faremos o mais rápido possível.",
-                    tags: ["poste", "cabo", "rompido", "caiu", "acidente", "emergência", "fibra"],
-                    updated_at: "13/11/2025"
-                },
-                {
-                    id: 3,
-                    sector_id: 1,
-                    category: "Procedimentos",
-                    title: "Internet Lenta (Verificação Padrão)",
-                    content: "Cliente reclama de lentidão, mas tem conexão. Procedimento padrão de diagnóstico inicial antes de escalar.",
-                    steps: [
-                        "Peça ao cliente para reiniciar o roteador (tirar da tomada por 30s).",
-                        "Pergunte se a lentidão é no Wi-Fi ou no cabo.",
-                        "Solicite um teste de velocidade (usando nosso medidor oficial) no cabo, se possível.",
-                        "Se a velocidade no cabo estiver normal, o problema é o Wi-Fi (vá para 'Procedimento: Wi-Fi Lento').",
-                        "Se no cabo estiver lento, verifique o consumo de banda no sistema e agende visita técnica."
-                    ],
-                    message_to_client: "Certo, vamos verificar sua lentidão. Por favor, reinicie seu roteador tirando-o da tomada por 30 segundos. Enquanto ele reinicia, me diga: você nota essa lentidão em quais dispositivos? É mais no celular (Wi-Fi) ou em um computador no cabo?",
-                    tags: ["lentidão", "lenta", "velocidade", "teste", "wifi", "cabo"],
-                    updated_at: "10/11/2025"
-                },
-                 {
-                    id: 4,
-                    sector_id: 2,
-                    category: "Procedimentos",
-                    title: "Ativação de Novo Cliente (Provisionamento)",
-                    content: "Procedimento para provisionar uma nova ONU na OLT.",
-                    steps: [
-                        "Coletar S/N (Serial Number) da ONU com o técnico.",
-                        "Acessar a OLT referente à localidade.",
-                        "Provisionar na porta correta conforme projeto.",
-                        "Verificar se ONU autenticou (Sinal OK)."
-                    ],
-                    message_to_client: "(Uso interno do técnico. Não enviar ao cliente.)",
-                    tags: ["onu", "olt", "provisionar", "ativacao", "novo cliente"],
-                    updated_at: "09/11/2025"
-                }
-            ],
-            contacts: [
-                { id: 1, name: "Marcos Oliveira", role: "Técnico de Campo (Plantão)", team: "Operacional", phone: "(00) 98888-1234" },
-                { id: 2, name: "Carla Mendes", role: "Supervisora (Plantão NOC)", team: "Suporte Avançado", phone: "(00) 99999-4321" },
-                { id: 3, name: "Equipe NOC N2", role: "Fila de Atendimento", team: "Suporte Avançado", phone: "0800-000-002" },
-                { id: 4, name: "Ricardo Almeida", role: "Técnico de Fibra (Plantão)", team: "Operacional", phone: "(00) 97777-5555" }
-            ],
-            auditLog: []
-        };
-
-        // Lógica da Aplicação
-        const app = {
-            currentScreen: 'login',
-            currentSectorId: null,
-            currentUser: null,
-            db: mockDB,
-            editingArticleId: null, 
-            adminTargetScreen: null, 
-            roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], 
-            editingContactId: null, 
-            deleteAction: { type: null, id: null }, 
-            geminiAPIKey: "", // Deixe em branco
-            geminiAPIModel: "gemini-2.5-flash-preview-09-2025",
-            aiGenCurrentTab: 'text', // NOVO: 'text' ou 'image'
-            aiGenBase64Image: null, // NOVO: Armazena a imagem
-
-            init() {
-                // Formulários de Autenticação
-                document.getElementById('login-form').addEventListener('submit', (e) => this.login(e));
-                document.getElementById('register-form').addEventListener('submit', (e) => this.register(e));
-
-                // Navegação e Busca
-                document.getElementById('search-input').addEventListener('input', (e) => this.search(e.target.value));
-                document.getElementById('search-form').addEventListener('submit', (e) => e.preventDefault());
-                document.getElementById('contacts-search-input').addEventListener('input', (e) => app.loadContacts(e.target.value));
-                
-                // Admin CRUD Artigos
-                document.getElementById('admin-form').addEventListener('submit', (e) => this.handleFormSubmit(e));
-                document.getElementById('admin-form-cancel').addEventListener('click', () => this.resetForm());
-
-                // Listeners dos Modais
-                document.getElementById('admin-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.checkAdminPassword(); });
-                document.getElementById('admin-pass-cancel').addEventListener('click', () => this.toggleAdminPasswordModal(false));
-
-                document.getElementById('change-my-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleChangeMyPassword(); });
-                document.getElementById('my-pass-cancel').addEventListener('click', () => this.toggleChangeMyPasswordModal(false));
-
-                document.getElementById('edit-user-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleEditUser(); });
-                document.getElementById('edit-user-cancel').addEventListener('click', () => this.toggleEditUserModal(false));
-                
-                document.getElementById('change-master-pass-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleChangeMasterPassword(); });
-
-                // CRUD de Contatos
-                document.getElementById('edit-contact-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleEditContact(); });
-                document.getElementById('edit-contact-cancel').addEventListener('click', () => this.toggleEditContactModal(false));
-
-                // Modal de Confirmação
-                document.getElementById('confirm-modal-cancel').addEventListener('click', () => this.toggleConfirmModal(false));
-                document.getElementById('confirm-modal-delete').addEventListener('click', () => this.handleConfirmDelete());
-
-                // AI Chat
-                document.getElementById('ai-chat-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleAIChatSubmit(); });
-
-                // NOVO: AI Generator
-                document.getElementById('ai-gen-image-input').addEventListener('change', (e) => this.handleImageUpload(e));
-                document.getElementById('ai-gen-image-clear').addEventListener('click', () => this.clearImageUpload());
-
-                // Popula selects de cargo
-                this.populateRoleSelects();
-
-                // Mostra a tela inicial (login)
-                this.showScreen('login');
-            },
-
-            // --- NAVEGAÇÃO ---
-            
-            showScreen(screenId) {
-                const authScreens = ['login']; 
-                const isAuthScreen = authScreens.includes(screenId);
-                const adminScreens = ['admin', 'users-admin', 'register', 'history']; 
-                
-                const header = document.getElementById('main-header');
-                const main = document.getElementById('main-content');
-                if (isAuthScreen) {
-                    header.classList.add('hidden');
-                    main.classList.remove('pt-24');
-                } else {
-                    header.classList.remove('hidden');
-                    main.classList.add('pt-24');
-                }
-
-                if (!this.currentUser && !isAuthScreen) {
-                    screenId = 'login';
-                } else if (this.currentUser && isAuthScreen) {
-                    screenId = 'home';
-                }
-                
-                if (this.currentUser) {
-                    const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
-                    const isAdmin = this.currentUser.role === 'Admin';
-
-                    // NOVO: Proteção para o gerador de IA
-                    if ((screenId === 'admin' || screenId === 'ai-generator') && !canManageContent) {
-                        this.showAlert('Acesso negado. Apenas Nível 3 ou superior.', true); 
-                        screenId = 'home';
-                    }
-                    if ((screenId === 'users-admin' || screenId === 'register' || screenId === 'history') && !isAdmin) {
-                         this.showAlert('Acesso negado. Apenas Admins.', true);
-                         screenId = 'home';
-                    }
-                }
-
-
-                document.querySelectorAll('.screen').forEach(screen => {
-                    screen.classList.remove('active', 'fade-in');
-                    screen.style.display = 'none'; 
-                });
-                
-                const activeScreen = document.getElementById(`${screenId}-screen`);
-                
-                if (activeScreen) {
-                    if (screenId === 'login') {
-                        activeScreen.style.display = 'flex';
-                    } else {
-                         activeScreen.style.display = 'block';
-                    }
-
-                    activeScreen.classList.add('active');
-                    void activeScreen.offsetWidth; 
-                    activeScreen.classList.add('fade-in');
-                    
-                    window.scrollTo(0, 0); 
-                    this.currentScreen = screenId; 
-
-                    // Ações específicas ao entrar na tela
-                    if(screenId === 'admin') {
-                        this.loadAdminList(); 
-                        this.resetForm();
-                    }
-                    if(screenId === 'users-admin' && this.currentUser?.role === 'Admin') {
-                        this.loadUsersAdminList();
-                    }
-                    if (screenId === 'contacts') {
-                        this.loadContacts(); 
-                    }
-                    if (screenId === 'history' && this.currentUser?.role === 'Admin') {
-                        this.loadHistory();
-                    }
-                    if (screenId === 'ai-generator') {
-                        this.clearImageUpload();
-                        document.getElementById('ai-gen-text-input').value = '';
-                    }
-                    
-                    if (this.currentUser) {
-                        this.updateUI();
-                    }
-                    
-                    document.getElementById('user-profile-menu').classList.toggle('hidden', !this.currentUser);
-                    document.getElementById('user-profile-menu').classList.toggle('flex', !!this.currentUser);
-
-                } else {
-                    console.error(`Tela com ID '${screenId}-screen' não encontrada.`);
-                    this.showScreen('login'); // Fallback
-                }
-            },
-
-            goBackToSector() {
-                this.showScreen('sector');
-                document.getElementById('search-input').value = '';
-                this.toggleSearchResults(false);
-            },
-
-            loadSector(sectorId) {
-                this.currentSectorId = sectorId;
-                const sector = this.db.sectors.find(s => s.id === sectorId);
-                if (!sector) return;
-
-                document.getElementById('sector-title').innerText = sector.name;
-                document.getElementById('search-input').value = ''; 
-                this.toggleSearchResults(false);
-                
-                this.loadCategories(sectorId);
-                
-                this.showScreen('sector');
-            },
-
-            loadCategories(sectorId) {
-                const listEl = document.getElementById('categories-list');
-                const articlesInSector = this.db.articles.filter(a => a.sector_id === sectorId);
-                
-                const categories = [...new Set(articlesInSector.map(a => a.category))];
-                
-                const icons = {
-                    "Problemas Comuns": "ph-warning-circle",
-                    "Procedimentos": "ph-list-checks",
-                    "Roteiros": "ph-microphone-stage",
-                    "Encaminhamentos": "ph-arrow-square-out",
-                    "default": "ph-book-open"
-                };
-                
-                listEl.innerHTML = ''; 
-                categories.forEach(category => {
-                    const icon = icons[category] || icons['default'];
-                    listEl.innerHTML += `
-                        <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('${category}')">
-                            <i class="ph-bold ${icon} text-4xl text-azul-principal mb-3"></i>
-                            <h3 class="text-lg font-semibold">${category}</h3>
-                        </div>
-                    `;
-                });
-            },
-
-            // LÓGICA DE CONTATOS (Com CRUD)
-            loadContacts(searchQuery = '') {
-                if (this.currentScreen !== 'contacts') { 
-                    this.showScreen('contacts'); 
-                    return; 
-                }
-                
-                const listEl = document.getElementById('contacts-list');
-                const lowerQuery = searchQuery.toLowerCase().trim();
-                const isAdmin = this.currentUser && this.currentUser.role === 'Admin';
-
-                document.getElementById('add-contact-btn').classList.toggle('hidden', !isAdmin);
-
-                let filteredContacts = this.db.contacts;
-
-                if (lowerQuery.length > 0) {
-                    filteredContacts = this.db.contacts.filter(c => 
-                        c.name.toLowerCase().includes(lowerQuery) ||
-                        c.role.toLowerCase().includes(lowerQuery) ||
-                        c.team.toLowerCase().includes(lowerQuery)
-                    );
-                }
-
-                const groups = filteredContacts.reduce((acc, contact) => {
-                    (acc[contact.team] = acc[contact.team] || []).push(contact);
-                    return acc;
-                }, {});
-
-                listEl.innerHTML = ''; 
-
-                if (filteredContacts.length === 0) {
-                    listEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhum contato encontrado.</p>';
-                    return;
-                }
-
-                for (const team in groups) {
-                    const contactsHTML = groups[team].map(contact => `
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-4">
-                            <div>
-                                <h4 class="font-semibold">${contact.name}</h4>
-                                <p class="text-sm text-cinza-texto">${contact.role}</p>
-                            </div>
-                            <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto flex-shrink-0">
-                                <a href="tel:${contact.phone}" class="bg-azul-principal text-white px-4 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all text-sm flex items-center justify-center space-x-2 w-full">
-                                    <i class="ph-bold ph-phone"></i>
-                                    <span>${contact.phone}</span>
-                                </a>
-                                ${isAdmin ? `
-                                <div class="flex gap-2 w-full">
-                                    <button onclick="app.promptEditContact(${contact.id})" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 text-sm flex-1 justify-center">Editar</button>
-                                    <button onclick="app.deleteContact(${contact.id}, '${contact.name}')" class="bg-vermelho-erro/20 text-vermelho-erro px-4 py-2 rounded-lg font-medium hover:bg-vermelho-erro/30 text-sm flex-1 justify-center">Excluir</button>
-                                </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `).join('');
-
-                    listEl.innerHTML += `
-                        <div class="mb-8">
-                            <h2 class="text-2xl font-bold mb-4">${team}</h2>
-                            <div class="space-y-4">
-                                ${contactsHTML}
-                            </div>
-                        </div>
-                    `;
-                }
-            },
-
-            // --- LÓGICA DE ARTIGOS E BUSCA ---
-
-            loadArticle(articleId) {
-                const article = this.db.articles.find(a => a.id === articleId);
-                if (!article) return;
-
-                const sector = this.db.sectors.find(s => s.id === article.sector_id);
-                
-                document.getElementById('article-title').innerText = article.title;
-                document.getElementById('article-sector').innerText = sector.name;
-                document.getElementById('article-updated').innerText = article.updated_at;
-                document.getElementById('article-content').innerText = article.content;
-                document.getElementById('article-steps').innerHTML = article.steps.map((step, i) => 
-                    `<li class="flex items-start">
-                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-azul-principal text-white text-sm font-bold flex items-center justify-center mr-3">${i+1}</span>
-                        <span>${step}</span>
-                    </li>`
-                ).join('');
-                document.getElementById('article-message-to-client').innerText = article.message_to_client;
-                document.getElementById('copy-button').onclick = () => this.copyMessage(article.message_to_client);
-
-                this.showScreen('article');
-            },
-
-            search(query) {
-                const lowerQuery = query.toLowerCase().trim();
-                if (lowerQuery.length < 2) {
-                    this.toggleSearchResults(false); 
-                    return;
-                }
-                const results = this.findRelevantArticles(query, this.currentSectorId);
-                this.renderSearchResults(results);
-                this.toggleSearchResults(true);
-            },
-
-            renderSearchResults(results) {
-                const resultsEl = document.getElementById('search-results');
-                resultsEl.innerHTML = ''; 
-
-                if (results.length === 0) {
-                    resultsEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhum resultado encontrado.</p>';
-                    return;
-                }
-
-                results.forEach(article => {
-                    resultsEl.innerHTML += `
-                        <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.loadArticle(${article.id})">
-                            <h4 class="font-bold text-azul-principal">${article.title}</h4>
-                            <p class="text-sm text-cinza-texto">${article.content.substring(0, 100)}...</p>
-                        </div>
-                    `;
-                });
-            },
-
-            toggleSearchResults(show) {
-                document.getElementById('search-results-container').classList.toggle('hidden', !show);
-                document.getElementById('categories-container').classList.toggle('hidden', show);
-                if (show && !document.getElementById('search-results-title').innerText.startsWith("Resultados para:")) {
-                    document.getElementById('search-results-title').innerText = "Resultados da Busca";
-                }
-            },
-
-            showArticlesByCategory(category) {
-                const articles = this.db.articles.filter(a => a.sector_id === this.currentSectorId && a.category === category);
-                this.renderSearchResults(articles);
-                this.toggleSearchResults(true);
-                document.getElementById('search-results-title').innerText = `Resultados para: ${category}`;
-            },
-
-            // --- UTILITÁRIOS ---
-
-            clone(obj) {
-                if (obj === null || typeof obj !== 'object') {
-                    return obj;
-                }
-                try {
-                    return JSON.parse(JSON.stringify(obj));
-                } catch (e) {
-                    console.error("Falha ao clonar objeto:", obj, e);
-                    return null;
-                }
-            },
-
-            logAction(action, entityType, entityId, entityName, previousState, newState) {
-                if (!this.currentUser) {
-                    console.warn("Tentativa de log sem usuário. Ação:", action, entityType);
-                    return;
-                }
-                
-                const logEntry = {
-                    id: this.db.nextLogId++,
-                    timestamp: new Date().toLocaleString('pt-BR'),
-                    userId: this.currentUser.id,
-                    userName: this.currentUser.name,
-                    action: action, 
-                    entityType: entityType, 
-                    entityId: entityId,
-                    entityName: entityName, 
-                    previousState: this.clone(previousState), 
-                    newState: this.clone(newState), 
-                    reverted: false 
-                };
-                
-                this.db.auditLog.push(logEntry);
-            },
-
-            copyMessage(text) {
-                const textarea = document.getElementById('copy-textarea');
-                textarea.value = text;
-                textarea.select();
-                try {
-                    document.execCommand('copy');
-                    this.showAlert('Texto copiado para a área de transferência!');
-                } catch (err) {
-                    console.error('Falha ao copiar:', err);
-                    this.showAlert('Falha ao copiar. Tente manualmente.', true);
-                }
-            },
-
-            showAlert(message, isError = false) {
-                const alertEl = document.getElementById('alert-toast');
-                const alertText = document.getElementById('alert-text');
-                
-                alertText.innerText = message;
-                alertEl.className = 'fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform'; // Reset
-                
-                if (isError) {
-                    alertEl.classList.add('bg-vermelho-erro');
-                } else {
-                    alertEl.classList.add('bg-verde-sucesso');
-                }
-                
-                alertEl.classList.remove('hidden', 'translate-y-10', 'opacity-0');
-                
-                setTimeout(() => {
-                    alertEl.classList.add('translate-y-10', 'opacity-0');
-                    setTimeout(() => alertEl.classList.add('hidden'), 300);
-                }, 3000);
-            },
-
-            shakeElement(elementId) {
-                const el = document.getElementById(elementId);
-                el.classList.add('animate-shake');
-                setTimeout(() => el.classList.remove('animate-shake'), 500);
-            },
-
-            // --- LÓGICA DE AUTENTICAÇÃO ---
-
-            login(e) {
-                e.preventDefault();
-                const username = document.getElementById('login-username').value.trim();
-                const password = document.getElementById('login-password').value;
-                const errorEl = document.getElementById('login-error');
-
-                const user = this.db.users.find(u => u.username === username && u.password === password);
-
-                if (user) {
-                    this.currentUser = user;
-                    this.showScreen('home');
-                    errorEl.classList.add('hidden');
-                    errorEl.innerText = '';
-                    document.getElementById('login-form').reset();
-                } else {
-                    errorEl.innerText = 'Usuário ou senha inválidos.';
-                    errorEl.classList.remove('hidden');
-                    this.shakeElement('login-form');
-                }
-            },
-
-            register(e) {
-                e.preventDefault();
-                const name = document.getElementById('register-name').value;
-                const username = document.getElementById('register-username').value;
-                const password = document.getElementById('register-password').value;
-                const role = document.getElementById('register-role').value;
-                const errorEl = document.getElementById('register-error');
-                
-                const existingUser = this.db.users.find(u => u.username === username);
-                if (existingUser) {
-                    errorEl.innerText = 'Este nome de usuário já está em uso.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-                
-                const newId = this.db.nextUserId++; 
-                const newUser = {
-                    id: newId,
-                    name: name,
-                    username: username,
-                    password: password,
-                    role: role, 
-                    avatar: `https://placehold.co/100x100/9AA1AC/FFFFFF?text=${name.charAt(0).toUpperCase()}&font=inter`
-                };
-                
-                this.db.users.push(newUser);
-                this.logAction('create', 'user', newId, name, null, newUser);
-                this.showAlert(`Usuário ${name} cadastrado com sucesso!`);
-                this.showScreen('users-admin'); 
-                errorEl.classList.add('hidden');
-                document.getElementById('register-form').reset();
-            },
-
-            logout() {
-                this.currentUser = null;
-                this.showScreen('login');
-            },
-
-            updateUI() {
-                if (!this.currentUser) return;
-                
-                document.getElementById('user-profile-name').innerText = this.currentUser.name;
-                document.getElementById('user-profile-role').innerText = this.currentUser.role;
-                document.getElementById('user-profile-avatar').src = this.currentUser.avatar;
-                document.getElementById('user-profile-avatar').alt = `Avatar de ${this.currentUser.name}`;
-                
-                const firstName = this.currentUser.name.split(' ')[0];
-                document.getElementById('home-welcome-title').innerText = `Bem-vindo(a), ${firstName}. O que você precisa?`;
-
-                const contentAdminRoles = ['Atendente N3', 'Supervisor', 'Admin'];
-                const articleAdminCard = document.getElementById('admin-articles-card');
-                const userAdminCard = document.getElementById('admin-users-card');
-                const historyAdminCard = document.getElementById('admin-history-card');
-                const aiGeneratorCard = document.getElementById('ai-generator-card'); // NOVO
-
-                const canManageContent = contentAdminRoles.includes(this.currentUser.role);
-                articleAdminCard.classList.toggle('hidden', !canManageContent);
-                aiGeneratorCard.classList.toggle('hidden', !canManageContent); // NOVO
-                userAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
-                historyAdminCard.classList.toggle('hidden', this.currentUser.role !== 'Admin');
-            },
-
-
-            // --- LÓGICA DE ADMIN (CRUD de Artigos) ---
-
-            loadAdminList() {
-                const listEl = document.getElementById('admin-articles-list');
-                if (!listEl) return;
-                listEl.innerHTML = '';
-                
-                const articlesToManage = this.db.articles; 
-
-                articlesToManage.forEach(article => {
-                    listEl.innerHTML += `
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-2">
-                            <div>
-                                <h4 class="font-semibold">${article.title}</h4>
-                                <span class="text-sm text-cinza-texto">${this.db.sectors.find(s => s.id === article.sector_id).name}</span>
-                            </div>
-                            <div class="space-x-2 flex-shrink-0">
-                                <button onclick="app.editArticle(${article.id})" class="text-azul-principal hover:underline text-sm font-medium">Editar</button>
-                                <button onclick="app.deleteArticle(${article.id}, '${article.title}')" class="text-vermelho-erro hover:underline text-sm font-medium">Excluir</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            },
-
-            handleFormSubmit(e) {
-                e.preventDefault();
-                
-                const title = document.getElementById('admin-title').value;
-                const sector_id = parseInt(document.getElementById('admin-sector').value);
-                const category = document.getElementById('admin-category').value;
-                const content = document.getElementById('admin-content').value;
-                const steps = document.getElementById('admin-steps').value.split('\n').filter(s => s.trim() !== '');
-                const message = document.getElementById('admin-message').value;
-                const tags = document.getElementById('admin-tags').value.split(',').map(t => t.trim()).filter(t => t !== '');
-                
-                const newArticleData = {
-                    sector_id,
-                    category,
-                    title,
-                    content,
-                    steps,
-                    message_to_client: message,
-                    tags,
-                    updated_at: new Date().toLocaleDateString('pt-BR')
-                };
-
-                if (this.editingArticleId) {
-                    const index = this.db.articles.findIndex(a => a.id === this.editingArticleId);
-                    if (index !== -1) {
-                        const previousState = this.clone(this.db.articles[index]); 
-                        this.db.articles[index] = { ...this.db.articles[index], ...newArticleData };
-                        const newState = this.clone(this.db.articles[index]); 
-                        this.logAction('update', 'article', this.editingArticleId, title, previousState, newState);
-                        this.showAlert('Artigo atualizado com sucesso!');
-                    }
-                } else {
-                    const newId = this.db.articles.length > 0 ? Math.max(...this.db.articles.map(a => a.id)) + 1 : 1;
-                    const newArticle = { id: newId, ...newArticleData };
-                    this.db.articles.push(newArticle);
-                    this.logAction('create', 'article', newId, title, null, newArticle); 
-                    this.showAlert('Artigo criado com sucesso!');
-                }
-
-                this.resetForm();
-                this.loadAdminList();
-            },
-
-            editArticle(articleId) {
-                const article = this.db.articles.find(a => a.id === articleId);
-                if (!article) return;
-
-                this.editingArticleId = article.id;
-                
-                document.getElementById('admin-title').value = article.title;
-                document.getElementById('admin-sector').value = article.sector_id;
-                document.getElementById('admin-category').value = article.category;
-                document.getElementById('admin-content').value = article.content;
-                document.getElementById('admin-steps').value = article.steps.join('\n');
-                document.getElementById('admin-message').value = article.message_to_client;
-                document.getElementById('admin-tags').value = article.tags.join(', ');
-
-                document.getElementById('admin-form-title').innerText = 'Editando Artigo';
-                document.getElementById('admin-form-submit').innerText = 'Atualizar Artigo';
-                
-                document.getElementById('admin-form').scrollIntoView({ behavior: 'smooth' });
-            },
-
-            deleteArticle(articleId, title) {
-                this.promptDelete('article', articleId, `Tem certeza que deseja excluir o artigo "${title}"?`);
-            },
-
-            resetForm() {
-                document.getElementById('admin-form').reset();
-                this.editingArticleId = null;
-                document.getElementById('admin-form-title').innerText = 'Adicionar Novo Artigo';
-                document.getElementById('admin-form-submit').innerText = 'Salvar Artigo';
-            },
-
-            // --- LÓGICA DE ADMIN (Gerenciar Usuários) ---
-            
-            populateRoleSelects() {
-                const roles = this.roles;
-                const registerSelect = document.getElementById('register-role');
-                const editSelect = document.getElementById('edit-user-role');
-                
-                registerSelect.innerHTML = roles.map(role => `<option value="${role}">${role}</option>`).join('');
-                editSelect.innerHTML = roles.map(role => `<option value="${role}">${role}</option>`).join('');
-            },
-
-            loadUsersAdminList() {
-                const listEl = document.getElementById('users-admin-list');
-                if (!listEl) return; 
-                
-                listEl.innerHTML = '';
-                const roles = this.roles;
-
-                this.db.users.forEach(user => {
-                    const isCurrentUser = user.id === this.currentUser.id;
-
-                    const options = roles.map(role => 
-                        `<option value="${role}" ${user.role === role ? 'selected' : ''}>${role}</option>`
-                    ).join('');
-
-                    listEl.innerHTML += `
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg">
-                            <div class="flex items-center gap-3 mb-2 sm:mb-0">
-                                <img src="${user.avatar}" alt="${user.name}" class="w-10 h-10 rounded-full">
-                                <div>
-                                    <h4 class="font-semibold">${user.name}</h4>
-                                    <span class="text-sm text-cinza-texto">${user.username}</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center space-x-2">
-                                <select onchange="app.updateUserRole(${user.id}, this.value)" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-azul-principal outline-none bg-white" ${isCurrentUser ? 'disabled' : ''}>
-                                    ${options}
-                                </select>
-                                <button onclick="app.promptEditUser(${user.id})" class="text-azul-principal hover:underline text-sm font-medium px-2 py-1" title="Editar Usuário">
-                                    Editar
-                                </button>
-                                <button onclick="app.deleteUser(${user.id}, '${user.name}')" class="text-vermelho-erro hover:underline text-sm font-medium px-2 py-1" ${isCurrentUser ? 'disabled' : ''} title="${isCurrentUser ? 'Você não pode excluir a si mesmo' : 'Excluir usuário'}">
-                                    ${isCurrentUser ? 'Meu Usuário' : 'Excluir'}
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                });
-            },
-
-            updateUserRole(userId, newRole) {
-                const userIndex = this.db.users.findIndex(u => u.id === userId);
-                if (userIndex === -1) return;
-
-                const previousState = this.clone(this.db.users[userIndex]);
-
-                if (this.db.users[userIndex].role === 'Admin' && newRole !== 'Admin') {
-                    const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
-                    if (adminCount <= 1) {
-                        this.showAlert('Não é possível alterar o cargo do último Admin.', true);
-                        this.loadUsersAdminList(); 
-                        return;
-                    }
-                }
-
-                this.db.users[userIndex].role = newRole;
-                
-                const newState = this.clone(this.db.users[userIndex]); 
-                this.logAction('update', 'user', userId, newState.name, previousState, newState);
-                
-                this.showAlert(`Cargo de ${this.db.users[userIndex].name} atualizado para ${newRole}!`);
-                this.loadUsersAdminList(); 
-            },
-
-            deleteUser(userId, name) {
-                this.promptDelete('user', userId, `Tem certeza que deseja excluir o usuário ${name}?`);
-            },
-
-            // --- LÓGICA DOS MODAIS (SENHAS, EDIÇÃO) ---
-
-            accessAdminScreen(target) {
-                if (!this.currentUser) {
-                    this.showScreen('login'); 
-                    return;
-                }
-
-                const canManageContent = ['Atendente N3', 'Supervisor', 'Admin'].includes(this.currentUser.role);
-                const isAdmin = this.currentUser.role === 'Admin';
-
-                if (target === 'admin') {
-                    if (canManageContent) {
-                        this.showScreen('admin'); 
-                    } else {
-                        this.showAlert('Acesso negado.', true);
-                        this.showScreen('home');
-                    }
-                } else if (target === 'users-admin' || target === 'history') { 
-                    if (isAdmin) {
-                        this.promptAdminPassword(target); 
-                    } else {
-                        this.showAlert('Acesso negado.', true);
-                        this.showScreen('home');
-                    }
-                }
-            },
-
-            // Senha Mestra
-            promptAdminPassword(target) {
-                this.adminTargetScreen = target; 
-                document.getElementById('admin-pass-form').reset();
-                document.getElementById('admin-pass-error').classList.add('hidden');
-                this.toggleAdminPasswordModal(true);
-            },
-            
-            toggleAdminPasswordModal(show) {
-                const modal = document.getElementById('admin-password-modal');
-                modal.classList.toggle('hidden', !show);
-                modal.classList.toggle('flex', show);
-            },
-
-            checkAdminPassword() {
-                const password = document.getElementById('admin-pass-input').value;
-                const errorEl = document.getElementById('admin-pass-error');
-
-                if (password === this.db.masterPassword) {
-                    this.toggleAdminPasswordModal(false);
-                    this.showScreen(this.adminTargetScreen); 
-                } else {
-                    errorEl.classList.remove('hidden');
-                    this.shakeElement('admin-pass-form');
-                }
-            },
-
-            // Senha Pessoal
-            promptChangeMyPassword() {
-                document.getElementById('change-my-pass-form').reset();
-                document.getElementById('change-my-pass-error').classList.add('hidden');
-                document.getElementById('change-my-pass-success').classList.add('hidden');
-                this.toggleChangeMyPasswordModal(true);
-            },
-
-            toggleChangeMyPasswordModal(show) {
-                const modal = document.getElementById('change-password-modal');
-                modal.classList.toggle('hidden', !show);
-                modal.classList.toggle('flex', show);
-            },
-
-            handleChangeMyPassword() {
-                const currentPass = document.getElementById('my-pass-current').value;
-                const newPass = document.getElementById('my-pass-new').value;
-                const confirmPass = document.getElementById('my-pass-confirm').value;
-                
-                const errorEl = document.getElementById('change-my-pass-error');
-                const successEl = document.getElementById('change-my-pass-success');
-                
-                errorEl.classList.add('hidden');
-                successEl.classList.add('hidden');
-
-                if (currentPass !== this.currentUser.password) {
-                    errorEl.innerText = 'Senha atual incorreta.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-                
-                if (newPass.length < 3) {
-                    errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                if (newPass !== confirmPass) {
-                    errorEl.innerText = 'As novas senhas não conferem.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                const previousState = { password: this.currentUser.password }; 
-                
-                this.currentUser.password = newPass;
-                const userIndex = this.db.users.findIndex(u => u.id === this.currentUser.id);
-                if (userIndex !== -1) {
-                    this.db.users[userIndex].password = newPass;
-                }
-                
-                const newState = { password: newPass }; 
-                this.logAction('update', 'userPassword', this.currentUser.id, this.currentUser.name, previousState, newState);
-                
-                successEl.innerText = 'Senha alterada com sucesso!';
-                successEl.classList.remove('hidden');
-                
-                document.getElementById('change-my-pass-form').reset();
-                setTimeout(() => this.toggleChangeMyPasswordModal(false), 2000);
-            },
-
-            // Editar Usuário
-            promptEditUser(userId) {
-                const user = this.db.users.find(u => u.id === userId);
-                if (!user) return;
-
-                document.getElementById('edit-user-form').reset();
-                document.getElementById('edit-user-error').classList.add('hidden');
-                
-                document.getElementById('edit-user-id').value = user.id;
-                document.getElementById('edit-user-name').value = user.name;
-                document.getElementById('edit-user-username').value = user.username;
-
-                const roleSelect = document.getElementById('edit-user-role');
-                roleSelect.value = user.role;
-                
-                this.toggleEditUserModal(true);
-            },
-            
-            toggleEditUserModal(show) {
-                const modal = document.getElementById('edit-user-modal');
-                modal.classList.toggle('hidden', !show);
-                modal.classList.toggle('flex', show);
-            },
-
-            handleEditUser() {
-                const userId = parseInt(document.getElementById('edit-user-id').value);
-                const name = document.getElementById('edit-user-name').value.trim();
-                const username = document.getElementById('edit-user-username').value.trim();
-                const role = document.getElementById('edit-user-role').value;
-                const newPassword = document.getElementById('edit-user-password').value; 
-                
-                const errorEl = document.getElementById('edit-user-error');
-                errorEl.classList.add('hidden');
-
-                const userIndex = this.db.users.findIndex(u => u.id === userId);
-                if (userIndex === -1) {
-                    this.showAlert('Erro: Usuário não encontrado.', true);
-                    return;
-                }
-                
-                const previousState = this.clone(this.db.users[userIndex]); 
-                
-                if (this.db.users.some(u => u.username === username && u.id !== userId)) {
-                    errorEl.innerText = 'Este nome de usuário já está em uso.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                this.db.users[userIndex].name = name;
-                this.db.users[userIndex].username = username;
-                
-                const currentRole = this.db.users[userIndex].role;
-                if (currentRole !== role) {
-                    if (currentRole === 'Admin' && role !== 'Admin') {
-                        const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
-                        if (adminCount <= 1) {
-                             this.showAlert('Não é possível alterar o cargo do último Admin.', true);
-                             this.loadUsersAdminList(); 
-                             return; 
-                        }
-                    }
-                    this.db.users[userIndex].role = role;
-                }
-                
-                if (newPassword.trim().length > 0) {
-                    if (newPassword.trim().length < 3) {
-                         errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
-                         errorEl.classList.remove('hidden');
-                         return;
-                    }
-                    this.db.users[userIndex].password = newPassword.trim();
-                }
-                
-                const newState = this.clone(this.db.users[userIndex]); 
-                this.logAction('update', 'user', userId, name, previousState, newState); 
-                
-                this.showAlert(`Usuário ${name} atualizado com sucesso!`);
-                this.toggleEditUserModal(false);
-                this.loadUsersAdminList(); 
-            },
-
-            // Senha Mestra
-            handleChangeMasterPassword() {
-                const currentPass = document.getElementById('master-pass-current').value;
-                const newPass = document.getElementById('master-pass-new').value;
-                const confirmPass = document.getElementById('master-pass-confirm').value;
-
-                const errorEl = document.getElementById('change-master-pass-error');
-                const successEl = document.getElementById('change-master-pass-success');
-
-                errorEl.classList.add('hidden');
-                successEl.classList.add('hidden');
-
-                if (currentPass !== this.db.masterPassword) {
-                    errorEl.innerText = 'Senha mestra atual incorreta.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                if (newPass.length < 3) {
-                    errorEl.innerText = 'A nova senha deve ter pelo menos 3 caracteres.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                if (newPass !== confirmPass) {
-                    errorEl.innerText = 'As novas senhas não conferem.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
-
-                this.db.masterPassword = newPass;
-                this.logAction('update', 'masterPassword', 0, 'Senha Mestra', null, null);
-                
-                successEl.innerText = 'Senha mestra alterada com sucesso!';
-                successEl.classList.remove('hidden');
-                document.getElementById('change-master-pass-form').reset();
-            },
-
-            // CRUD de Contatos
-            promptEditContact(contactId) {
-                document.getElementById('edit-contact-form').reset();
-                this.editingContactId = contactId;
-
-                if (contactId === null) {
-                    document.getElementById('edit-contact-title').innerText = 'Adicionar Novo Contato';
-                } else {
-                    document.getElementById('edit-contact-title').innerText = 'Editar Contato';
-                    const contact = this.db.contacts.find(c => c.id === contactId);
-                    if (contact) {
-                        document.getElementById('edit-contact-id').value = contact.id;
-                        document.getElementById('edit-contact-name').value = contact.name;
-                        document.getElementById('edit-contact-phone').value = contact.phone;
-                        document.getElementById('edit-contact-team').value = contact.team;
-                        document.getElementById('edit-contact-role').value = contact.role;
-                    }
-                }
-                this.toggleEditContactModal(true);
-            },
-
-            toggleEditContactModal(show) {
-                const modal = document.getElementById('edit-contact-modal');
-                modal.classList.toggle('hidden', !show);
-                modal.classList.toggle('flex', show);
-            },
-
-            handleEditContact() {
-                const name = document.getElementById('edit-contact-name').value;
-                const phone = document.getElementById('edit-contact-phone').value;
-                const team = document.getElementById('edit-contact-team').value;
-                const role = document.getElementById('edit-contact-role').value;
-
-                if (!name || !phone || !team || !role) {
-                    this.showAlert('Todos os campos são obrigatórios.', true);
-                    return;
-                }
-
-                if (this.editingContactId === null) {
-                    const newId = this.db.nextContactId++;
-                    const newContact = { id: newId, name, phone, team, role };
-                    this.db.contacts.push(newContact);
-                    this.logAction('create', 'contact', newId, name, null, newContact); 
-                    this.showAlert('Contato adicionado com sucesso!');
-                } else {
-                    const index = this.db.contacts.findIndex(c => c.id === this.editingContactId);
-                    if (index !== -1) {
-                        const previousState = this.clone(this.db.contacts[index]); 
-                        this.db.contacts[index] = { id: this.editingContactId, name, phone, team, role };
-                        const newState = this.clone(this.db.contacts[index]); 
-                        this.logAction('update', 'contact', this.editingContactId, name, previousState, newState); 
-                        this.showAlert('Contato atualizado com sucesso!');
-                    }
-                }
-
-                this.toggleEditContactModal(false);
-                this.loadContacts(document.getElementById('contacts-search-input').value); 
-            },
-
-            deleteContact(contactId, name) {
-                this.promptDelete('contact', contactId, `Tem certeza que deseja excluir o contato ${name}?`);
-            },
-
-            // --- LÓGICA DO MODAL DE CONFIRMAÇÃO ---
-            
-            promptDelete(type, id, message) {
-                this.deleteAction = { type, id };
-                document.getElementById('confirm-modal-text').innerText = message || 'Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.';
-                this.toggleConfirmModal(true);
-            },
-
-            toggleConfirmModal(show) {
-                const modal = document.getElementById('confirm-modal');
-                modal.classList.toggle('hidden', !show);
-                modal.classList.toggle('flex', show);
-            },
-
-            handleConfirmDelete() {
-                const { type, id } = this.deleteAction;
-                if (!type || id === null) return;
-
-                switch (type) {
-                    case 'article':
-                        const articleIndex = this.db.articles.findIndex(a => a.id === id);
-                        if (articleIndex !== -1) {
-                            const previousState = this.clone(this.db.articles[articleIndex]); 
-                            const articleName = previousState.title;
-                            this.db.articles.splice(articleIndex, 1);
-                            this.logAction('delete', 'article', id, articleName, previousState, null); 
-                            this.showAlert('Artigo excluído com sucesso.', true);
-                            this.loadAdminList();
-                        }
-                        break;
-                    
-                    case 'user':
-                        const userIndex = this.db.users.findIndex(u => u.id === id);
-                        if (userIndex === -1) return;
-                        
-                        const previousStateUser = this.clone(this.db.users[userIndex]); 
-                        const userName = previousStateUser.name;
-                        
-                        if (this.db.users[userIndex].role === 'Admin') {
-                            const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
-                            if (adminCount <= 1) {
-                                this.showAlert('Não é possível excluir o último Admin do sistema.', true);
-                                this.toggleConfirmModal(false); 
-                                return;
-                            }
-                        }
-                        
-                        this.db.users.splice(userIndex, 1);
-                        this.logAction('delete', 'user', id, userName, previousStateUser, null); 
-                        this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
-                        this.loadUsersAdminList(); 
-                        break;
-                    
-                    case 'contact':
-                        const contactIndex = this.db.contacts.findIndex(c => c.id === id);
-                        if (contactIndex !== -1) {
-                            const previousStateContact = this.clone(this.db.contacts[contactIndex]); 
-                            const contactName = previousStateContact.name;
-                            this.db.contacts.splice(contactIndex, 1);
-                            this.logAction('delete', 'contact', id, contactName, previousStateContact, null); 
-                            this.showAlert('Contato excluído com sucesso.', true);
-                            this.loadContacts(document.getElementById('contacts-search-input').value); 
-                        }
-                        break;
-                }
-
-                this.toggleConfirmModal(false);
-                this.deleteAction = { type: null, id: null }; 
-            },
-
-            // --- LÓGICA DE HISTÓRICO E REVERSÃO ---
-
-            loadHistory() {
-                const listEl = document.getElementById('history-log-list');
-                if (!listEl) return;
-                
-                listEl.innerHTML = '';
-                const logs = [...this.db.auditLog].reverse(); 
-                
-                if (logs.length === 0) {
-                    listEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhuma alteração registrada ainda.</p>';
-                    return;
-                }
-
-                logs.forEach(log => {
-                    let description = '';
-                    let icon = '';
-                    let color = '';
-
-                    switch (log.action) {
-                        case 'create':
-                            description = `criou o ${log.entityType} "${log.entityName}"`;
-                            icon = 'ph-plus-circle';
-                            color = 'text-verde-sucesso';
-                            break;
-                        case 'update':
-                            description = `atualizou o ${log.entityType} "${log.entityName}"`;
-                            icon = 'ph-pencil-simple';
-                            color = 'text-amarelo-aviso';
-                            break;
-                        case 'delete':
-                            description = `excluiu o ${log.entityType} "${log.entityName}"`;
-                            icon = 'ph-trash';
-                            color = 'text-vermelho-erro';
-                            break;
-                        case 'revert':
-                            description = `REVERTEU a ação sobre "${log.entityName}"`;
-                            icon = 'ph-arrow-counter-clockwise';
-                            color = 'text-azul-principal';
-                            break;
-                        default:
-                            description = `realizou uma ação (${log.action}) em "${log.entityName}"`;
-                            icon = 'ph-question';
-                            color = 'text-cinza-texto';
-                    }
-
-                    let revertButton = '';
-                    if (log.action !== 'revert' && !log.reverted) {
-                        revertButton = `<button onclick="app.revertChange(${log.id})" class="text-azul-principal hover:underline text-sm font-medium">Reverter</button>`;
-                    } else if (log.reverted) {
-                        revertButton = `<span class="text-cinza-texto text-sm font-medium">Já Revertido</span>`;
-                    }
-
-                    listEl.innerHTML += `
-                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg gap-2">
-                            <div class="flex items-center gap-3">
-                                <i class="ph-bold ${icon} ${color} text-2xl"></i>
-                                <div>
-                                    <h4 class="font-semibold">${log.userName} ${description}</h4>
-                                    <span class="text-sm text-cinza-texto">${log.timestamp} (Log ID: ${log.id})</span>
-                                </div>
-                            </div>
-                            <div class="flex-shrink-0">
-                                ${revertButton}
-                            </div>
-                        </div>
-                    `;
-                });
-            },
-
-            revertChange(logId) {
-                const logEntry = this.db.auditLog.find(log => log.id === logId);
-                if (!logEntry || logEntry.reverted) {
-                    this.showAlert('Esta ação não pode ser revertida ou já foi revertida.', true);
-                    return;
-                }
-
-                try {
-                    let success = false;
-                    let logMessage = '';
-
-                    switch (logEntry.action) {
-                        case 'update':
-                            if (logEntry.entityType === 'article') {
-                                const index = this.db.articles.findIndex(e => e.id === logEntry.entityId);
-                                if (index !== -1) {
-                                    this.db.articles[index] = this.clone(logEntry.previousState);
-                                    success = true;
-                                }
-                            } else if (logEntry.entityType === 'user' || logEntry.entityType === 'userPassword') {
-                                const index = this.db.users.findIndex(e => e.id === logEntry.entityId);
-                                if (index !== -1) {
-                                    this.db.users[index] = this.clone(logEntry.previousState);
-                                    success = true;
-                                }
-                            } else if (logEntry.entityType === 'contact') {
-                                const index = this.db.contacts.findIndex(e => e.id === logEntry.entityId);
-                                if (index !== -1) {
-                                    this.db.contacts[index] = this.clone(logEntry.previousState);
-                                    success = true;
-                                }
-                            }
-                            logMessage = `Reversão de 'update' para ${logEntry.entityType} ID ${logEntry.entityId}`;
-                            break;
-                        
-                        case 'delete':
-                            if (logEntry.entityType === 'article') {
-                                this.db.articles.push(this.clone(logEntry.previousState));
-                                success = true;
-                            } else if (logEntry.entityType === 'user') {
-                                this.db.users.push(this.clone(logEntry.previousState));
-                                success = true;
-                            } else if (logEntry.entityType === 'contact') {
-                                this.db.contacts.push(this.clone(logEntry.previousState));
-                                success = true;
-                            }
-                            logMessage = `Reversão de 'delete' para ${logEntry.entityType} ID ${logEntry.entityId}`;
-                            break;
-
-                        case 'create':
-                            if (logEntry.entityType === 'article') {
-                                const index = this.db.articles.findIndex(e => e.id === logEntry.entityId);
-                                if (index !== -1) {
-                                    this.db.articles.splice(index, 1);
-                                    success = true;
-                                }
-                            } else if (logEntry.entityType === 'user') {
-                                const index = this.db.users.findIndex(e => e.id === logEntry.entityId);
-                                if (index !== -1) {
-                                    this.db.users.splice(index, 1);
-                                    success = true;
-                                }
-                            } else if (logEntry.entityType === 'contact') {
-                                const index = this.db.contacts.findIndex(e => e.id === logEntry.entityId);
-                                if (index !== -1) {
-                                    this.db.contacts.splice(index, 1);
-                                    success = true;
-                                }
-                            }
-                            logMessage = `Reversão de 'create' para ${logEntry.entityType} ID ${logEntry.entityId}`;
-                            break;
-                        
-                        default:
-                            this.showAlert('Tipo de ação desconhecida, não pode ser revertida.', true);
-                            return;
-                    }
-
-                    if (success) {
-                        logEntry.reverted = true; 
-                        this.logAction('revert', logEntry.entityType, logEntry.entityId, logEntry.entityName, logEntry.newState, logEntry.previousState);
-                        this.showAlert(`Ação (Log ID: ${logId}) foi revertida com sucesso!`);
-                        this.loadHistory(); 
-                    } else {
-                        this.showAlert(`Falha ao reverter: O item (ID: ${logEntry.entityId}) não foi encontrado. Talvez já tenha sido excluído?`, true);
-                    }
-
-                } catch (e) {
-                    console.error("Erro ao reverter:", e);
-                    this.showAlert('Ocorreu um erro grave durante a reversão.', true);
-                }
-            },
-
-            // --- LÓGICA DO ASSISTENTE DE IA (GEMINI) ---
-
-            handleAIChatSubmit() {
-                const input = document.getElementById('ai-chat-input');
-                const query = input.value.trim();
-                if (query === '') return;
-
-                this.renderChatMessage(query, 'user');
-                input.value = '';
-
-                const loadingEl = document.getElementById('ai-chat-loading');
-                loadingEl.classList.remove('hidden');
-                this.scrollChatHistory();
-
-                this.getAIChatResponse(query).then(aiResponse => {
-                    loadingEl.classList.add('hidden');
-                    this.renderChatMessage(aiResponse, 'ai');
-                }).catch(error => {
-                    console.error("Erro no handleAIChatSubmit:", error);
-                    loadingEl.classList.add('hidden');
-                    this.renderChatMessage("Desculpe, ocorreu um erro ao processar sua solicitação.", 'ai');
-                });
-            },
-
-            renderChatMessage(message, sender) {
-                const historyEl = document.getElementById('ai-chat-history');
-                const messageDiv = document.createElement('div');
-                
-                if (sender === 'user') {
-                    messageDiv.className = 'flex justify-end';
-                    messageDiv.innerHTML = `
-                        <div class="bg-blue-100 text-azul-escuro p-3 rounded-lg rounded-br-none max-w-md">
-                            ${message}
-                        </div>`;
-                } else {
-                    messageDiv.className = 'flex justify-start';
-                    messageDiv.innerHTML = `
-                        <div class="bg-azul-principal text-white p-3 rounded-lg rounded-bl-none max-w-md">
-                            ${message.replace(/\n/g, '<br>')}
-                        </div>`;
-                }
-                
-                historyEl.appendChild(messageDiv);
-                this.scrollChatHistory();
-            },
-
-            scrollChatHistory() {
-                const historyEl = document.getElementById('ai-chat-history');
-                historyEl.scrollTop = historyEl.scrollHeight;
-            },
-
-            findRelevantArticles(query, sectorId = null) {
-                const lowerQuery = query.toLowerCase().trim();
-                let articles = this.db.articles;
-
-                if (sectorId) {
-                    articles = articles.filter(a => a.sector_id === sectorId);
-                }
-
-                const results = articles.filter(article => {
-                    const inTitle = article.title.toLowerCase().includes(lowerQuery);
-                    const inContent = article.content.toLowerCase().includes(lowerQuery);
-                    const inTags = article.tags.some(tag => lowerQuery.includes(tag.toLowerCase()));
-                    const queryInTags = article.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
-                    return inTitle || inContent || inTags || queryInTags;
-                });
-                return results;
-            },
-
-            async getAIChatResponse(query) {
-                const relevantArticles = this.findRelevantArticles(query);
-                
-                const systemPrompt = `Você é um assistente de IA especialista em suporte técnico de provedores de internet. Você trabalha na "Central de Conhecimento".
-Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de clientes de forma rápida e precisa.
-- Você SÓ PODE usar as informações dos "Artigos de Conhecimento" fornecidos no contexto.
-- Não invente informações ou procedimentos que não estão listados.
-- Se a pergunta não puder ser respondida com o contexto, informe que não encontrou informações sobre isso na base de conhecimento.
-- Seja direto, profissional e formate sua resposta de forma clara (use listas se necessário).
-- Se o artigo tiver um "Script para Cliente", inclua-o na sua resposta quando for relevante.`;
-
-                let userPrompt;
-
-                if (relevantArticles.length > 0) {
-                    const context = relevantArticles.map(a => `
-                        ---
-                        Artigo: ${a.title}
-                        Setor: ${a.sector_id === 1 ? 'Suporte Técnico' : 'Operacional'}
-                        Conteúdo: ${a.content}
-                        Passo a Passo: ${a.steps.join('; ')}
-                        Script para Cliente: ${a.message_to_client}
-                        Tags: ${a.tags.join(', ')}
-                        ---
-                    `).join('\n');
-
-                    userPrompt = `Baseado SOMENTE no contexto de artigos a seguir, responda a pergunta do atendente.
-                    
-                    Contexto Fornecido:
-                    ${context}
-                    
-                    Pergunta do Atendente: "${query}"
-                    
-                    Sua resposta (use o contexto acima):`;
-                } else {
-                    userPrompt = `A pergunta do atendente é: "${query}".
-                    NENHUM artigo foi encontrado na base de conhecimento sobre este assunto.
-                    Informe ao atendente, de forma amigável, que você não encontrou informações sobre isso no banco de dados da Central de Conhecimento.`;
-                }
-
-                try {
-                    const aiText = await this.callGeminiAPI(systemPrompt, userPrompt);
-                    return aiText;
-                } catch (error) {
-                    console.error("Erro ao chamar Gemini API:", error);
-                    return "Desculpe, ocorreu um erro ao tentar me conectar à IA. Tente novamente.";
-                }
-            },
-
-            // --- NOVO: LÓGICA DO GERADOR DE ARTIGOS IA ---
-
-            switchAiGenTab(tab) {
-                this.aiGenCurrentTab = tab;
-                document.getElementById('ai-gen-tab-text').classList.toggle('active', tab === 'text');
-                document.getElementById('ai-gen-tab-image').classList.toggle('active', tab === 'image');
-                document.getElementById('ai-gen-content-text').classList.toggle('active', tab === 'text');
-                document.getElementById('ai-gen-content-image').classList.toggle('active', tab === 'image');
-            },
-
-            handleImageUpload(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.aiGenBase64Image = e.target.result.split(',')[1]; // Pega apenas o data
-                    document.getElementById('ai-gen-image-preview-img').src = e.target.result;
-                    document.getElementById('ai-gen-image-preview').classList.remove('hidden');
-                };
-                reader.readAsDataURL(file);
-            },
-
-            clearImageUpload() {
-                this.aiGenBase64Image = null;
-                const input = document.getElementById('ai-gen-image-input');
-                input.value = null; // Limpa o input
-                document.getElementById('ai-gen-image-preview').classList.add('hidden');
-                document.getElementById('ai-gen-image-preview-img').src = '';
-            },
-
-            async handleAIGenerateArticle() {
-                const textInput = document.getElementById('ai-gen-text-input').value.trim();
-                
-                let inputContent = null;
-                let inputType = this.aiGenCurrentTab; // 'text' ou 'image'
-
-                if (inputType === 'text' && textInput === '') {
-                    this.showAlert('Por favor, cole o texto da transcrição ou anotação.', true);
-                    return;
-                } else if (inputType === 'text') {
-                    inputContent = textInput;
-                }
-
-                if (inputType === 'image' && !this.aiGenBase64Image) {
-                    this.showAlert('Por favor, envie uma imagem.', true);
-                    return;
-                } else if (inputType === 'image') {
-                    inputContent = this.aiGenBase64Image;
-                }
-
-                const loadingOverlay = document.getElementById('ai-gen-loading');
-                loadingOverlay.classList.remove('hidden');
-
-                try {
-                    const aiResponse = await this.getAIArticleGeneration(inputContent, inputType);
-                    
-                    // Sucesso, agora vamos pré-preencher o formulário
-                    this.prefillAdminForm(aiResponse);
-                    this.showAlert('Artigo gerado pela IA! Revise e salve.');
-
-                } catch (error) {
-                    console.error("Erro ao gerar artigo com IA:", error);
-                    this.showAlert("Ocorreu um erro ao gerar o artigo. Tente novamente.", true);
-                } finally {
-                    loadingOverlay.classList.add('hidden');
-                }
-            },
-
-            async getAIArticleGeneration(content, type) {
-                // Usando o prompt que você definiu (T12), adaptado para JSON
-                const systemPrompt = `Você é uma IA assistente de uma Base de Conhecimento. Sua função é receber conteúdo bruto (texto ou imagem de rascunho) e estruturá-lo em um formato de artigo técnico JSON.
-                
-                Analise o conteúdo e extraia as seguintes informações:
-                1.  **titulo**: Um título curto e direto para o problema.
-                2.  **resumo_problema**: Um resumo do problema descrito.
-                3.  **resumo_solucao**: Um resumo da solução aplicada (se houver).
-                4.  **causa_provavel**: A causa provável (se mencionada).
-                5.  **tags**: Uma lista de 3 a 5 palavras-chave (tags) em uma string, separadas por vírgula.
-                6.  **categoria**: A categoria principal (ex: Problemas Comuns, Procedimentos).
-                7.  **setor_id**: O setor responsável (1 para Suporte Técnico, 2 para Operacional).
-                8.  **procedimento**: Um passo a passo da solução, formatado como uma string com \\n para novas linhas.
-                9.  **script_cliente**: O que deve ser dito ao cliente (se mencionado).
-                
-                Se uma informação não for encontrada, retorne "Não informado" no campo correspondente.
-                Seja objetivo e use linguagem técnica padronizada.`;
-
-                let userPrompt;
-                if (type === 'text') {
-                    userPrompt = `Analise o seguinte texto (transcrição/anotação) e gere o artigo estruturado:
-                    
-                    ---
-                    ${content}
-                    ---`;
-                } else { // type === 'image'
-                    userPrompt = `Analise a imagem deste rascunho/anotação e gere o artigo estruturado com base no texto que você ler nela.`;
-                }
-
-                // Define o schema de resposta JSON
-                const schema = {
-                    type: "OBJECT",
-                    properties: {
-                        "titulo": { "type": "STRING" },
-                        "resumo_problema": { "type": "STRING" },
-                        "resumo_solucao": { "type": "STRING", "description": "Se não houver, coloque 'Não informado'" },
-                        "causa_provavel": { "type": "STRING", "description": "Se não houver, coloque 'Não informado'" },
-                        "tags": { "type": "STRING", "description": "Ex: tag1, tag2, tag3" },
-                        "categoria": { "type": "STRING", "description": "Ex: Problemas Comuns, Procedimentos" },
-                        "setor_id": { "type": "STRING", "description": "1 para Suporte Técnico, 2 para Operacional" },
-                        "procedimento": { "type": "STRING", "description": "Passos separados por \\n" },
-                        "script_cliente": { "type": "STRING", "description": "O que dizer ao cliente. Se não houver, coloque 'Não informado'" }
-                    },
-                    required: ["titulo", "resumo_problema", "resumo_solucao", "tags", "categoria", "setor_id", "procedimento", "script_cliente"]
-                };
-
-                const aiResponseText = await this.callGeminiAPI(
-                    systemPrompt, 
-                    userPrompt,
-                    3, // retries
-                    1000, // delay
-                    (type === 'image' ? content : null), // base64Image
-                    schema // responseSchema
-                );
-                
-                // A API com schema JSON retorna o texto JSON
-                return JSON.parse(aiResponseText);
-            },
-
-            prefillAdminForm(articleData) {
-                // Limpa o formulário e vai para a tela de admin
-                this.resetForm();
-                this.showScreen('admin');
-                
-                document.getElementById('admin-title').value = articleData.titulo || '';
-                document.getElementById('admin-sector').value = articleData.setor_id === "2" ? "2" : "1"; // Garante 1 ou 2
-                document.getElementById('admin-category').value = articleData.categoria || 'Procedimentos';
-                document.getElementById('admin-tags').value = articleData.tags || '';
-                document.getElementById('admin-content').value = articleData.resumo_problema || '';
-                
-                // Converte \n para nova linha real no textarea
-                document.getElementById('admin-steps').value = (articleData.procedimento || '').replace(/\\n/g, '\n');
-                
-                document.getElementById('admin-message').value = articleData.script_cliente || '';
-
-                // Foca no título
-                document.getElementById('admin-title').focus();
-            },
-
-            // --- API GEMINI (Modificada para multimodal e JSON) ---
-
-            /**
-             * Função para chamar a API do Gemini com backoff exponencial.
-             * @param {string} systemPrompt - O prompt do sistema.
-             * @param {string} userPrompt - A pergunta do usuário.
-             *EXCLUSIVO* @param {number} retries - Tentativas.
-             * @param {number} delay - Delay inicial.
-             * @param {string|null} base64Image - Dados da imagem em base64 (opcional).
-             * @param {object|null} responseSchema - Schema JSON para a resposta (opcional).
-             */
-            async callGeminiAPI(systemPrompt, userPrompt, retries = 3, delay = 1000, base64Image = null, responseSchema = null) {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.geminiAPIModel}:generateContent?key=${this.geminiAPIKey}`;
-
-                let parts = [{ text: userPrompt }];
-                if (base64Image) {
-                    parts.push({
-                        inlineData: {
-                            mimeType: "image/jpeg", // Assumindo JPEG, PNG ou WEBP são convertidos
-                            data: base64Image
-                        }
-                    });
-                }
-
-                const payload = {
-                    contents: [{ parts: parts }],
-                    systemInstruction: {
-                        parts: [{ text: systemPrompt }]
-                    },
-                    generationConfig: {
-                        temperature: 0.5,
-                        topK: 1,
-                        topP: 1,
-                    }
-                };
-
-                // Adiciona o schema de resposta se fornecido
-                if (responseSchema) {
-                    payload.generationConfig.responseMimeType = "application/json";
-                    payload.generationConfig.responseSchema = responseSchema;
-                }
-
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (response.status === 429 && retries > 0) {
-                        await this.exponentialBackoff(delay);
-                        return this.callGeminiAPI(systemPrompt, userPrompt, retries - 1, delay * 2, base64Image, responseSchema);
-                    }
-
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        console.error("Erro na API Gemini:", response.status, errorData);
-                        throw new Error(`Erro da API: ${errorData?.error?.message || response.statusText}`);
-                    }
-
-                    const result = await response.json();
-                    
-                    if (result.candidates && result.candidates.length > 0) {
-                        const text = result.candidates[0].content.parts[0].text;
-                        return text;
-                    } else if (result.promptFeedback) {
-                        console.warn("Prompt bloqueado:", result.promptFeedback);
-                        throw new Error("Não consegui processar essa solicitação. O conteúdo pode ter sido bloqueado por razões de segurança.");
-                    }
-
-                    throw new Error("Não recebi uma resposta válida da IA.");
-
-                } catch (error) {
-                    console.error("Falha ao chamar a API Gemini:", error);
-                    if (retries > 0) {
-                        await this.exponentialBackoff(delay);
-                        return this.callGeminiAPI(systemPrompt, userPrompt, retries - 1, delay * 2, base64Image, responseSchema);
-                    }
-                    throw error; 
-                }
-            },
-            
-            exponentialBackoff(delay) {
-                return new Promise(resolve => setTimeout(resolve, delay));
-            }
-
-        };
-
-        // Inicia a aplicação quando o DOM estiver pronto
-        document.addEventListener('DOMContentLoaded', () => app.init());
-    </script>
+
+
+    <!-- Topo Fixo -->
+
+    <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-sm shadow-md z-50">
+
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+
+            <!-- Logo e Nome (Editável) -->
+
+            <div class="flex items-center space-x-3">
+
+                <div class="w-10 h-10 bg-azul-principal/20 rounded-lg flex items-center justify-center">
+
+                    <i class="ph-bold ph-circles-four text-azul-principal text-2xl"></i>
+
+                </div>
+
+                <span class="text-xl font-bold text-azul-escuro hidden sm:block">Central de Conhecimento</span>
+
+            </div>
+
+
+
+            <!-- Perfil do Usuário (Agora dinâmico) -->
+
+            <div id="user-profile-menu" class="hidden items-center space-x-3">
+
+                <span class="hidden sm:inline text-right text-sm">
+
+                    <div id="user-profile-name" class="font-medium"></div>
+
+                    <div id="user-profile-role" class="text-cinza-texto"></div>
+
+                </span>
+
+                <img id="user-profile-avatar" alt="Avatar do Usuário" class="w-10 h-10 rounded-full border-2 border-azul-principal/50">
+
+                <button onclick="app.logout()" class="ml-2 text-cinza-texto hover:text-vermelho-erro transition-all" title="Sair">
+
+                    <i class="ph-bold ph-sign-out text-2xl"></i>
+
+                </button>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+
+
+    <!-- Conteúdo Principal -->
+
+    <main class="pt-24 container mx-auto px-6 py-8">
+
+
+
+        <!-- TELA 0: LOGIN -->
+
+        <section id="login-screen" class="screen active fade-in">
+
+            <div class="max-w-md mx-auto mt-12">
+
+                <form id="login-form" class="auth-card p-8 rounded-xl shadow-lg">
+
+                    <div class="text-center mb-6">
+
+                        <div class="w-16 h-16 bg-azul-principal/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+
+                            <i class="ph-bold ph-circles-four text-azul-principal text-4xl"></i>
+
+                        </div>
+
+                        <h1 class="text-3xl font-bold text-azul-escuro">Acessar Central</h1>
+
+                        <p class="text-cinza-texto mt-1">Use suas credenciais para entrar.</p>
+
+                    </div>
+
+
+
+                    <div id="login-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+
+
+
+                    <div class="space-y-4">
+
+                        <div>
+
+                            <label for="login-username" class="block text-sm font-medium mb-1">Usuário</label>
+
+                            <input type="text" id="login-username" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                        </div>
+
+                        <div>
+
+                            <label for="login-password" class="block text-sm font-medium mb-1">Senha</label>
+
+                            <input type="password" id="login-password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                        </div>
+
+                        <button type="submit" class="w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg">
+
+                            Entrar
+
+                        </button>
+
+                    </div>
+
+                    
+
+                    <p class="text-center text-sm text-cinza-texto mt-6">
+
+                        Não tem uma conta? 
+
+                        <a href="#" onclick="app.showScreen('register')" class="font-medium text-azul-principal hover:underline">Cadastre-se</a>
+
+                    </p>
+
+                </form>
+
+            </div>
+
+        </section>
+
+        
+
+        <!-- TELA 0.1: CADASTRO -->
+
+        <section id="register-screen" class="screen fade-in">
+
+            <div class="max-w-md mx-auto mt-12">
+
+                <form id="register-form" class="auth-card p-8 rounded-xl shadow-lg">
+
+                    <h1 class="text-3xl font-bold text-azul-escuro text-center mb-6">Criar Conta</h1>
+
+                    
+
+                    <div id="register-error" class="hidden bg-vermelho-erro/10 text-vermelho-erro p-3 rounded-lg text-sm mb-4"></div>
+
+
+
+                    <div class="space-y-4">
+
+                        <div>
+
+                            <label for="register-name" class="block text-sm font-medium mb-1">Nome Completo</label>
+
+                            <input type="text" id="register-name" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                        </div>
+
+                        <div>
+
+                            <label for="register-username" class="block text-sm font-medium mb-1">Nome de Usuário (login)</label>
+
+                            <input type="text" id="register-username" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                        </div>
+
+                        <div>
+
+                            <label for="register-password" class="block text-sm font-medium mb-1">Senha</label>
+
+                            <input type="password" id="register-password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                        </div>
+
+                        <div>
+
+                            <label for="register-role" class="block text-sm font-medium mb-1">Cargo</label>
+
+                            <select id="register-role" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
+
+                                <option value="Atendente N1">Atendente Nível 1</option>
+
+                                <option value="Atendente N2">Atendente Nível 2</option>
+
+                                <option value="Atendente N3">Atendente Nível 3</option>
+
+                                <option value="Supervisor">Supervisor</option>
+
+                                <option value="Admin">Admin</option>
+
+                            </select>
+
+                        </div>
+
+                        <button type="submit" class="w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all text-lg">
+
+                            Cadastrar
+
+                        </button>
+
+                    </div>
+
+                    
+
+                    <p class="text-center text-sm text-cinza-texto mt-6">
+
+                        Já tem uma conta? 
+
+                        <a href="#" onclick="app.showScreen('login')" class="font-medium text-azul-principal hover:underline">Faça login</a>
+
+                    </p>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+
+
+
+        <!-- TELA 1: HOME (Seleção de Setores) -->
+
+        <section id="home-screen" class="screen fade-in">
+
+            <h1 id="home-welcome-title" class="text-3xl font-bold mb-8 text-center"></h1>
+
+            
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+
+                
+
+                <!-- Bloco Setor: Suporte Técnico -->
+
+                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+
+                     onclick="app.loadSector(1)">
+
+                    <i class="ph-bold ph-broadcast text-7xl text-azul-principal mb-4"></i>
+
+                    <h2 class="text-2xl font-bold mb-2">Suporte Técnico</h2>
+
+                    <p class="text-cinza-texto">Diagnósticos, falhas de conexão, lentidão e procedimentos de rede.</p>
+
+                </div>
+
+
+
+                <!-- Bloco Setor: Operacional -->
+
+                <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+
+                     onclick="app.loadSector(2)">
+
+                    <i class="ph-bold ph-wrench text-7xl text-azul-principal mb-4"></i>
+
+                    <h2 class="text-2xl font-bold mb-2">Operacional</h2>
+
+                    <p class="text-cinza-texto">Instalação, manutenção de campo, equipamentos e agendamentos.</p>
+
+                </div>
+
+                
+
+                <!-- Bloco Admin: Gerenciar Conteúdo (CRUD de Artigos) -->
+
+                <div id="admin-articles-card" class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+
+                     onclick="app.attemptAdminAccess()">
+
+                    <i class="ph-bold ph-pencil-simple-line text-7xl text-azul-principal mb-4"></i>
+
+                    <h2 class="text-2xl font-bold mb-2">Gerenciar Conteúdo</h2>
+
+                    <p class="text-cinza-texto">Adicionar, editar ou remover artigos da base de conhecimento.</p>
+
+                </div>
+
+                
+
+                <!-- NOVO Bloco Admin: Gerenciar Usuários (Somente Admin) -->
+
+                <div id="admin-users-card" class="sector-card hidden bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+
+                     onclick="app.showScreen('users-admin')">
+
+                    <i class="ph-bold ph-users-three text-7xl text-azul-principal mb-4"></i>
+
+                    <h2 class="text-2xl font-bold mb-2">Gerenciar Usuários</h2>
+
+                    <p class="text-cinza-texto">Editar cargos e excluir usuários do sistema.</p>
+
+                </div>
+
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- TELA 2: SETOR (Busca e Categorias) -->
+
+        <section id="sector-screen" class="screen fade-in max-w-4xl mx-auto">
+
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+
+                Voltar para Home
+
+            </button>
+
+            <h1 id="sector-title" class="text-3xl font-bold mb-8"></h1>
+
+            
+
+            <!-- Barra de Busca Enorme -->
+
+            <form id="search-form" class="relative mb-8">
+
+                <i class="ph-bold ph-magnifying-glass text-cinza-texto text-2xl absolute left-6 top-1/2 -translate-y-1/2"></i>
+
+                <input type="text" id="search-input" placeholder="Digite uma palavra-chave... (ex: poste caído, fibra rompida, lentidão)" class="huge-search-bar w-full text-lg pl-16 pr-6 py-5 rounded-xl border-2 border-transparent focus:border-azul-principal focus:ring-2 focus:ring-azul-principal/50 outline-none">
+
+            </form>
+
+
+
+            <!-- Container de Resultados da Busca -->
+
+            <div id="search-results-container" class="hidden">
+
+                <h2 id="search-results-title" class="text-2xl font-bold mb-6">Resultados da Busca</h2>
+
+                <div id="search-results" class="space-y-4">
+
+                    <!-- Resultados da busca aparecem aqui -->
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Container de Categorias -->
+
+            <div id="categories-container">
+
+                <h2 class="text-2xl font-bold mb-6">Categorias Principais</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                    <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('Problemas Comuns')">
+
+                        <i class="ph-bold ph-warning-circle text-4xl text-azul-principal mb-3"></i>
+
+                        <h3 class="text-lg font-semibold">Problemas Comuns</h3>
+
+                    </div>
+
+                    <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('Procedimentos')">
+
+                        <i class="ph-bold ph-list-checks text-4xl text-azul-principal mb-3"></i>
+
+                        <h3 class="text-lg font-semibold">Procedimentos</h3>
+
+                    </div>
+
+                    <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('Roteiros')">
+
+                        <i class="ph-bold ph-microphone-stage text-4xl text-azul-principal mb-3"></i>
+
+                        <h3 class="text-lg font-semibold">Roteiros de Atendimento</h3>
+
+                    </div>
+
+                    <div class="category-card bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.showArticlesByCategory('Encaminhamentos')">
+
+                        <i class="ph-bold ph-arrow-square-out text-4xl text-azul-principal mb-3"></i>
+
+                        <h3 class="text-lg font-semibold">Encaminhamentos</h3>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- TELA 3: ARTIGO (Informação Final) -->
+
+        <section id="article-screen" class="screen fade-in max-w-3xl mx-auto">
+
+            <button onclick="app.goBackToSector()" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+
+                Voltar para Busca
+
+            </button>
+
+            
+
+            <article class="bg-white p-8 sm:p-10 rounded-xl shadow-lg">
+
+                <!-- Cabeçalho -->
+
+                <h1 id="article-title" class="text-3xl sm:text-4xl font-bold mb-4"></h1>
+
+                <div class="flex flex-wrap text-sm text-cinza-texto space-x-4 mb-6">
+
+                    <span>Setor: <strong id="article-sector" class="text-azul-escuro"></strong></span>
+
+                    <span>Última atualização: <strong id="article-updated" class="text-azul-escuro"></strong></span>
+
+                </div>
+
+
+
+                <!-- Conteúdo -->
+
+                <div class="prose max-w-none">
+
+                    <h2 class="text-xl font-semibold mb-2">O que é?</h2>
+
+                    <p id="article-content" class="mb-6"></p>
+
+
+
+                    <h2 class="text-xl font-semibold mb-2">Passo a Passo (O que fazer)</h2>
+
+                    <ol id="article-steps" class="list-none space-y-3 mb-6 p-0">
+
+                        <!-- Passos gerados por JS -->
+
+                    </ol>
+
+                    
+
+                    <h2 class="text-xl font-semibold mb-2">O que dizer ao cliente</h2>
+
+                    <div class="bg-cinza-fundo p-4 rounded-lg">
+
+                        <p id="article-message-to-client" class="text-azul-escuro"></p>
+
+                    </div>
+
+
+
+                    <button id="copy-button" class="mt-6 w-full bg-azul-principal text-white px-6 py-3 rounded-lg font-medium hover:bg-azul-escuro transition-all flex items-center justify-center space-x-2">
+
+                        <i class="ph-bold ph-copy"></i>
+
+                        <span>Copiar texto para envio</span>
+
+                    </button>
+
+                </div>
+
+            </article>
+
+        </section>
+
+
+
+        <!-- TELA 4: ADMIN (CRUD de Artigos) -->
+
+        <section id="admin-screen" class="screen fade-in max-w-4xl mx-auto">
+
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+
+                Voltar para Home
+
+            </button>
+
+            <h1 class="text-3xl font-bold mb-8">Gerenciar Conteúdo</h1>
+
+
+
+            <!-- Formulário de Adicionar/Editar Artigo -->
+
+            <form id="admin-form" class="bg-white p-8 rounded-xl shadow-lg mb-8">
+
+                <h2 id="admin-form-title" class="text-2xl font-bold mb-6">Adicionar Novo Artigo</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Coluna 1 -->
+
+                    <div>
+
+                        <label for="admin-title" class="block text-sm font-medium mb-1">Título do Artigo</label>
+
+                        <input type="text" id="admin-title" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none" required>
+
+                    </div>
+
+                    <div>
+
+                        <label for="admin-sector" class="block text-sm font-medium mb-1">Setor</label>
+
+                        <select id="admin-sector" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
+
+                            <option value="1">Suporte Técnico</option>
+
+                            <option value="2">Operacional</option>
+
+                        </select>
+
+                    </div>
+
+                    <div>
+
+                        <label for="admin-category" class="block text-sm font-medium mb-1">Categoria</label>
+
+                        <select id="admin-category" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none bg-white" required>
+
+                            <option value="Problemas Comuns">Problemas Comuns</option>
+
+                            <option value="Procedimentos">Procedimentos</option>
+
+                            <option value="Roteiros">Roteiros</option>
+
+                            <option value="Encaminhamentos">Encaminhamentos</option>
+
+                        </select>
+
+                    </div>
+
+                    <div>
+
+                        <label for="admin-tags" class="block text-sm font-medium mb-1">Tags (separadas por vírgula)</label>
+
+                        <input type="text" id="admin-tags" placeholder="ex: lentidão, queda, fibra" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none">
+
+                    </div>
+
+                    <!-- Coluna 2 (Campos de Texto Grandes) -->
+
+                    <div class="md:col-span-2">
+
+                        <label for="admin-content" class="block text-sm font-medium mb-1">Descrição / O que é?</label>
+
+                        <textarea id="admin-content" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
+
+                    </div>
+
+                    <div class="md:col-span-2">
+
+                        <label for="admin-steps" class="block text-sm font-medium mb-1">Passo a Passo (um por linha)</label>
+
+                        <textarea id="admin-steps" rows="5" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
+
+                    </div>
+
+                    <div class="md:col-span-2">
+
+                        <label for="admin-message" class="block text-sm font-medium mb-1">O que dizer ao cliente (Script)</label>
+
+                        <textarea id="admin-message" rows="4" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-azul-principal outline-none"></textarea>
+
+                    </div>
+
+                </div>
+
+                <!-- Botões do Formulário -->
+
+                <div class="flex items-center justify-end space-x-4 mt-6">
+
+                    <button type="button" id="admin-form-cancel" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition-all">
+
+                        Cancelar
+
+                    </button>
+
+                    <button type="submit" id="admin-form-submit" class="bg-azul-principal text-white px-6 py-2 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+
+                        Salvar Artigo
+
+                    </button>
+
+                </div>
+
+            </form>
+
+            
+
+            <!-- Lista de Artigos Existentes -->
+
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+
+                 <h2 class="text-2xl font-bold mb-6">Artigos Existentes</h2>
+
+                 <div id="admin-articles-list" class="space-y-4">
+
+                     <!-- Artigos para gerenciar serão listados aqui -->
+
+                 </div>
+
+            </div>
+
+
+
+        </section>
+
+
+
+        <!-- NOVA TELA 5: ADMIN (Gerenciar Usuários) -->
+
+        <section id="users-admin-screen" class="screen fade-in max-w-4xl mx-auto">
+
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+
+                Voltar para Home
+
+            </button>
+
+            <h1 class="text-3xl font-bold mb-8">Gerenciar Usuários</h1>
+
+            
+
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+
+                 <h2 class="text-2xl font-bold mb-6">Lista de Usuários</h2>
+
+                 <p class="text-sm text-cinza-texto mb-6 -mt-4">Altere o cargo de um usuário selecionando a opção ou exclua-o. Você não pode excluir sua própria conta.</p>
+
+                 <div class="space-y-4" id="users-admin-list">
+
+                    <!-- Lista de usuários será populada pelo JS -->
+
+                 </div>
+
+            </div>
+
+        </section>
+
+
+
+        
+
+        <!-- Alerta de "Copiado!" -->
+
+        <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-50 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
+
+            <span id="alert-text"></span>
+
+        </div>
+
+        
+
+        <!-- Textarea oculto para cópia -->
+
+        <textarea id="copy-textarea" class="absolute -left-full"></textarea>
+
+
+
+    </main>
+
+
+
+    <script>
+
+        // Simulação de um banco de dados
+
+        const mockDB = {
+
+            users: [
+
+                { id: 1, name: "Ana Sousa", username: "ana", password: "123", role: "Atendente N1", avatar: "https://placehold.co/100x100/4FA3FF/FFFFFF?text=A&font=inter" },
+
+                { id: 2, name: "Bruno Costa", username: "bruno", password: "123", role: "Supervisor", avatar: "https://placehold.co/100x100/1F2F4B/FFFFFF?text=B&font=inter" },
+
+                { id: 3, name: "Admin Mestre", username: "admin", password: "admin", role: "Admin", avatar: "https://placehold.co/100x100/E87A7A/FFFFFF?text=AD&font=inter" }
+
+            ],
+
+            sectors: [
+
+                { id: 1, name: "Suporte Técnico" },
+
+                { id: 2, name: "Operacional" }
+
+            ],
+
+            articles: [
+
+                {
+
+                    id: 1,
+
+                    sector_id: 1,
+
+                    category: "Problemas Comuns",
+
+                    title: "Cliente sem conexão (Luz LOS piscando)",
+
+                    content: "Quando a luz 'LOS' do roteador está piscando em vermelho, indica um problema de sinal óptico, geralmente rompimento de fibra.",
+
+                    steps: [
+
+                        "Acalme o cliente e informe que a luz indica um problema físico na rede.",
+
+                        "Confirme o endereço completo.",
+
+                        "Verifique se há outros clientes na mesma região com o mesmo problema (pode ser falha massiva).",
+
+                        "Abra um chamado técnico de urgência para a equipe de campo."
+
+                    ],
+
+                    message_to_client: "Entendo, essa luz piscando indica que há um problema físico na fibra que chega até sua casa. Já estou registrando sua solicitação e enviando uma equipe técnica para verificar a rede na sua rua o mais rápido possível.",
+
+                    tags: ["los", "vermelha", "piscando", "sem sinal", "fibra", "rompimento"],
+
+                    updated_at: "14/11/2025"
+
+                },
+
+                {
+
+                    id: 2,
+
+                    sector_id: 1,
+
+                    category: "Problemas Comuns",
+
+                    title: "Poste caído ou fibra rompida na rua",
+
+                    content: "Cliente informa dano físico visível na infraestrutura da rua (poste caído, cabo partido, etc.) que causou a queda de sinal.",
+
+                    steps: [
+
+                        "Agradeça a informação (é valiosa).",
+
+                        "NÃO prometa prazo. Informe que é uma manutenção emergencial complexa.",
+
+                        "Confirme o endereço exato do dano.",
+
+                        "Abra um chamado de EMERGÊNCIA tipo 'Dano Físico' para o Operacional e informe o supervisor."
+
+                    ],
+
+                    message_to_client: "Muito obrigado por nos avisar sobre o poste! Sua informação é muito importante. Já estou abrindo um chamado de emergência para nossa equipe técnica verificar a situação no local. Como é um dano físico na rede, pode levar um tempo para normalizar, mas faremos o mais rápido possível.",
+
+                    tags: ["poste", "cabo", "rompido", "caiu", "acidente", "emergência", "fibra"],
+
+                    updated_at: "13/11/2025"
+
+                },
+
+                {
+
+                    id: 3,
+
+                    sector_id: 1,
+
+                    category: "Procedimentos",
+
+                    title: "Internet Lenta (Verificação Padrão)",
+
+                    content: "Cliente reclama de lentidão, mas tem conexão. Procedimento padrão de diagnóstico inicial antes de escalar.",
+
+                    steps: [
+
+                        "Peça ao cliente para reiniciar o roteador (tirar da tomada por 30s).",
+
+                        "Pergunte se a lentidão é no Wi-Fi ou no cabo.",
+
+                        "Solicite um teste de velocidade (usando nosso medidor oficial) no cabo, se possível.",
+
+                        "Se a velocidade no cabo estiver normal, o problema é o Wi-Fi (vá para 'Procedimento: Wi-Fi Lento').",
+
+                        "Se no cabo estiver lento, verifique o consumo de banda no sistema e agende visita técnica."
+
+                    ],
+
+                    message_to_client: "Certo, vamos verificar sua lentidão. Por favor, reinicie seu roteador tirando-o da tomada por 30 segundos. Enquanto ele reinicia, me diga: você nota essa lentidão em quais dispositivos? É mais no celular (Wi-Fi) ou em um computador no cabo?",
+
+                    tags: ["lentidão", "lenta", "velocidade", "teste", "wifi", "cabo"],
+
+                    updated_at: "10/11/2025"
+
+                }
+
+            ]
+
+        };
+
+
+
+        // Lógica da Aplicação
+
+        const app = {
+
+            currentScreen: 'login',
+
+            currentSectorId: null,
+
+            currentUser: null,
+
+            db: mockDB,
+
+            editingArticleId: null, // Para saber se estamos editando ou criando
+
+
+
+            init() {
+
+                // Formulários de Autenticação
+
+                document.getElementById('login-form').addEventListener('submit', (e) => this.login(e));
+
+                document.getElementById('register-form').addEventListener('submit', (e) => this.register(e));
+
+
+
+                // Navegação e Busca
+
+                document.getElementById('search-input').addEventListener('input', (e) => this.search(e.target.value));
+
+                document.getElementById('search-form').addEventListener('submit', (e) => e.preventDefault());
+
+
+
+                // Admin CRUD
+
+                document.getElementById('admin-form').addEventListener('submit', (e) => this.handleFormSubmit(e));
+
+                document.getElementById('admin-form-cancel').addEventListener('click', () => this.resetForm());
+
+
+
+                // Mostra a tela inicial (agora login)
+
+                this.showScreen('login');
+
+            },
+
+
+
+            // --- NAVEGAÇÃO ---
+
+            
+
+            showScreen(screenId) {
+
+                // Lógica de proteção de rotas
+
+                const authScreens = ['login', 'register'];
+
+                const isAuthScreen = authScreens.includes(screenId);
+
+
+
+                if (!this.currentUser && !isAuthScreen) {
+
+                    // Se não está logado e tenta acessar tela protegida, vai para login
+
+                    screenId = 'login';
+
+                } else if (this.currentUser && isAuthScreen) {
+
+                    // Se está logado e tenta acessar login/registro, vai para home
+
+                    screenId = 'home';
+
+                }
+
+
+
+                document.querySelectorAll('.screen').forEach(screen => {
+
+                    screen.classList.remove('active');
+
+                });
+
+                
+
+                const activeScreen = document.getElementById(`${screenId}-screen`);
+
+                
+
+                if (activeScreen) {
+
+                    activeScreen.classList.add('active', 'fade-in');
+
+                    window.scrollTo(0, 0); // Rola para o topo
+
+                    this.currentScreen = screenId;
+
+
+
+                    // Ações específicas ao entrar na tela
+
+                    if(screenId === 'admin') {
+
+                        this.loadAdminList(); // Recarrega a lista ao entrar
+
+                        this.resetForm();
+
+                    }
+
+                    if(screenId === 'users-admin' && this.currentUser && this.currentUser.role === 'Admin') {
+
+                        this.loadUsersAdminList();
+
+                    }
+
+                    
+
+                    // Atualiza a UI se o usuário estiver logado
+
+                    if (this.currentUser) {
+
+                        this.updateUI();
+
+                    }
+
+                    
+
+                    // Mostra ou oculta o menu do usuário
+
+                    document.getElementById('user-profile-menu').classList.toggle('hidden', !this.currentUser);
+
+                    document.getElementById('user-profile-menu').classList.toggle('flex', !!this.currentUser);
+
+
+
+                } else {
+
+                    console.error(`Tela com ID '${screenId}-screen' não encontrada.`);
+
+                    this.showScreen('login'); // Fallback
+
+                }
+
+            },
+
+
+
+            goBackToSector() {
+
+                this.showScreen('sector');
+
+                // Limpa a busca ao voltar
+
+                document.getElementById('search-input').value = '';
+
+                this.toggleSearchResults(false);
+
+            },
+
+
+
+            loadSector(sectorId) {
+
+                this.currentSectorId = sectorId;
+
+                const sector = this.db.sectors.find(s => s.id === sectorId);
+
+                if (!sector) return;
+
+
+
+                document.getElementById('sector-title').innerText = sector.name;
+
+                document.getElementById('search-input').value = ''; // Limpa busca
+
+                this.toggleSearchResults(false);
+
+                
+
+                // TODO: Popular categorias dinamicamente com base no setor
+
+                
+
+                this.showScreen('sector');
+
+            },
+
+
+
+            // --- LÓGICA DE ARTIGOS E BUSCA ---
+
+
+
+            loadArticle(articleId) {
+
+                const article = this.db.articles.find(a => a.id === articleId);
+
+                if (!article) return;
+
+
+
+                const sector = this.db.sectors.find(s => s.id === article.sector_id);
+
+                
+
+                document.getElementById('article-title').innerText = article.title;
+
+                document.getElementById('article-sector').innerText = sector.name;
+
+                document.getElementById('article-updated').innerText = article.updated_at;
+
+                document.getElementById('article-content').innerText = article.content;
+
+                document.getElementById('article-steps').innerHTML = article.steps.map((step, i) => 
+
+                    `<li class="flex items-start">
+
+                        <span class="flex-shrink-0 w-6 h-6 rounded-full bg-azul-principal text-white text-sm font-bold flex items-center justify-center mr-3">${i+1}</span>
+
+                        <span>${step}</span>
+
+                    </li>`
+
+                ).join('');
+
+                document.getElementById('article-message-to-client').innerText = article.message_to_client;
+
+                document.getElementById('copy-button').onclick = () => this.copyMessage(article.message_to_client);
+
+
+
+                this.showScreen('article');
+
+            },
+
+
+
+            // Simulação de "Fuzzy Search"
+
+            search(query) {
+
+                const lowerQuery = query.toLowerCase().trim();
+
+                if (lowerQuery.length < 2) {
+
+                    this.toggleSearchResults(false); // Esconde resultados se busca for curta
+
+                    return;
+
+                }
+
+
+
+                const articles = this.db.articles.filter(a => a.sector_id === this.currentSectorId);
+
+                const results = articles.filter(article => {
+
+                    const inTitle = article.title.toLowerCase().includes(lowerQuery);
+
+                    const inContent = article.content.toLowerCase().includes(lowerQuery);
+
+                    const inTags = article.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+
+                    return inTitle || inContent || inTags;
+
+                });
+
+
+
+                this.renderSearchResults(results);
+
+                this.toggleSearchResults(true);
+
+            },
+
+
+
+            renderSearchResults(results) {
+
+                const resultsEl = document.getElementById('search-results');
+
+                resultsEl.innerHTML = ''; // Limpa resultados anteriores
+
+
+
+                if (results.length === 0) {
+
+                    resultsEl.innerHTML = '<p class="text-cinza-texto text-center">Nenhum resultado encontrado.</p>';
+
+                    return;
+
+                }
+
+
+
+                results.forEach(article => {
+
+                    resultsEl.innerHTML += `
+
+                        <div class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer" onclick="app.loadArticle(${article.id})">
+
+                            <h4 class="font-bold text-azul-principal">${article.title}</h4>
+
+                            <p class="text-sm text-cinza-texto">${article.content.substring(0, 100)}...</p>
+
+                        </div>
+
+                    `;
+
+                });
+
+            },
+
+
+
+            toggleSearchResults(show) {
+
+                document.getElementById('search-results-container').classList.toggle('hidden', !show);
+
+                document.getElementById('categories-container').classList.toggle('hidden', show);
+
+            },
+
+
+
+            showArticlesByCategory(category) {
+
+                const articles = this.db.articles.filter(a => a.sector_id === this.currentSectorId && a.category === category);
+
+                this.renderSearchResults(articles);
+
+                this.toggleSearchResults(true);
+
+                document.getElementById('search-results-title').innerText = `Resultados para: ${category}`;
+
+            },
+
+
+
+            // --- UTILITÁRIOS ---
+
+
+
+            copyMessage(text) {
+
+                const textarea = document.getElementById('copy-textarea');
+
+                textarea.value = text;
+
+                textarea.select();
+
+                try {
+
+                    document.execCommand('copy');
+
+                    this.showAlert('Texto copiado para a área de transferência!');
+
+                } catch (err) {
+
+                    console.error('Falha ao copiar:', err);
+
+                    this.showAlert('Falha ao copiar. Tente manualmente.', true);
+
+                }
+
+            },
+
+
+
+            showAlert(message, isError = false) {
+
+                const alertEl = document.getElementById('alert-toast');
+
+                const alertText = document.getElementById('alert-text');
+
+                
+
+                alertText.innerText = message;
+
+                alertEl.className = 'fixed bottom-5 right-5 z-50 px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform'; // Reset
+
+                
+
+                if (isError) {
+
+                    alertEl.classList.add('bg-vermelho-erro');
+
+                } else {
+
+                    alertEl.classList.add('bg-verde-sucesso');
+
+                }
+
+                
+
+                alertEl.classList.remove('hidden', 'translate-y-10', 'opacity-0');
+
+                
+
+                setTimeout(() => {
+
+                    alertEl.classList.add('translate-y-10', 'opacity-0');
+
+                    setTimeout(() => alertEl.classList.add('hidden'), 300);
+
+                }, 3000);
+
+            },
+
+
+
+            // --- LÓGICA DE AUTENTICAÇÃO ---
+
+
+
+            attemptAdminAccess() {
+
+                if (!this.currentUser) {
+
+                    this.showScreen('login'); // Salvaguarda, não deve acontecer se logado
+
+                    return;
+
+                }
+
+                
+
+                const adminRoles = ['Supervisor', 'Admin'];
+
+                
+
+                if (adminRoles.includes(this.currentUser.role)) {
+
+                    this.showScreen('admin');
+
+                } else {
+
+                    this.showAlert('Acesso negado. Permissão de Supervisor ou Admin necessária.', true);
+
+                }
+
+            },
+
+
+
+            login(e) {
+
+                e.preventDefault();
+
+                const username = document.getElementById('login-username').value;
+
+                const password = document.getElementById('login-password').value;
+
+                const errorEl = document.getElementById('login-error');
+
+
+
+                const user = this.db.users.find(u => u.username === username && u.password === password);
+
+
+
+                if (user) {
+
+                    this.currentUser = user;
+
+                    this.showScreen('home');
+
+                    errorEl.classList.add('hidden');
+
+                    errorEl.innerText = '';
+
+                    document.getElementById('login-form').reset();
+
+                } else {
+
+                    errorEl.innerText = 'Usuário ou senha inválidos.';
+
+                    errorEl.classList.remove('hidden');
+
+                }
+
+            },
+
+
+
+            register(e) {
+
+                e.preventDefault();
+
+                const name = document.getElementById('register-name').value;
+
+                const username = document.getElementById('register-username').value;
+
+                const password = document.getElementById('register-password').value;
+
+                const role = document.getElementById('register-role').value; // Pega o cargo do select
+
+                const errorEl = document.getElementById('register-error');
+
+                
+
+                // Verifica se usuário já existe
+
+                const existingUser = this.db.users.find(u => u.username === username);
+
+                if (existingUser) {
+
+                    errorEl.innerText = 'Este nome de usuário já está em uso.';
+
+                    errorEl.classList.remove('hidden');
+
+                    return;
+
+                }
+
+                
+
+                // Cria novo usuário
+
+                const newId = this.db.users.length > 0 ? Math.max(...this.db.users.map(u => u.id)) + 1 : 1;
+
+                const newUser = {
+
+                    id: newId,
+
+                    name: name,
+
+                    username: username,
+
+                    password: password, // Em um app real, use hash!
+
+                    role: role, // Usa o cargo selecionado
+
+                    avatar: `https://placehold.co/100x100/9AA1AC/FFFFFF?text=${name.charAt(0).toUpperCase()}&font=inter`
+
+                };
+
+                
+
+                this.db.users.push(newUser);
+
+                this.currentUser = newUser;
+
+                this.showScreen('home');
+
+                errorEl.classList.add('hidden');
+
+                document.getElementById('register-form').reset();
+
+            },
+
+
+
+            logout() {
+
+                this.currentUser = null;
+
+                this.showScreen('login');
+
+            },
+
+
+
+            updateUI() {
+
+                if (!this.currentUser) return;
+
+                
+
+                // Atualiza Header
+
+                document.getElementById('user-profile-name').innerText = this.currentUser.name;
+
+                document.getElementById('user-profile-role').innerText = this.currentUser.role;
+
+                document.getElementById('user-profile-avatar').src = this.currentUser.avatar;
+
+                document.getElementById('user-profile-avatar').alt = `Avatar de ${this.currentUser.name}`;
+
+                
+
+                // Atualiza Título da Home
+
+                const firstName = this.currentUser.name.split(' ')[0];
+
+                document.getElementById('home-welcome-title').innerText = `Bem-vindo(a), ${firstName}. O que você precisa?`;
+
+
+
+                // Controla visibilidade dos cards de Admin na Home
+
+                const adminRoles = ['Supervisor', 'Admin'];
+
+                const articleAdminCard = document.getElementById('admin-articles-card');
+
+                const userAdminCard = document.getElementById('admin-users-card');
+
+
+
+                // Gerenciar Conteúdo (Artigos) - Supervisor ou Admin
+
+                if (adminRoles.includes(this.currentUser.role)) {
+
+                    articleAdminCard.classList.remove('hidden');
+
+                } else {
+
+                    articleAdminCard.classList.add('hidden');
+
+                }
+
+
+
+                // Gerenciar Usuários - Apenas Admin
+
+                if (this.currentUser.role === 'Admin') {
+
+                    userAdminCard.classList.remove('hidden');
+
+                    this.loadUsersAdminList(); // Pré-carrega a lista de usuários
+
+                } else {
+
+                    userAdminCard.classList.add('hidden');
+
+                }
+
+            },
+
+
+
+
+
+            // --- LÓGICA DE ADMIN (CRUD de Artigos) ---
+
+
+
+            loadAdminList() {
+
+                const listEl = document.getElementById('admin-articles-list');
+
+                if (!listEl) return;
+
+                listEl.innerHTML = '';
+
+                
+
+                const articlesToManage = this.db.articles; // Em app real, filtrar por permissão
+
+
+
+                articlesToManage.forEach(article => {
+
+                    listEl.innerHTML += `
+
+                        <div class="flex justify-between items-center bg-cinza-fundo p-4 rounded-lg">
+
+                            <div>
+
+                                <h4 class="font-semibold">${article.title}</h4>
+
+                                <span class="text-sm text-cinza-texto">${this.db.sectors.find(s => s.id === article.sector_id).name}</span>
+
+                            </div>
+
+                            <div class="space-x-2 flex-shrink-0">
+
+                                <button onclick="app.editArticle(${article.id})" class="text-azul-principal hover:underline text-sm font-medium">Editar</button>
+
+                                <button onclick="app.deleteArticle(${article.id})" class="text-vermelho-erro hover:underline text-sm font-medium">Excluir</button>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                });
+
+            },
+
+
+
+            handleFormSubmit(e) {
+
+                e.preventDefault();
+
+                
+
+                const title = document.getElementById('admin-title').value;
+
+                const sector_id = parseInt(document.getElementById('admin-sector').value);
+
+                const category = document.getElementById('admin-category').value;
+
+                const content = document.getElementById('admin-content').value;
+
+                const steps = document.getElementById('admin-steps').value.split('\n').filter(s => s.trim() !== '');
+
+                const message = document.getElementById('admin-message').value;
+
+                const tags = document.getElementById('admin-tags').value.split(',').map(t => t.trim()).filter(t => t !== '');
+
+                
+
+                const newArticleData = {
+
+                    sector_id,
+
+                    category,
+
+                    title,
+
+                    content,
+
+                    steps,
+
+                    message_to_client: message,
+
+                    tags,
+
+                    updated_at: new Date().toLocaleDateString('pt-BR')
+
+                };
+
+
+
+                if (this.editingArticleId) {
+
+                    // Atualiza Artigo
+
+                    const index = this.db.articles.findIndex(a => a.id === this.editingArticleId);
+
+                    if (index !== -1) {
+
+                        this.db.articles[index] = { ...this.db.articles[index], ...newArticleData };
+
+                        this.showAlert('Artigo atualizado com sucesso!');
+
+                    }
+
+                } else {
+
+                    // Cria Novo Artigo
+
+                    const newId = this.db.articles.length > 0 ? Math.max(...this.db.articles.map(a => a.id)) + 1 : 1;
+
+                    this.db.articles.push({ id: newId, ...newArticleData });
+
+                    this.showAlert('Artigo criado com sucesso!');
+
+                }
+
+
+
+                this.resetForm();
+
+                this.loadAdminList();
+
+            },
+
+
+
+            editArticle(articleId) {
+
+                const article = this.db.articles.find(a => a.id === articleId);
+
+                if (!article) return;
+
+
+
+                this.editingArticleId = article.id;
+
+                
+
+                document.getElementById('admin-title').value = article.title;
+
+                document.getElementById('admin-sector').value = article.sector_id;
+
+                document.getElementById('admin-category').value = article.category;
+
+                document.getElementById('admin-content').value = article.content;
+
+                document.getElementById('admin-steps').value = article.steps.join('\n');
+
+                document.getElementById('admin-message').value = article.message_to_client;
+
+                document.getElementById('admin-tags').value = article.tags.join(', ');
+
+
+
+                document.getElementById('admin-form-title').innerText = 'Editando Artigo';
+
+                document.getElementById('admin-form-submit').innerText = 'Atualizar Artigo';
+
+                
+
+                window.scrollTo(0, document.getElementById('admin-form').offsetTop);
+
+            },
+
+
+
+            deleteArticle(articleId) {
+
+                // Em um app real, use um modal, não window.confirm
+
+                // if (!window.confirm('Tem certeza que deseja excluir este artigo?')) {
+
+                //     return;
+
+                // }
+
+                
+
+                const index = this.db.articles.findIndex(a => a.id === articleId);
+
+                if (index !== -1) {
+
+                    this.db.articles.splice(index, 1);
+
+                    this.showAlert('Artigo excluído com sucesso.', true);
+
+                    this.loadAdminList();
+
+                }
+
+            },
+
+
+
+            resetForm() {
+
+                document.getElementById('admin-form').reset();
+
+                this.editingArticleId = null;
+
+                document.getElementById('admin-form-title').innerText = 'Adicionar Novo Artigo';
+
+                document.getElementById('admin-form-submit').innerText = 'Salvar Artigo';
+
+            },
+
+
+
+            // --- NOVA LÓGICA DE ADMIN (Gerenciar Usuários) ---
+
+
+
+            loadUsersAdminList() {
+
+                const listEl = document.getElementById('users-admin-list');
+
+                if (!listEl) return; // Não executa se a tela não estiver visível/pronta
+
+                
+
+                listEl.innerHTML = '';
+
+                const roles = ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"];
+
+
+
+                this.db.users.forEach(user => {
+
+                    const isCurrentUser = user.id === this.currentUser.id;
+
+
+
+                    // Cria as opções do select
+
+                    const options = roles.map(role => 
+
+                        `<option value="${role}" ${user.role === role ? 'selected' : ''}>${role}</option>`
+
+                    ).join('');
+
+
+
+                    listEl.innerHTML += `
+
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center bg-cinza-fundo p-4 rounded-lg">
+
+                            <div class="mb-2 sm:mb-0">
+
+                                <h4 class="font-semibold">${user.name}</h4>
+
+                                <span class="text-sm text-cinza-texto">${user.username}</span>
+
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+
+                                <select onchange="app.updateUserRole(${user.id}, this.value)" class="w-full sm:w-auto border border-gray-300 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-azul-principal outline-none bg-white" ${isCurrentUser ? 'disabled' : ''}>
+
+                                    ${options}
+
+                                </select>
+
+                                <button onclick="app.deleteUser(${user.id})" class="text-vermelho-erro hover:underline text-sm font-medium px-2 py-1" ${isCurrentUser ? 'disabled' : ''} title="${isCurrentUser ? 'Você não pode excluir a si mesmo' : 'Excluir usuário'}">
+
+                                    ${isCurrentUser ? 'Meu Usuário' : 'Excluir'}
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    `;
+
+                });
+
+            },
+
+
+
+            updateUserRole(userId, newRole) {
+
+                const userIndex = this.db.users.findIndex(u => u.id === userId);
+
+                if (userIndex === -1) return;
+
+
+
+                // Não permite rebaixar o último admin
+
+                if (this.db.users[userIndex].role === 'Admin' && newRole !== 'Admin') {
+
+                    const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+
+                    if (adminCount <= 1) {
+
+                        this.showAlert('Não é possível alterar o cargo do último Admin.', true);
+
+                        this.loadUsersAdminList(); // Recarrega para reverter a mudança visual
+
+                        return;
+
+                    }
+
+                }
+
+
+
+                this.db.users[userIndex].role = newRole;
+
+                this.showAlert(`Cargo de ${this.db.users[userIndex].name} atualizado para ${newRole}!`);
+
+                this.loadUsersAdminList(); // Recarrega a lista
+
+            },
+
+
+
+            deleteUser(userId) {
+
+                if (userId === this.currentUser.id) {
+
+                    this.showAlert('Você não pode excluir sua própria conta.', true);
+
+                    return;
+
+                }
+
+                
+
+                const userIndex = this.db.users.findIndex(u => u.id === userId);
+
+                if (userIndex === -1) return;
+
+
+
+                const userName = this.db.users[userIndex].name;
+
+
+
+                // Não permite excluir o último admin
+
+                if (this.db.users[userIndex].role === 'Admin') {
+
+                    const adminCount = this.db.users.filter(u => u.role === 'Admin').length;
+
+                    if (adminCount <= 1) {
+
+                        this.showAlert('Não é possível excluir o último Admin do sistema.', true);
+
+                        return;
+
+                    }
+
+                }
+
+                
+
+                // Em um app real, use um modal, não window.confirm
+
+                // if (window.confirm(`Tem certeza que deseja excluir o usuário ${userName}?`)) {
+
+                    this.db.users.splice(userIndex, 1);
+
+                    this.showAlert(`Usuário ${userName} excluído com sucesso.`, true);
+
+                    this.loadUsersAdminList(); // Recarrega a lista
+
+                // }
+
+            }
+
+        };
+
+
+
+        // Inicia a aplicação quando o DOM estiver pronto
+
+        document.addEventListener('DOMContentLoaded', () => app.init());
+
+    </script>
+
 </body>
+
 </html>
+
