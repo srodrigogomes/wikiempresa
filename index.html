@@ -140,6 +140,24 @@
             display: flex; /* Mostra quando ativo */
         }
 
+        /* Estilos para a nova tela de Chat AI */
+        #ai-chat-history {
+            scroll-behavior: smooth;
+        }
+        /* Esconde a scrollbar mantendo a funcionalidade */
+        #ai-chat-history::-webkit-scrollbar {
+            width: 0.5em;
+        }
+        #ai-chat-history::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #ai-chat-history::-webkit-scrollbar-thumb {
+            background: transparent;
+        }
+        #ai-chat-history:hover::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Cor suave para scrollbar no hover */
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body class="bg-cinza-fundo text-azul-escuro overflow-x-hidden">
@@ -256,6 +274,18 @@
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
                 
+                <!-- NOVO Bloco: Assistente de IA -->
+                <div class="sector-card bg-azul-escuro text-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer md:col-span-2 lg:col-span-3"
+                     onclick="app.showScreen('ai-chat')">
+                    <div class="flex flex-col sm:flex-row items-center sm:space-x-6">
+                        <i class="ph-bold ph-brain text-7xl text-azul-principal mb-4 sm:mb-0"></i>
+                        <div>
+                             <h2 class="text-2xl font-bold mb-2 text-center sm:text-left">Assistente de IA</h2>
+                             <p class="text-gray-300 text-center sm:text-left">Faça perguntas e obtenha respostas inteligentes com base nos artigos da Central.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Bloco Setor: Suporte Técnico -->
                 <div class="sector-card bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
                      onclick="app.loadSector(1)">
@@ -539,6 +569,45 @@
             </div>
         </section>
         
+        <!-- NOVA TELA 8: AI CHAT -->
+        <section id="ai-chat-screen" class="screen fade-in max-w-3xl mx-auto">
+            <button onclick="app.showScreen('home')" class="mb-4 text-azul-principal font-medium hover:underline flex items-center">
+                <i class="ph-bold ph-arrow-left mr-1"></i>
+                Voltar para Home
+            </button>
+            <h1 class="text-3xl font-bold mb-6">Assistente de IA</h1>
+            <p class="text-cinza-texto mb-6">Faça uma pergunta em linguagem natural (ex: "o que fazer se a luz LOS piscar?"). A IA usará a base de conhecimento para encontrar a melhor resposta.</p>
+            
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <!-- Chat History -->
+                <div id="ai-chat-history" class="h-96 overflow-y-auto mb-6 p-4 bg-cinza-fundo rounded-lg space-y-4">
+                    <!-- Mensagem inicial -->
+                    <div class="flex justify-start">
+                        <div class="bg-azul-principal text-white p-3 rounded-lg rounded-bl-none max-w-md">
+                            Olá! Sou o assistente de IA da Central de Conhecimento. Faça uma pergunta sobre nossos procedimentos.
+                        </div>
+                    </div>
+                    <!-- Mensagens do chat aparecem aqui -->
+                </div>
+
+                <!-- Loading Spinner (dentro do chat) -->
+                <div id="ai-chat-loading" class="hidden flex justify-start mb-4">
+                    <div class="flex items-center space-x-2 bg-gray-200 text-gray-700 p-3 rounded-lg rounded-bl-none max-w-xs">
+                        <i class="ph-bold ph-spinner text-azul-principal text-2xl animate-spin"></i>
+                        <span>Pensando...</span>
+                    </div>
+                </div>
+
+                <!-- Input Form -->
+                <form id="ai-chat-form" class="flex items-center gap-4">
+                    <input type="text" id="ai-chat-input" placeholder="Digite sua pergunta..." class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-azul-principal outline-none text-lg">
+                    <button type="submit" class="bg-azul-principal text-white p-4 rounded-lg font-medium hover:bg-azul-escuro transition-all">
+                        <i class="ph-bold ph-paper-plane-right text-2xl"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
         <!-- Alerta de "Copiado!" -->
         <div id="alert-toast" class="hidden fixed bottom-5 right-5 z-[100] px-6 py-3 rounded-lg shadow-lg text-white transition-all duration-300 transform translate-y-10 opacity-0">
             <span id="alert-text"></span>
@@ -821,6 +890,8 @@
             roles: ["Atendente N1", "Atendente N2", "Atendente N3", "Supervisor", "Admin"], // Cargos Padrão
             editingContactId: null, // Para CRUD de contatos
             deleteAction: { type: null, id: null }, // Para modal de confirmação
+            geminiAPIKey: "", // Deixe em branco, será tratado pelo ambiente
+            geminiAPIModel: "gemini-2.5-flash-preview-09-2025",
 
             init() {
                 // Formulários de Autenticação
@@ -856,6 +927,9 @@
                 document.getElementById('confirm-modal-cancel').addEventListener('click', () => this.toggleConfirmModal(false));
                 document.getElementById('confirm-modal-delete').addEventListener('click', () => this.handleConfirmDelete());
 
+                // NOVO: AI Chat
+                document.getElementById('ai-chat-form').addEventListener('submit', (e) => { e.preventDefault(); this.handleAIChatSubmit(); });
+
                 // Popula selects de cargo
                 this.populateRoleSelects();
 
@@ -871,6 +945,8 @@
                 const isAuthScreen = authScreens.includes(screenId);
                 // adminScreens agora inclui 'history'
                 const adminScreens = ['admin', 'users-admin', 'register', 'history']; 
+                // Telas que precisam de login mas não são de admin
+                const protectedScreens = ['home', 'sector', 'article', 'contacts', 'ai-chat'];
                 
                 // Oculta/Mostra header
                 const header = document.getElementById('main-header');
@@ -1103,13 +1179,8 @@
                     return;
                 }
 
-                const articles = this.db.articles.filter(a => a.sector_id === this.currentSectorId);
-                const results = articles.filter(article => {
-                    const inTitle = article.title.toLowerCase().includes(lowerQuery);
-                    const inContent = article.content.toLowerCase().includes(lowerQuery);
-                    const inTags = article.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
-                    return inTitle || inContent || inTags;
-                });
+                // A função findRelevantArticles faz a mesma lógica, podemos reutilizar
+                const results = this.findRelevantArticles(query, this.currentSectorId);
 
                 this.renderSearchResults(results);
                 this.toggleSearchResults(true);
@@ -1951,7 +2022,7 @@
                     // Botão de Reverter
                     let revertButton = '';
                     if (log.action !== 'revert' && !log.reverted) {
-                         // Só pode reverter se não for uma reversão e se já não foi revertido
+                        // Só pode reverter se não for uma reversão e se já não foi revertido
                         revertButton = `<button onclick="app.revertChange(${log.id})" class="text-azul-principal hover:underline text-sm font-medium">Reverter</button>`;
                     } else if (log.reverted) {
                         revertButton = `<span class="text-cinza-texto text-sm font-medium">Já Revertido</span>`;
@@ -2070,7 +2141,217 @@
                     console.error("Erro ao reverter:", e);
                     this.showAlert('Ocorreu um erro grave durante a reversão.', true);
                 }
+            },
+
+            // --- NOVO: LÓGICA DO ASSISTENTE DE IA (GEMINI) ---
+
+            /**
+             * Manipula o envio do formulário de chat da IA.
+             */
+            async handleAIChatSubmit() {
+                const input = document.getElementById('ai-chat-input');
+                const query = input.value.trim();
+                if (query === '') return;
+
+                // Renderiza a mensagem do usuário
+                this.renderChatMessage(query, 'user');
+                input.value = '';
+
+                // Mostra o loading
+                const loadingEl = document.getElementById('ai-chat-loading');
+                loadingEl.classList.remove('hidden');
+                this.scrollChatHistory();
+
+                // Obtém a resposta da IA
+                try {
+                    const aiResponse = await this.getAIResponse(query);
+                    loadingEl.classList.add('hidden');
+                    this.renderChatMessage(aiResponse, 'ai');
+                } catch (error) {
+                    console.error("Erro no handleAIChatSubmit:", error);
+                    loadingEl.classList.add('hidden');
+                    this.renderChatMessage("Desculpe, ocorreu um erro ao processar sua solicitação.", 'ai');
+                }
+            },
+
+            /**
+             * Renderiza uma mensagem na tela de chat.
+             */
+            renderChatMessage(message, sender) {
+                const historyEl = document.getElementById('ai-chat-history');
+                const messageDiv = document.createElement('div');
+                
+                if (sender === 'user') {
+                    messageDiv.className = 'flex justify-end';
+                    messageDiv.innerHTML = `
+                        <div class="bg-blue-100 text-azul-escuro p-3 rounded-lg rounded-br-none max-w-md">
+                            ${message}
+                        </div>`;
+                } else {
+                    messageDiv.className = 'flex justify-start';
+                    messageDiv.innerHTML = `
+                        <div class="bg-azul-principal text-white p-3 rounded-lg rounded-bl-none max-w-md">
+                            ${message.replace(/\n/g, '<br>')}
+                        </div>`;
+                }
+                
+                historyEl.appendChild(messageDiv);
+                this.scrollChatHistory();
+            },
+
+            /**
+             * Rola o histórico do chat para o final.
+             */
+            scrollChatHistory() {
+                const historyEl = document.getElementById('ai-chat-history');
+                historyEl.scrollTop = historyEl.scrollHeight;
+            },
+
+            /**
+             * Busca artigos relevantes no mockDB.
+             * @param {string} query - A pergunta do usuário.
+             * @param {number} [sectorId] - ID do setor opcional para filtrar.
+             */
+            findRelevantArticles(query, sectorId = null) {
+                const lowerQuery = query.toLowerCase().trim();
+                let articles = this.db.articles;
+
+                if (sectorId) {
+                    articles = articles.filter(a => a.sector_id === sectorId);
+                }
+
+                const results = articles.filter(article => {
+                    const inTitle = article.title.toLowerCase().includes(lowerQuery);
+                    const inContent = article.content.toLowerCase().includes(lowerQuery);
+                    const inTags = article.tags.some(tag => lowerQuery.includes(tag.toLowerCase()));
+                    const queryInTags = article.tags.some(tag => tag.toLowerCase().includes(lowerQuery));
+                    return inTitle || inContent || inTags || queryInTags;
+                });
+                return results;
+            },
+
+            /**
+             * Constrói o prompt e obtém a resposta da IA.
+             */
+            async getAIResponse(query) {
+                const relevantArticles = this.findRelevantArticles(query);
+                
+                const systemPrompt = `Você é um assistente de IA especialista em suporte técnico de provedores de internet. Você trabalha na "Central de Conhecimento".
+Sua função é ajudar atendentes (N1, N2, etc.) a resolver problemas de clientes de forma rápida e precisa.
+- Você SÓ PODE usar as informações dos "Artigos de Conhecimento" fornecidos no contexto.
+- Não invente informações ou procedimentos que não estão listados.
+- Se a pergunta não puder ser respondida com o contexto, informe que não encontrou informações sobre isso na base de conhecimento.
+- Seja direto, profissional e formate sua resposta de forma clara (use listas se necessário).
+- Se o artigo tiver um "Script para Cliente", inclua-o na sua resposta quando for relevante.`;
+
+                let userPrompt;
+
+                if (relevantArticles.length > 0) {
+                    const context = relevantArticles.map(a => `
+                        ---
+                        Artigo: ${a.title}
+                        Setor: ${a.sector_id === 1 ? 'Suporte Técnico' : 'Operacional'}
+                        Conteúdo: ${a.content}
+                        Passo a Passo: ${a.steps.join('; ')}
+                        Script para Cliente: ${a.message_to_client}
+                        Tags: ${a.tags.join(', ')}
+                        ---
+                    `).join('\n');
+
+                    userPrompt = `Baseado SOMENTE no contexto de artigos a seguir, responda a pergunta do atendente.
+                    
+                    Contexto Fornecido:
+                    ${context}
+                    
+                    Pergunta do Atendente: "${query}"
+                    
+                    Sua resposta (use o contexto acima):`;
+                } else {
+                    // Nenhum artigo encontrado
+                    userPrompt = `A pergunta do atendente é: "${query}".
+                    NENHUM artigo foi encontrado na base de conhecimento sobre este assunto.
+                    Informe ao atendente, de forma amigável, que você não encontrou informações sobre isso no banco de dados da Central de Conhecimento.`;
+                }
+
+                try {
+                    const aiText = await this.callGeminiAPI(systemPrompt, userPrompt);
+                    return aiText;
+                } catch (error) {
+                    console.error("Erro ao chamar Gemini API:", error);
+                    return "Desculpe, ocorreu um erro ao tentar me conectar à IA. Tente novamente.";
+                }
+            },
+
+            /**
+             * Função para chamar a API do Gemini com backoff exponencial.
+             */
+            async callGeminiAPI(systemPrompt, userPrompt, retries = 3, delay = 1000) {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${this.geminiAPIModel}:generateContent?key=${this.geminiAPIKey}`;
+
+                const payload = {
+                    contents: [{
+                        parts: [{ text: userPrompt }]
+                    }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    generationConfig: {
+                        temperature: 0.5,
+                        topK: 1,
+                        topP: 1,
+                    }
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (response.status === 429 && retries > 0) {
+                        // Throttling (Too Many Requests), espera e tenta de novo
+                        await this.exponentialBackoff(delay);
+                        return this.callGeminiAPI(systemPrompt, userPrompt, retries - 1, delay * 2);
+                    }
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("Erro na API Gemini:", response.status, errorData);
+                        throw new Error(`Erro da API: ${errorData?.error?.message || response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0) {
+                        const text = result.candidates[0].content.parts[0].text;
+                        return text;
+                    } else if (result.promptFeedback) {
+                        console.warn("Prompt bloqueado:", result.promptFeedback);
+                        return "Não consegui processar essa solicitação. O conteúdo pode ter sido bloqueado por razões de segurança.";
+                    }
+
+                    return "Não recebi uma resposta válida da IA.";
+
+                } catch (error) {
+                    console.error("Falha ao chamar a API Gemini:", error);
+                    if (retries > 0) {
+                        await this.exponentialBackoff(delay);
+                        return this.callGeminiAPI(systemPrompt, userPrompt, retries - 1, delay * 2);
+                    }
+                    throw error; // Lança o erro após esgotar as tentativas
+                }
+            },
+            
+            /**
+             * Utilitário para espera (backoff).
+             */
+            exponentialBackoff(delay) {
+                return new Promise(resolve => setTimeout(resolve, delay));
             }
+
         };
 
         // Inicia a aplicação quando o DOM estiver pronto
