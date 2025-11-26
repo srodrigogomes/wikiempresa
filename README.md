@@ -1,4 +1,63 @@
-# wikiempresa
+# 📘 Central de Conhecimento (ISP/Telecom)
 
+Uma aplicação Web de página única (SPA) desenvolvida para gestão de conhecimento, procedimentos técnicos e suporte operacional. O sistema simula um ambiente corporativo de um provedor de internet (ISP), permitindo que atendentes e técnicos consultem soluções rápidas, contatos de emergência e scripts de atendimento.
 
-📘 Central de Conhecimento (ISP/Telecom)Uma aplicação Web de página única (SPA) desenvolvida para gestão de conhecimento, procedimentos técnicos e suporte operacional. O sistema simula um ambiente corporativo de um provedor de internet (ISP), permitindo que atendentes e técnicos consultem soluções rápidas, contatos de emergência e scripts de atendimento.🎯 Funcionalidades🏢 Para o Usuário Comum (Atendentes/Técnicos)Busca Inteligente: Pesquisa em tempo real de artigos por título, conteúdo ou tags (ex: "lentidão", "los vermelho").Base de Conhecimento: Artigos divididos por setores (Suporte Técnico, Operacional) e categorias.Scripts de Atendimento: Visualização clara de "O que dizer ao cliente" e "Passo a passo técnico".Contatos de Emergência: Lista telefônica filtrável por equipe e cargo.Cópia Rápida: Botão para copiar scripts de resposta para a área de transferência.🛡️ Para Administradores e SupervisoresGestão de Usuários (CRUD): Criar, editar, promover cargos e excluir usuários.Gestão de Conteúdo (CRUD): Editor completo para criar e atualizar procedimentos e artigos.Gestão de Contatos: Adicionar e remover telefones úteis da agenda.Log de Auditoria e Reversão:Histórico detalhado de todas as ações (quem fez, o que fez e quando).Funcionalidade de Undo (Reverter): Capacidade de desfazer alterações (ex: restaurar um artigo excluído ou reverter a edição de um usuário).Segurança Extra: Senha Mestra solicitada para ações críticas.🚀 Tecnologias UtilizadasO projeto foi construído como um Monólito Front-end (arquivo único) para facilidade de implantação e testes.HTML5: Estrutura semântica.CSS3 & Tailwind CSS (via CDN): Estilização moderna, responsiva e animações.JavaScript (Vanilla): Lógica de SPA, roteamento virtual, manipulação do DOM e "Mock Database".Phosphor Icons: Ícones vetoriais modernos.Google Fonts: Tipografia 'Inter'.📦 Como UsarComo o projeto utiliza CDNs e não requer build process, é extremamente simples de executar:Baixe o arquivo index.html (ou clone este repositório).Abra o arquivo diretamente em seu navegador (Chrome, Firefox, Edge).O sistema carregará automaticamente.Nota: O sistema utiliza um banco de dados em memória (mockDB). Ao recarregar a página (F5), todas as alterações feitas (novos usuários, artigos editados) serão perdidas e os dados voltarão ao estado original.🔑 Credenciais de Acesso (Demo)O sistema já vem populado com usuários de teste para diferentes níveis de acesso. Utilize as credenciais abaixo na tela de login:UsuárioSenhaCargoNível de Acessoana123Atendente N1Básico (Leitura e Busca)bruno123SupervisorIntermediário (Gestão de Conteúdo)adminadminAdminTotal (Gestão de Usuários e Histórico)🔐 Senha Mestra (Admin)Para acessar áreas sensíveis (como a lista de usuários ou o histórico de edições), o sistema solicitará uma senha extra:Senha Mestra: admin123📂 Estrutura do CódigoO código está contido em um único arquivo HTML para portabilidade, organizado da seguinte forma:<head>: Importação de bibliotecas (Tailwind, Icons, Fonts) e CSS customizado (animações, correções).<body>:Header: Barra de navegação responsiva.Main: Container onde as "Telas" (sections) são alternadas.Modais: Janelas de diálogo para edições e confirmações.<script>:mockDB: Objeto JSON que simula o banco de dados.app: Objeto principal contendo toda a lógica (Rotas, CRUD, Logs, UI).🛠️ CustomizaçãoPara adaptar este projeto para o seu uso real:Persistência: Substitua o mockDB por chamadas a uma API Real (REST/GraphQL) ou utilize localStorage para salvar os dados no navegador.Identidade Visual: Altere as variáveis CSS :root no início do arquivo para mudar as cores principais (--azul-principal, etc).Imagens: As imagens atuais são placeholders do Unsplash e Placehold.co.📄 LicençaEste projeto é de código aberto e pode ser utilizado para fins educacionais ou comerciais.
+![Status do Projeto](https://img.shields.io/badge/Status-Funcional-brightgreen) ![Tech](https://img.shields.io/badge/Tech-HTML%20%7C%20JS%20%7C%20Tailwind-blue)
+
+## 🎯 Funcionalidades
+
+### 🏢 Para o Usuário Comum (Atendentes/Técnicos)
+* **Busca Inteligente:** Pesquisa em tempo real de artigos por título, conteúdo ou tags (ex: "lentidão", "los vermelho").
+* **Base de Conhecimento:** Artigos divididos por setores (Suporte Técnico, Operacional) e categorias.
+* **Scripts de Atendimento:** Visualização clara de "O que dizer ao cliente" e "Passo a passo técnico".
+* **Contatos de Emergência:** Lista telefônica filtrável por equipe e cargo.
+* **Cópia Rápida:** Botão para copiar scripts de resposta para a área de transferência.
+
+### 🛡️ Para Administradores e Supervisores
+* **Gestão de Usuários (CRUD):** Criar, editar, promover cargos e excluir usuários.
+* **Gestão de Conteúdo (CRUD):** Editor completo para criar e atualizar procedimentos e artigos.
+* **Gestão de Contatos:** Adicionar e remover telefones úteis da agenda.
+* **Log de Auditoria e Reversão:**
+    * Histórico detalhado de todas as ações (quem fez, o que fez e quando).
+    * **Funcionalidade de Undo (Reverter):** Capacidade de desfazer alterações (ex: restaurar um artigo excluído ou reverter a edição de um usuário).
+* **Segurança Extra:** Senha Mestra solicitada para ações críticas.
+
+## 🚀 Tecnologias Utilizadas
+
+O projeto foi construído como um **Monólito Front-end** (arquivo único) para facilidade de implantação e testes.
+
+* **HTML5:** Estrutura semântica.
+* **CSS3 & Tailwind CSS (via CDN):** Estilização moderna, responsiva e animações.
+* **JavaScript (Vanilla):** Lógica de SPA, roteamento virtual, manipulação do DOM e "Mock Database".
+* **Phosphor Icons:** Ícones vetoriais modernos.
+* **Google Fonts:** Tipografia 'Inter'.
+
+## 📦 Como Usar
+
+Como o projeto utiliza CDNs e não requer build process, é extremamente simples de executar:
+
+1.  Baixe o arquivo `index.html` (ou clone este repositório).
+2.  Abra o arquivo diretamente em seu navegador (Chrome, Firefox, Edge).
+3.  O sistema carregará automaticamente.
+
+> **Nota:** O sistema utiliza um banco de dados em memória (`mockDB`). **Ao recarregar a página (F5), todas as alterações feitas (novos usuários, artigos editados) serão perdidas e os dados voltarão ao estado original.**
+
+## 🔑 Credenciais de Acesso (Demo)
+
+O sistema já vem populado com usuários de teste para diferentes níveis de acesso. Utilize as credenciais abaixo na tela de login:
+
+| Usuário | Senha | Cargo | Nível de Acesso |
+| :--- | :--- | :--- | :--- |
+| **ana** | `123` | Atendente N1 | Básico (Leitura e Busca) |
+| **bruno** | `123` | Supervisor | Intermediário (Gestão de Conteúdo) |
+| **admin** | `admin` | Admin | Total (Gestão de Usuários e Histórico) |
+
+### 🔐 Senha Mestra (Admin)
+Para acessar áreas sensíveis (como a lista de usuários ou o histórico de edições), o sistema solicitará uma senha extra:
+* **Senha Mestra:** `admin123`
+
+## 📂 Estrutura do Código
+
+O código está contido em um único arquivo HTML para portabilidade, organizado da seguinte forma:
+
+1.  **`<head>`:** Importação de bibliotecas (Tailwind, Icons, Fonts) e CSS customizado (animações,
